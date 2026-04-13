@@ -21,8 +21,55 @@
         .video:hover { transform: scale(1.03); background: #111; }
         .thumb-container { width: 100%; aspect-ratio: 16 / 9; background-size: cover; background-position: center; }
         .video-label { padding: 15px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #fff; }
-        .overlay-btn { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: #ffffff; padding: 10px 18px; border: 1px solid #444; font-size: 10px; letter-spacing: 2px; opacity: 0; transition: 0.3s; pointer-events: none; }
-        .video:hover .overlay-btn { opacity: 1; top: 45%; }
+      
+
+.overlay-btn {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    /* ─── BACKGROUND & FROST ─── */
+    background: rgbargba(0, 0, 0, 0.2);      /* Box fill colour + opacity df(10, 10, 10, 0.3) */
+    backdrop-filter: blur(20px);              /* Frost intensity */
+    -webkit-backdrop-filter: blur(20px);
+    
+    /* ─── TEXT ─── */
+    color: #00ffcc;                          /* Text colour */
+    font-size: 10px;                         /* Text size */
+    font-weight: 500;                        /* 300=light, 400=normal, 500=medium, 700=bold */
+    letter-spacing: 3px;                     /* Space between letters */
+    text-transform: uppercase;
+    white-space: nowrap;
+    
+    /* ─── BORDER ─── */
+    border: 1px solid rgba(0, 255, 204, 0.25);  /* Border thickness, style, colour */
+    border-radius: 2px;                       /* 0=sharp corners, 4px=rounded, 20px=pill */
+    
+    /* ─── SPACING ─── */
+    padding: 10px 18px;                      /* Vertical Horizontal */
+    
+    /* ─── ANIMATION ─── */
+    opacity: 0;
+    transition: opacity 0.3s ease, backdrop-filter 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+    pointer-events: none;
+}
+
+.video:hover .overlay-btn {
+    opacity: 1;
+    
+    /* Enhanced hover state */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(0, 0, 0, 0.2);
+    border-color: #00ffcc;
+}
+
+
+
+
+
+
     </style>
 </head>
 <body>
