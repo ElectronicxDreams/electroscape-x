@@ -10,485 +10,266 @@
         nav a { color: #fff; text-decoration: none; margin: 0 20px; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; }
         nav a:hover { color: #00ffcc; }
         h1 { font-size: 18px; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 40px; color: #00ffcc; }
-        .featured-box { max-width: 1200px; margin: 0 auto 30px auto; }
-        .featured-box iframe { aspect-ratio: 16 / 9; border-radius: 4px; width: 100%; border: 1px solid #222; background: #000; }
+
+        .featured-box { max-width: 1200px; margin: 0 auto 30px auto; position: relative; }
+        #player-container { aspect-ratio: 16 / 9; border-radius: 4px; width: 100%; border: 1px solid #222; background: #000; overflow: hidden; }
         #now-playing-label { font-size: 10px; color: #ffffff; text-transform: uppercase; letter-spacing: 5px; margin-bottom: 15px; min-height: 15px; }
-        .action-bar { margin: 40px 0; display: flex; justify-content: center; }
-        .shuffle-btn { background: transparent; border: 1px solid #00ffcc; color: #00ffcc; padding: 12px 35px; font-family: 'Orbitron', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: 0.4s; border-radius: 2px; text-decoration: none; }
-        .shuffle-btn:hover { border-color: #00ffcc; color: #fff; }
+
+        .action-bar { margin: 40px 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .ctrl-btn {
+            background: transparent;
+            border: 1px solid #333;
+            color: #888;
+            padding: 12px 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: 0.4s;
+            border-radius: 2px;
+        }
+        .ctrl-btn:hover { border-color: #00ffcc; color: #fff; }
+        .shuffle-btn { border-color: #00ffcc; color: #00ffcc; }
+
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(390px, 390px)); gap: 25px; max-width: 100%; margin: 0 auto; justify-content: center; }
         .video { background: #080808; border-radius: 4px; transition: 0.3s; position: relative; cursor: pointer; border: 1px solid #1a1a1a; overflow: hidden; }
         .video:hover { transform: scale(1.03); background: #111; }
+        .video.is-playing { border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.15); }
+
         .thumb-container { width: 100%; aspect-ratio: 16 / 9; background-size: cover; background-position: center; }
-        .video-label { padding: 15px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #fff; }
-      
+        .video-label { padding: 15px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #fff; text-align: left; }
 
-.overlay-btn {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    
-    /* ─── BACKGROUND & FROST ─── */
-    background: rgbargba(0, 0, 0, 0.2);      /* Box fill colour + opacity df(10, 10, 10, 0.3) */
-    backdrop-filter: blur(20px);              /* Frost intensity */
-    -webkit-backdrop-filter: blur(20px);
-    
-    /* ─── TEXT ─── */
-    color: #00ffcc;                          /* Text colour */
-    font-size: 10px;                         /* Text size */
-    font-weight: 500;                        /* 300=light, 400=normal, 500=medium, 700=bold */
-    letter-spacing: 3px;                     /* Space between letters */
-    text-transform: uppercase;
-    white-space: nowrap;
-    
-    /* ─── BORDER ─── */
-    border: 1px solid rgba(0, 255, 204, 0.25);  /* Border thickness, style, colour */
-    border-radius: 2px;                       /* 0=sharp corners, 4px=rounded, 20px=pill */
-    
-    /* ─── SPACING ─── */
-    padding: 10px 18px;                      /* Vertical Horizontal */
-    
-    /* ─── ANIMATION ─── */
-    opacity: 0;
-    transition: opacity 0.3s ease, backdrop-filter 0.3s ease, background 0.3s ease, border-color 0.3s ease;
-    pointer-events: none;
-}
-
-.video:hover .overlay-btn {
-    opacity: 1;
-    
-    /* Enhanced hover state */
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    background: rgba(0, 0, 0, 0.2);
-    border-color: #00ffcc;
-}
-
-
-
-
-
-
+        .overlay-btn {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: #00ffcc;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border: 1px solid rgba(0, 255, 204, 0.25);
+            border-radius: 2px;
+            padding: 10px 18px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .video:hover .overlay-btn { opacity: 1; }
     </style>
 </head>
 <body>
-    <nav><a href='https://www.youtube.com/@ElectroscapeX' target='_blank'>YouTube</a>
-<a href='https://beacons.ai/weblinks' target='_blank'>Weblinks</a>
-</nav>
+    <nav>
+        <a href='https://www.youtube.com/@ElectroscapeX' target='_blank'>YouTube</a>
+        <a href='https://beacons.ai/weblinks' target='_blank'>Weblinks</a>
+    </nav>
     <h1>Electroscape.X</h1>
+
     <div class="featured-box">
-        <div id="now-playing-label">Featured Playlist</div>
-        <iframe id="main-player" src="https://www.youtube-nocookie.com/embed/videoseries?list=PLdd12CvCHG0vam_fzY6e0tXdzESwFGizz" frameborder="0" allowfullscreen></iframe>
+        <div id="now-playing-label">Select a track to begin</div>
+        <div id="player-container">
+            <div id="yt-player"></div>
+        </div>
     </div>
+
     <div class="action-bar">
-        <a href="#" class="shuffle-btn" onclick="shuffleGallery(); return false;">[ Shuffle Gallery ]</a>
+        <button class="ctrl-btn" id="prev-btn">[ Previous ]</button>
+        <button class="ctrl-btn shuffle-btn" id="shuffle-btn">[ Shuffle Gallery ]</button>
+        <button class="ctrl-btn" id="next-btn">[ Next ]</button>
     </div>
+
     <div class="grid" id="video-grid">
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/t_gSy_5Ntic', '12 Moons - Pilot')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/t_gSy_5Ntic/maxresdefault.jpg"), url("https://img.youtube.com/vi/t_gSy_5Ntic/hqdefault.jpg");'></div>
-    <div class='video-label'>12 Moons - Pilot</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/JcfV8wX3eD0', 'Mike Koglin - The Silence (Matt Darey Tekara Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/JcfV8wX3eD0/maxresdefault.jpg"), url("https://img.youtube.com/vi/JcfV8wX3eD0/hqdefault.jpg");'></div>
-    <div class='video-label'>Mike Koglin - The Silence (Matt Darey Tekara Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/b8GiBNgFE68', 'Quench - Dreams')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/b8GiBNgFE68/maxresdefault.jpg"), url("https://img.youtube.com/vi/b8GiBNgFE68/hqdefault.jpg");'></div>
-    <div class='video-label'>Quench - Dreams</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/r7msXPN7-6E', 'Yung Lain, Luhcy - Memory')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/r7msXPN7-6E/maxresdefault.jpg"), url("https://img.youtube.com/vi/r7msXPN7-6E/hqdefault.jpg");'></div>
-    <div class='video-label'>Yung Lain, Luhcy - Memory</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/cYTy2_ysX_M', 'Sylac - Dreaming Of Utopia')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/cYTy2_ysX_M/maxresdefault.jpg"), url("https://img.youtube.com/vi/cYTy2_ysX_M/hqdefault.jpg");'></div>
-    <div class='video-label'>Sylac - Dreaming Of Utopia</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/_QLhND8ZY5c', 'Facade - Razor Crest (Original Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/_QLhND8ZY5c/maxresdefault.jpg"), url("https://img.youtube.com/vi/_QLhND8ZY5c/hqdefault.jpg");'></div>
-    <div class='video-label'>Facade - Razor Crest (Original Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/BpxCj1hT560', 'Exotek - Awareness')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/BpxCj1hT560/maxresdefault.jpg"), url("https://img.youtube.com/vi/BpxCj1hT560/hqdefault.jpg");'></div>
-    <div class='video-label'>Exotek - Awareness</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/-IhwSryEoyM', 'Faskil - Masquerade')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/-IhwSryEoyM/maxresdefault.jpg"), url("https://img.youtube.com/vi/-IhwSryEoyM/hqdefault.jpg");'></div>
-    <div class='video-label'>Faskil - Masquerade</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/2QnqKlGRq6s', 'Push - Universal Nation (Remastered Album Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/2QnqKlGRq6s/maxresdefault.jpg"), url("https://img.youtube.com/vi/2QnqKlGRq6s/hqdefault.jpg");'></div>
-    <div class='video-label'>Push - Universal Nation (Remastered Album Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/zlhK1e-Cpso', 'Matt Darey - Point Zero')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/zlhK1e-Cpso/maxresdefault.jpg"), url("https://img.youtube.com/vi/zlhK1e-Cpso/hqdefault.jpg");'></div>
-    <div class='video-label'>Matt Darey - Point Zero</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/dmWql1Qxuic', 'Yotto - North')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/dmWql1Qxuic/maxresdefault.jpg"), url("https://img.youtube.com/vi/dmWql1Qxuic/hqdefault.jpg");'></div>
-    <div class='video-label'>Yotto - North</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/691rqkNhvBI', 'Quadran - The Love I Lost (Maxi Club Vocal)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/691rqkNhvBI/maxresdefault.jpg"), url("https://img.youtube.com/vi/691rqkNhvBI/hqdefault.jpg");'></div>
-    <div class='video-label'>Quadran - The Love I Lost (Maxi Club Vocal)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/SkO3JbjUON0', 'Platunoff - You Dont Know (Alex Van Deep Remix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/SkO3JbjUON0/maxresdefault.jpg"), url("https://img.youtube.com/vi/SkO3JbjUON0/hqdefault.jpg");'></div>
-    <div class='video-label'>Platunoff - You Dont Know (Alex Van Deep Remix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/5KQOcBvzqJQ', 'Push - Tranzy State of Mind (Club Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/5KQOcBvzqJQ/maxresdefault.jpg"), url("https://img.youtube.com/vi/5KQOcBvzqJQ/hqdefault.jpg");'></div>
-    <div class='video-label'>Push - Tranzy State of Mind (Club Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/ORPENK0pHaw', 'Exotek - Transitions (Original Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/ORPENK0pHaw/maxresdefault.jpg"), url("https://img.youtube.com/vi/ORPENK0pHaw/hqdefault.jpg");'></div>
-    <div class='video-label'>Exotek - Transitions (Original Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/rl-ZjMaLdlE', 'Odyssee of Noises - Firedance (The Sunrise)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/rl-ZjMaLdlE/maxresdefault.jpg"), url("https://img.youtube.com/vi/rl-ZjMaLdlE/hqdefault.jpg");'></div>
-    <div class='video-label'>Odyssee of Noises - Firedance (The Sunrise)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/jrIYQ0CfKPk', 'Man Without Country - Deadsea')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/jrIYQ0CfKPk/maxresdefault.jpg"), url("https://img.youtube.com/vi/jrIYQ0CfKPk/hqdefault.jpg");'></div>
-    <div class='video-label'>Man Without Country - Deadsea</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/JrxoJ1XCVhQ', 'Binary finary - 1998 (Original Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/JrxoJ1XCVhQ/maxresdefault.jpg"), url("https://img.youtube.com/vi/JrxoJ1XCVhQ/hqdefault.jpg");'></div>
-    <div class='video-label'>Binary finary - 1998 (Original Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/9VpbE75M6cQ', 'Ra - Time Current')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/9VpbE75M6cQ/maxresdefault.jpg"), url("https://img.youtube.com/vi/9VpbE75M6cQ/hqdefault.jpg");'></div>
-    <div class='video-label'>Ra - Time Current</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/gch5YoUGZ6w', 'Cape Town - Proglifter - Original Mix')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/gch5YoUGZ6w/maxresdefault.jpg"), url("https://img.youtube.com/vi/gch5YoUGZ6w/hqdefault.jpg");'></div>
-    <div class='video-label'>Cape Town - Proglifter - Original Mix</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/K5-wFdhzmic', '1997x - Pomogi Mne')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/K5-wFdhzmic/maxresdefault.jpg"), url("https://img.youtube.com/vi/K5-wFdhzmic/hqdefault.jpg");'></div>
-    <div class='video-label'>1997x - Pomogi Mne</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/99QrOj6eMYU', 'Zero call - Stellar Wind (Adrian Marth Remix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/99QrOj6eMYU/maxresdefault.jpg"), url("https://img.youtube.com/vi/99QrOj6eMYU/hqdefault.jpg");'></div>
-    <div class='video-label'>Zero call - Stellar Wind (Adrian Marth Remix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/6JRMFXXt6TE', 'John B - Pressure 2019 (2020 Remaster)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/6JRMFXXt6TE/maxresdefault.jpg"), url("https://img.youtube.com/vi/6JRMFXXt6TE/hqdefault.jpg");'></div>
-    <div class='video-label'>John B - Pressure 2019 (2020 Remaster)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/5mlkk4iPthk', 'filejacker - Omen')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/5mlkk4iPthk/maxresdefault.jpg"), url("https://img.youtube.com/vi/5mlkk4iPthk/hqdefault.jpg");'></div>
-    <div class='video-label'>filejacker - Omen</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/YU3t7BMWWso', 'League for Spiritual Discovery - Resonant Warrior')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/YU3t7BMWWso/maxresdefault.jpg"), url("https://img.youtube.com/vi/YU3t7BMWWso/hqdefault.jpg");'></div>
-    <div class='video-label'>League for Spiritual Discovery - Resonant Warrior</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/P180OVCPFw4', 'John B - Ageispolis (Aphex Twin Cover)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/P180OVCPFw4/maxresdefault.jpg"), url("https://img.youtube.com/vi/P180OVCPFw4/hqdefault.jpg");'></div>
-    <div class='video-label'>John B - Ageispolis (Aphex Twin Cover)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/rqvbRV9rAZk', 'Blusoul - Kill City')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/rqvbRV9rAZk/maxresdefault.jpg"), url("https://img.youtube.com/vi/rqvbRV9rAZk/hqdefault.jpg");'></div>
-    <div class='video-label'>Blusoul - Kill City</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/KPJWS8xLK8I', 'Basil OGlue, Phase Difference -  Fading into Motion')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/KPJWS8xLK8I/maxresdefault.jpg"), url("https://img.youtube.com/vi/KPJWS8xLK8I/hqdefault.jpg");'></div>
-    <div class='video-label'>Basil OGlue, Phase Difference -  Fading into Motion</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/QVqjTB1r0VU', 'Suduaya - House Of The Flying People')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/QVqjTB1r0VU/maxresdefault.jpg"), url("https://img.youtube.com/vi/QVqjTB1r0VU/hqdefault.jpg");'></div>
-    <div class='video-label'>Suduaya - House Of The Flying People</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/A39sd4J6RHw', 'The Enigma Tng - Black Infinity (Dnb Version)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/A39sd4J6RHw/maxresdefault.jpg"), url("https://img.youtube.com/vi/A39sd4J6RHw/hqdefault.jpg");'></div>
-    <div class='video-label'>The Enigma Tng - Black Infinity (Dnb Version)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/tRanQQj0SGM', 'Push - Journey Of Life')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/tRanQQj0SGM/maxresdefault.jpg"), url("https://img.youtube.com/vi/tRanQQj0SGM/hqdefault.jpg");'></div>
-    <div class='video-label'>Push - Journey Of Life</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/y_r4HoDVCco', 'Ferry Corsten - Star Traveller')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/y_r4HoDVCco/maxresdefault.jpg"), url("https://img.youtube.com/vi/y_r4HoDVCco/hqdefault.jpg");'></div>
-    <div class='video-label'>Ferry Corsten - Star Traveller</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/JrpRDvLG9YI', 'Gouryella - Gouryella (Alan Fitzpatrick Tribute To 99 Remix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/JrpRDvLG9YI/maxresdefault.jpg"), url("https://img.youtube.com/vi/JrpRDvLG9YI/hqdefault.jpg");'></div>
-    <div class='video-label'>Gouryella - Gouryella (Alan Fitzpatrick Tribute To 99 Remix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/L74Dpb82J5M', 'Midway - Cobra')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/L74Dpb82J5M/maxresdefault.jpg"), url("https://img.youtube.com/vi/L74Dpb82J5M/hqdefault.jpg");'></div>
-    <div class='video-label'>Midway - Cobra</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/L-dm2e1nwqY', 'POB, Art Of Trance - Turkish Bizarre ( DBA Remix )')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/L-dm2e1nwqY/maxresdefault.jpg"), url("https://img.youtube.com/vi/L-dm2e1nwqY/hqdefault.jpg");'></div>
-    <div class='video-label'>POB, Art Of Trance - Turkish Bizarre ( DBA Remix )</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/2qYa_PvnleY', 'Man Without Country - Foe')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/2qYa_PvnleY/maxresdefault.jpg"), url("https://img.youtube.com/vi/2qYa_PvnleY/hqdefault.jpg");'></div>
-    <div class='video-label'>Man Without Country - Foe</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/jI34hvMuEgQ', 'HI-LO, Reinier Zonneveld, Oliver Heldens - String Theory')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/jI34hvMuEgQ/maxresdefault.jpg"), url("https://img.youtube.com/vi/jI34hvMuEgQ/hqdefault.jpg");'></div>
-    <div class='video-label'>HI-LO, Reinier Zonneveld, Oliver Heldens - String Theory</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/tceq-bOzEDY', 'Pulser - My Religion (Extended Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/tceq-bOzEDY/maxresdefault.jpg"), url("https://img.youtube.com/vi/tceq-bOzEDY/hqdefault.jpg");'></div>
-    <div class='video-label'>Pulser - My Religion (Extended Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/q6Ei7uL0ABU', 'Trance Wax, Dusky - Northern Sky (Dusky Remix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/q6Ei7uL0ABU/maxresdefault.jpg"), url("https://img.youtube.com/vi/q6Ei7uL0ABU/hqdefault.jpg");'></div>
-    <div class='video-label'>Trance Wax, Dusky - Northern Sky (Dusky Remix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/MUwjbgNLv-Q', 'Masters & Nickson - Out There (5th Dimension) (Original Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/MUwjbgNLv-Q/maxresdefault.jpg"), url("https://img.youtube.com/vi/MUwjbgNLv-Q/hqdefault.jpg");'></div>
-    <div class='video-label'>Masters & Nickson - Out There (5th Dimension) (Original Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/2EYBTupJbWE', 'G&M Project - Sunday Afternoon (M.O.R.P.H. Remix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/2EYBTupJbWE/maxresdefault.jpg"), url("https://img.youtube.com/vi/2EYBTupJbWE/hqdefault.jpg");'></div>
-    <div class='video-label'>G&M Project - Sunday Afternoon (M.O.R.P.H. Remix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/_YuzAW51yCU', 'Perry ONeil - Numb (Original Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/_YuzAW51yCU/maxresdefault.jpg"), url("https://img.youtube.com/vi/_YuzAW51yCU/hqdefault.jpg");'></div>
-    <div class='video-label'>Perry ONeil - Numb (Original Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/vGQEcFCK6TE', 'Tinlicker, Robert Miles - Children (Extended Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/vGQEcFCK6TE/maxresdefault.jpg"), url("https://img.youtube.com/vi/vGQEcFCK6TE/hqdefault.jpg");'></div>
-    <div class='video-label'>Tinlicker, Robert Miles - Children (Extended Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/Nw_5n5jupeA', 'Grace - Skin on Skin (Orange Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/Nw_5n5jupeA/maxresdefault.jpg"), url("https://img.youtube.com/vi/Nw_5n5jupeA/hqdefault.jpg");'></div>
-    <div class='video-label'>Grace - Skin on Skin (Orange Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/FqI-B82VwWQ', 'VSN7 - Shine')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/FqI-B82VwWQ/maxresdefault.jpg"), url("https://img.youtube.com/vi/FqI-B82VwWQ/hqdefault.jpg");'></div>
-    <div class='video-label'>VSN7 - Shine</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/P1x4-LYuwrM', 'Push - Strange World (Remastered Album Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/P1x4-LYuwrM/maxresdefault.jpg"), url("https://img.youtube.com/vi/P1x4-LYuwrM/hqdefault.jpg");'></div>
-    <div class='video-label'>Push - Strange World (Remastered Album Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/pUQoMiqoqSk', 'Infinite Dimensions - Iapetus')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/pUQoMiqoqSk/maxresdefault.jpg"), url("https://img.youtube.com/vi/pUQoMiqoqSk/hqdefault.jpg");'></div>
-    <div class='video-label'>Infinite Dimensions - Iapetus</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/xh80z8A4bS4', 'Infera - Evol')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/xh80z8A4bS4/maxresdefault.jpg"), url("https://img.youtube.com/vi/xh80z8A4bS4/hqdefault.jpg");'></div>
-    <div class='video-label'>Infera - Evol</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/iLtIN3MlPXk', 'A-mase, T-AI-NA - Leti So Mnoi')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/iLtIN3MlPXk/maxresdefault.jpg"), url("https://img.youtube.com/vi/iLtIN3MlPXk/hqdefault.jpg");'></div>
-    <div class='video-label'>A-mase, T-AI-NA - Leti So Mnoi</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/F8zffZ7mBeU', 'Pino Angel - Celestial')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/F8zffZ7mBeU/maxresdefault.jpg"), url("https://img.youtube.com/vi/F8zffZ7mBeU/hqdefault.jpg");'></div>
-    <div class='video-label'>Pino Angel - Celestial</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/b6jqctXkR28', 'Julian Nates - 23 (Extended Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/b6jqctXkR28/maxresdefault.jpg"), url("https://img.youtube.com/vi/b6jqctXkR28/hqdefault.jpg");'></div>
-    <div class='video-label'>Julian Nates - 23 (Extended Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/j_jEnFiWGEY', 'Donbor - Blood Hammer')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/j_jEnFiWGEY/maxresdefault.jpg"), url("https://img.youtube.com/vi/j_jEnFiWGEY/hqdefault.jpg");'></div>
-    <div class='video-label'>Donbor - Blood Hammer</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/okq9UYUCapo', 'Push - Blue Midnight')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/okq9UYUCapo/maxresdefault.jpg"), url("https://img.youtube.com/vi/okq9UYUCapo/hqdefault.jpg");'></div>
-    <div class='video-label'>Push - Blue Midnight</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/yC9EthJk6QI', 'Isorin - Antidote')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/yC9EthJk6QI/maxresdefault.jpg"), url("https://img.youtube.com/vi/yC9EthJk6QI/hqdefault.jpg");'></div>
-    <div class='video-label'>Isorin - Antidote</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/z-23OADtmXE', 'Andy Ling - Fixation (Relaunch Remix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/z-23OADtmXE/maxresdefault.jpg"), url("https://img.youtube.com/vi/z-23OADtmXE/hqdefault.jpg");'></div>
-    <div class='video-label'>Andy Ling - Fixation (Relaunch Remix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/cyBRrp8TdUo', 'Blufeld - Huddlestone Arch (Original Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/cyBRrp8TdUo/maxresdefault.jpg"), url("https://img.youtube.com/vi/cyBRrp8TdUo/hqdefault.jpg");'></div>
-    <div class='video-label'>Blufeld - Huddlestone Arch (Original Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/lllysWefKqs', 'Collapse Project - Arise from the Darkness')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/lllysWefKqs/maxresdefault.jpg"), url("https://img.youtube.com/vi/lllysWefKqs/hqdefault.jpg");'></div>
-    <div class='video-label'>Collapse Project - Arise from the Darkness</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/jXwTCUkvESU', 'CVN - Breeze')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/jXwTCUkvESU/maxresdefault.jpg"), url("https://img.youtube.com/vi/jXwTCUkvESU/hqdefault.jpg");'></div>
-    <div class='video-label'>CVN - Breeze</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/DtHuQu0hrsk', 'Basil OGlue - Kosmo')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/DtHuQu0hrsk/maxresdefault.jpg"), url("https://img.youtube.com/vi/DtHuQu0hrsk/hqdefault.jpg");'></div>
-    <div class='video-label'>Basil OGlue - Kosmo</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/5xWpKZlZ4UY', 'Sewerslvt - Mr. K!ll Myself')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/5xWpKZlZ4UY/maxresdefault.jpg"), url("https://img.youtube.com/vi/5xWpKZlZ4UY/hqdefault.jpg");'></div>
-    <div class='video-label'>Sewerslvt - Mr. K!ll Myself</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/joXJ4S-Qzws', 'Martian Moon - Frozen Time')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/joXJ4S-Qzws/maxresdefault.jpg"), url("https://img.youtube.com/vi/joXJ4S-Qzws/hqdefault.jpg");'></div>
-    <div class='video-label'>Martian Moon - Frozen Time</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/QXIC458IT24', 'brothel. & Deadcrow - Miræ')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/QXIC458IT24/maxresdefault.jpg"), url("https://img.youtube.com/vi/QXIC458IT24/hqdefault.jpg");'></div>
-    <div class='video-label'>brothel. & Deadcrow - Miræ</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/CkBOZvqa7zA', 'Mekas - Chaosmos')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/CkBOZvqa7zA/maxresdefault.jpg"), url("https://img.youtube.com/vi/CkBOZvqa7zA/hqdefault.jpg");'></div>
-    <div class='video-label'>Mekas - Chaosmos</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/C8IwxjiJfrw', 'Quietman - The Sleeper (Man With No Name Remix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/C8IwxjiJfrw/maxresdefault.jpg"), url("https://img.youtube.com/vi/C8IwxjiJfrw/hqdefault.jpg");'></div>
-    <div class='video-label'>Quietman - The Sleeper (Man With No Name Remix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/fQ9xyoXXsX4', 'Electric Universe - One Love (Original Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/fQ9xyoXXsX4/maxresdefault.jpg"), url("https://img.youtube.com/vi/fQ9xyoXXsX4/hqdefault.jpg");'></div>
-    <div class='video-label'>Electric Universe - One Love (Original Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/KIQHGkhiTAg', 'Facade - The Owl & The Butterfly')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/KIQHGkhiTAg/maxresdefault.jpg"), url("https://img.youtube.com/vi/KIQHGkhiTAg/hqdefault.jpg");'></div>
-    <div class='video-label'>Facade - The Owl & The Butterfly</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/7kobF-tArrM', 'Ultravibe - Choose Freedom (Original Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/7kobF-tArrM/maxresdefault.jpg"), url("https://img.youtube.com/vi/7kobF-tArrM/hqdefault.jpg");'></div>
-    <div class='video-label'>Ultravibe - Choose Freedom (Original Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/FMnLp-fIloQ', 'Mejer - Power Within')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/FMnLp-fIloQ/maxresdefault.jpg"), url("https://img.youtube.com/vi/FMnLp-fIloQ/hqdefault.jpg");'></div>
-    <div class='video-label'>Mejer - Power Within</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/XMAFp0VBvIU', 'Age Of Love - The Age Of Love (Mr Sam Vs Fred Baker Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/XMAFp0VBvIU/maxresdefault.jpg"), url("https://img.youtube.com/vi/XMAFp0VBvIU/hqdefault.jpg");'></div>
-    <div class='video-label'>Age Of Love - The Age Of Love (Mr Sam Vs Fred Baker Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/aMK32_r4Cbw', 'TKYOGORE - SIMULATION END')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/aMK32_r4Cbw/maxresdefault.jpg"), url("https://img.youtube.com/vi/aMK32_r4Cbw/hqdefault.jpg");'></div>
-    <div class='video-label'>TKYOGORE - SIMULATION END</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/XJXGIZJVR28', 'Aubrey Fry - Dystopia')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/XJXGIZJVR28/maxresdefault.jpg"), url("https://img.youtube.com/vi/XJXGIZJVR28/hqdefault.jpg");'></div>
-    <div class='video-label'>Aubrey Fry - Dystopia</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/cVhIRqCozMQ', 'Mystxrivl, Sokos - Spark')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/cVhIRqCozMQ/maxresdefault.jpg"), url("https://img.youtube.com/vi/cVhIRqCozMQ/hqdefault.jpg");'></div>
-    <div class='video-label'>Mystxrivl, Sokos - Spark</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/gMWTNCI-A58', 'Allicorn - Brutalised')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/gMWTNCI-A58/maxresdefault.jpg"), url("https://img.youtube.com/vi/gMWTNCI-A58/hqdefault.jpg");'></div>
-    <div class='video-label'>Allicorn - Brutalised</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/nCZEel4r_6Q', 'Vestron Vulture - K.T.')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/nCZEel4r_6Q/maxresdefault.jpg"), url("https://img.youtube.com/vi/nCZEel4r_6Q/hqdefault.jpg");'></div>
-    <div class='video-label'>Vestron Vulture - K.T.</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/XRLQQzFNMQw', 'Parallel, Eschaton - Instincts (Patience Remix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/XRLQQzFNMQw/maxresdefault.jpg"), url("https://img.youtube.com/vi/XRLQQzFNMQw/hqdefault.jpg");'></div>
-    <div class='video-label'>Parallel, Eschaton - Instincts (Patience Remix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/kBw_pTgju18', 'Cinematrik - Ghosts (Original Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/kBw_pTgju18/maxresdefault.jpg"), url("https://img.youtube.com/vi/kBw_pTgju18/hqdefault.jpg");'></div>
-    <div class='video-label'>Cinematrik - Ghosts (Original Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/vYE7g36IfvA', 'Emir Guven - Goodbye (Extended Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/vYE7g36IfvA/maxresdefault.jpg"), url("https://img.youtube.com/vi/vYE7g36IfvA/hqdefault.jpg");'></div>
-    <div class='video-label'>Emir Guven - Goodbye (Extended Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
-  <div class='video' onclick="swapToFeatured('https://www.youtube-nocookie.com/embed/2qJRgZrtreQ', 'Slam Duck - Sunset Haze (Extended Mix)')">
-    <div class='thumb-container' style='background-image: url("https://img.youtube.com/vi/2qJRgZrtreQ/maxresdefault.jpg"), url("https://img.youtube.com/vi/2qJRgZrtreQ/hqdefault.jpg");'></div>
-    <div class='video-label'>Slam Duck - Sunset Haze (Extended Mix)</div>
-    <div class='overlay-btn'>> ACTIVATE <</div>
-  </div>
+        <div class="video" data-id="t_gSy_5Ntic" data-title="12 Moons - Pilot"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/t_gSy_5Ntic/maxresdefault.jpg');"></div><div class="video-label">12 Moons - Pilot</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="JcfV8wX3eD0" data-title="Mike Koglin - The Silence (Matt Darey Tekara Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/JcfV8wX3eD0/maxresdefault.jpg');"></div><div class="video-label">Mike Koglin - The Silence (Matt Darey Tekara Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="b8GiBNgFE68" data-title="Quench - Dreams"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/b8GiBNgFE68/maxresdefault.jpg');"></div><div class="video-label">Quench - Dreams</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="r7msXPN7-6E" data-title="Yung Lain, Luhcy - Memory"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/r7msXPN7-6E/maxresdefault.jpg');"></div><div class="video-label">Yung Lain, Luhcy - Memory</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="cYTy2_ysX_M" data-title="Sylac - Dreaming Of Utopia"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/cYTy2_ysX_M/maxresdefault.jpg');"></div><div class="video-label">Sylac - Dreaming Of Utopia</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="_QLhND8ZY5c" data-title="Facade - Razor Crest (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/_QLhND8ZY5c/maxresdefault.jpg');"></div><div class="video-label">Facade - Razor Crest (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="BpxCj1hT560" data-title="Exotek - Awareness"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/BpxCj1hT560/maxresdefault.jpg');"></div><div class="video-label">Exotek - Awareness</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="-IhwSryEoyM" data-title="Faskil - Masquerade"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/-IhwSryEoyM/maxresdefault.jpg');"></div><div class="video-label">Faskil - Masquerade</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="2QnqKlGRq6s" data-title="Push - Universal Nation (Remastered Album Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/2QnqKlGRq6s/maxresdefault.jpg');"></div><div class="video-label">Push - Universal Nation (Remastered Album Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="zlhK1e-Cpso" data-title="Matt Darey - Point Zero"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/zlhK1e-Cpso/maxresdefault.jpg');"></div><div class="video-label">Matt Darey - Point Zero</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="dmWql1Qxuic" data-title="Yotto - North"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/dmWql1Qxuic/maxresdefault.jpg');"></div><div class="video-label">Yotto - North</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="691rqkNhvBI" data-title="Quadran - The Love I Lost (Maxi Club Vocal)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/691rqkNhvBI/maxresdefault.jpg');"></div><div class="video-label">Quadran - The Love I Lost (Maxi Club Vocal)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="SkO3JbjUON0" data-title="Platunoff - You Don't Know (Alex Van Deep Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/SkO3JbjUON0/maxresdefault.jpg');"></div><div class="video-label">Platunoff - You Don't Know (Alex Van Deep Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="5KQOcBvzqJQ" data-title="Push - Tranzy State of Mind (Club Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/5KQOcBvzqJQ/maxresdefault.jpg');"></div><div class="video-label">Push - Tranzy State of Mind (Club Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="ORPENK0pHaw" data-title="Exotek - Transitions (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/ORPENK0pHaw/maxresdefault.jpg');"></div><div class="video-label">Exotek - Transitions (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="rl-ZjMaLdlE" data-title="Odyssee of Noises - Firedance (The Sunrise)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/rl-ZjMaLdlE/maxresdefault.jpg');"></div><div class="video-label">Odyssee of Noises - Firedance (The Sunrise)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="jrIYQ0CfKPk" data-title="Man Without Country - Deadsea"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/jrIYQ0CfKPk/maxresdefault.jpg');"></div><div class="video-label">Man Without Country - Deadsea</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="JrxoJ1XCVhQ" data-title="Binary finary - 1998 (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/JrxoJ1XCVhQ/maxresdefault.jpg');"></div><div class="video-label">Binary finary - 1998 (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="9VpbE75M6cQ" data-title="Ra - Time Current"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/9VpbE75M6cQ/maxresdefault.jpg');"></div><div class="video-label">Ra - Time Current</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="gch5YoUGZ6w" data-title="Cape Town - Proglifter - Original Mix"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/gch5YoUGZ6w/maxresdefault.jpg');"></div><div class="video-label">Cape Town - Proglifter - Original Mix</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="K5-wFdhzmic" data-title="1997x - Pomogi Mne"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/K5-wFdhzmic/maxresdefault.jpg');"></div><div class="video-label">1997x - Pomogi Mne</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="99QrOj6eMYU" data-title="Zero call - Stellar Wind (Adrian Marth Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/99QrOj6eMYU/maxresdefault.jpg');"></div><div class="video-label">Zero call - Stellar Wind (Adrian Marth Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="6JRMFXXt6TE" data-title="John B - Pressure 2019 (2020 Remaster)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/6JRMFXXt6TE/maxresdefault.jpg');"></div><div class="video-label">John B - Pressure 2019 (2020 Remaster)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="5mlkk4iPthk" data-title="filejacker - Omen"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/5mlkk4iPthk/maxresdefault.jpg');"></div><div class="video-label">filejacker - Omen</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="YU3t7BMWWso" data-title="League for Spiritual Discovery - Resonant Warrior"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/YU3t7BMWWso/maxresdefault.jpg');"></div><div class="video-label">League for Spiritual Discovery - Resonant Warrior</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="P180OVCPFw4" data-title="John B - Ageispolis (Aphex Twin Cover)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/P180OVCPFw4/maxresdefault.jpg');"></div><div class="video-label">John B - Ageispolis (Aphex Twin Cover)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="rqvbRV9rAZk" data-title="Blusoul - Kill City"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/rqvbRV9rAZk/maxresdefault.jpg');"></div><div class="video-label">Blusoul - Kill City</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="KPJWS8xLK8I" data-title="Basil O'Glue, Phase Difference - Fading into Motion"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/KPJWS8xLK8I/maxresdefault.jpg');"></div><div class="video-label">Basil O'Glue, Phase Difference - Fading into Motion</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="QVqjTB1r0VU" data-title="Suduaya - House Of The Flying People"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/QVqjTB1r0VU/maxresdefault.jpg');"></div><div class="video-label">Suduaya - House Of The Flying People</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="A39sd4J6RHw" data-title="The Enigma Tng - Black Infinity (Dnb Version)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/A39sd4J6RHw/maxresdefault.jpg');"></div><div class="video-label">The Enigma Tng - Black Infinity (Dnb Version)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="tRanQQj0SGM" data-title="Push - Journey Of Life"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/tRanQQj0SGM/maxresdefault.jpg');"></div><div class="video-label">Push - Journey Of Life</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="y_r4HoDVCco" data-title="Ferry Corsten - Star Traveller"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/y_r4HoDVCco/maxresdefault.jpg');"></div><div class="video-label">Ferry Corsten - Star Traveller</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="JrpRDvLG9YI" data-title="Gouryella - Gouryella (Alan Fitzpatrick Tribute To '99 Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/JrpRDvLG9YI/maxresdefault.jpg');"></div><div class="video-label">Gouryella - Gouryella (Alan Fitzpatrick Tribute To '99 Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="L74Dpb82J5M" data-title="Midway - Cobra"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/L74Dpb82J5M/maxresdefault.jpg');"></div><div class="video-label">Midway - Cobra</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="L-dm2e1nwqY" data-title="POB, Art Of Trance - Turkish Bizarre (DBA Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/L-dm2e1nwqY/maxresdefault.jpg');"></div><div class="video-label">POB, Art Of Trance - Turkish Bizarre (DBA Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="2qYa_PvnleY" data-title="Man Without Country - Foe"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/2qYa_PvnleY/maxresdefault.jpg');"></div><div class="video-label">Man Without Country - Foe</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="jI34hvMuEgQ" data-title="HI-LO, Reinier Zonneveld, Oliver Heldens - String Theory"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/jI34hvMuEgQ/maxresdefault.jpg');"></div><div class="video-label">HI-LO, Reinier Zonneveld, Oliver Heldens - String Theory</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="tceq-bOzEDY" data-title="Pulser - My Religion (Extended Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/tceq-bOzEDY/maxresdefault.jpg');"></div><div class="video-label">Pulser - My Religion (Extended Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="q6Ei7uL0ABU" data-title="Trance Wax, Dusky - Northern Sky (Dusky Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/q6Ei7uL0ABU/maxresdefault.jpg');"></div><div class="video-label">Trance Wax, Dusky - Northern Sky (Dusky Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="MUwjbgNLv-Q" data-title="Masters & Nickson - Out There (5th Dimension) (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/MUwjbgNLv-Q/maxresdefault.jpg');"></div><div class="video-label">Masters &amp; Nickson - Out There (5th Dimension) (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="2EYBTupJbWE" data-title="G&M Project - Sunday Afternoon (M.O.R.P.H. Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/2EYBTupJbWE/maxresdefault.jpg');"></div><div class="video-label">G&amp;M Project - Sunday Afternoon (M.O.R.P.H. Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="_YuzAW51yCU" data-title="Perry O'Neil - Numb (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/_YuzAW51yCU/maxresdefault.jpg');"></div><div class="video-label">Perry O'Neil - Numb (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="vGQEcFCK6TE" data-title="Tinlicker, Robert Miles - Children (Extended Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/vGQEcFCK6TE/maxresdefault.jpg');"></div><div class="video-label">Tinlicker, Robert Miles - Children (Extended Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="Nw_5n5jupeA" data-title="Grace - Skin on Skin (Orange Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/Nw_5n5jupeA/maxresdefault.jpg');"></div><div class="video-label">Grace - Skin on Skin (Orange Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="FqI-B82VwWQ" data-title="VSN7 - Shine"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/FqI-B82VwWQ/maxresdefault.jpg');"></div><div class="video-label">VSN7 - Shine</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="P1x4-LYuwrM" data-title="Push - Strange World (Remastered Album Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/P1x4-LYuwrM/maxresdefault.jpg');"></div><div class="video-label">Push - Strange World (Remastered Album Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="pUQoMiqoqSk" data-title="Infinite Dimensions - Iapetus"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/pUQoMiqoqSk/maxresdefault.jpg');"></div><div class="video-label">Infinite Dimensions - Iapetus</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="xh80z8A4bS4" data-title="Infera - Evol"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/xh80z8A4bS4/maxresdefault.jpg');"></div><div class="video-label">Infera - Evol</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="iLtIN3MlPXk" data-title="A-mase, T-AI-NA - Leti So Mnoi"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/iLtIN3MlPXk/maxresdefault.jpg');"></div><div class="video-label">A-mase, T-AI-NA - Leti So Mnoi</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="F8zffZ7mBeU" data-title="Pino Angel - Celestial"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/F8zffZ7mBeU/maxresdefault.jpg');"></div><div class="video-label">Pino Angel - Celestial</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="b6jqctXkR28" data-title="Julian Nates - 23 (Extended Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/b6jqctXkR28/maxresdefault.jpg');"></div><div class="video-label">Julian Nates - 23 (Extended Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="j_jEnFiWGEY" data-title="Donbor - Blood Hammer"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/j_jEnFiWGEY/maxresdefault.jpg');"></div><div class="video-label">Donbor - Blood Hammer</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="okq9UYUCapo" data-title="Push - Blue Midnight"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/okq9UYUCapo/maxresdefault.jpg');"></div><div class="video-label">Push - Blue Midnight</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="yC9EthJk6QI" data-title="Isorin - Antidote"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/yC9EthJk6QI/maxresdefault.jpg');"></div><div class="video-label">Isorin - Antidote</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="z-23OADtmXE" data-title="Andy Ling - Fixation (Relaunch Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/z-23OADtmXE/maxresdefault.jpg');"></div><div class="video-label">Andy Ling - Fixation (Relaunch Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="cyBRrp8TdUo" data-title="Blufeld - Huddlestone Arch (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/cyBRrp8TdUo/maxresdefault.jpg');"></div><div class="video-label">Blufeld - Huddlestone Arch (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="lllysWefKqs" data-title="Collapse Project - Arise from the Darkness"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/lllysWefKqs/maxresdefault.jpg');"></div><div class="video-label">Collapse Project - Arise from the Darkness</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="jXwTCUkvESU" data-title="CVN - Breeze"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/jXwTCUkvESU/maxresdefault.jpg');"></div><div class="video-label">CVN - Breeze</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="DtHuQu0hrsk" data-title="Basil O'Glue - Kosmo"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/DtHuQu0hrsk/maxresdefault.jpg');"></div><div class="video-label">Basil O'Glue - Kosmo</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="5xWpKZlZ4UY" data-title="Sewerslvt - Mr. K!ll Myself"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/5xWpKZlZ4UY/maxresdefault.jpg');"></div><div class="video-label">Sewerslvt - Mr. K!ll Myself</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="joXJ4S-Qzws" data-title="Martian Moon - Frozen Time"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/joXJ4S-Qzws/maxresdefault.jpg');"></div><div class="video-label">Martian Moon - Frozen Time</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="QXIC458IT24" data-title="brothel. &amp; Deadcrow - Miræ"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/QXIC458IT24/maxresdefault.jpg');"></div><div class="video-label">brothel. &amp; Deadcrow - Miræ</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="CkBOZvqa7zA" data-title="Mekas - Chaosmos"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/CkBOZvqa7zA/maxresdefault.jpg');"></div><div class="video-label">Mekas - Chaosmos</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="C8IwxjiJfrw" data-title="Quietman - The Sleeper (Man With No Name Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/C8IwxjiJfrw/maxresdefault.jpg');"></div><div class="video-label">Quietman - The Sleeper (Man With No Name Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="fQ9xyoXXsX4" data-title="Electric Universe - One Love (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/fQ9xyoXXsX4/maxresdefault.jpg');"></div><div class="video-label">Electric Universe - One Love (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="KIQHGkhiTAg" data-title="Facade - The Owl &amp; The Butterfly"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/KIQHGkhiTAg/maxresdefault.jpg');"></div><div class="video-label">Facade - The Owl &amp; The Butterfly</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="7kobF-tArrM" data-title="Ultravibe - Choose Freedom (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/7kobF-tArrM/maxresdefault.jpg');"></div><div class="video-label">Ultravibe - Choose Freedom (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="FMnLp-fIloQ" data-title="Mejer - Power Within"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/FMnLp-fIloQ/maxresdefault.jpg');"></div><div class="video-label">Mejer - Power Within</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="XMAFp0VBvIU" data-title="Age Of Love - The Age Of Love (Mr Sam Vs Fred Baker Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/XMAFp0VBvIU/maxresdefault.jpg');"></div><div class="video-label">Age Of Love - The Age Of Love (Mr Sam Vs Fred Baker Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="aMK32_r4Cbw" data-title="TKYOGORE - SIMULATION END"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/aMK32_r4Cbw/maxresdefault.jpg');"></div><div class="video-label">TKYOGORE - SIMULATION END</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="XJXGIZJVR28" data-title="Aubrey Fry - Dystopia"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/XJXGIZJVR28/maxresdefault.jpg');"></div><div class="video-label">Aubrey Fry - Dystopia</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="cVhIRqCozMQ" data-title="Mystxrivl, Sokos - Spark"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/cVhIRqCozMQ/maxresdefault.jpg');"></div><div class="video-label">Mystxrivl, Sokos - Spark</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="gMWTNCI-A58" data-title="Allicorn - Brutalised"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/gMWTNCI-A58/maxresdefault.jpg');"></div><div class="video-label">Allicorn - Brutalised</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="nCZEel4r_6Q" data-title="Vestron Vulture - K.T."><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/nCZEel4r_6Q/maxresdefault.jpg');"></div><div class="video-label">Vestron Vulture - K.T.</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="XRLQQzFNMQw" data-title="Parallel, Eschaton - Instincts (Patience Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/XRLQQzFNMQw/maxresdefault.jpg');"></div><div class="video-label">Parallel, Eschaton - Instincts (Patience Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="kBw_pTgju18" data-title="Cinematrik - Ghosts (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/kBw_pTgju18/maxresdefault.jpg');"></div><div class="video-label">Cinematrik - Ghosts (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="vYE7g36IfvA" data-title="Emir Guven - Goodbye (Extended Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/vYE7g36IfvA/maxresdefault.jpg');"></div><div class="video-label">Emir Guven - Goodbye (Extended Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="2qJRgZrtreQ" data-title="Slam Duck - Sunset Haze (Extended Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/2qJRgZrtreQ/maxresdefault.jpg');"></div><div class="video-label">Slam Duck - Sunset Haze (Extended Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
     </div>
-<script>
-    function swapToFeatured(url, title) {
-        var p = document.getElementById('main-player');
-        var l = document.getElementById('now-playing-label');
-        p.src = url + (url.includes('?') ? '&' : '?') + 'autoplay=1';
-        l.innerText = 'NOW PLAYING: ' + title;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    function shuffleGallery() {
-        var g = document.getElementById('video-grid');
-        var v = Array.from(g.children);
-        for (var i = v.length - 1; i > 0; i--) { var j = Math.floor(Math.random()*(i+1)); g.appendChild(v[j]); }
-    }
-</script>
+
+    <script>
+        var player = null;
+        var currentIndex = 0;
+        var queue = [];
+        var ended = false;
+
+        function buildQueue() {
+            var cards = document.querySelectorAll('#video-grid .video');
+            queue = Array.from(cards).map(function(el) {
+                return { id: el.dataset.id, title: el.dataset.title, el: el };
+            });
+        }
+
+        function setActiveCard(index) {
+            document.querySelectorAll('#video-grid .video').forEach(function(el) {
+                el.classList.remove('is-playing');
+            });
+            if (queue[index]) {
+                queue[index].el.classList.add('is-playing');
+            }
+        }
+
+        function playTrack(index) {
+            if (!queue.length) return;
+            index = ((index % queue.length) + queue.length) % queue.length;
+            currentIndex = index;
+            ended = false;
+
+            var track = queue[currentIndex];
+            document.getElementById('now-playing-label').textContent = track.title;
+            setActiveCard(currentIndex);
+
+            if (player && typeof player.loadVideoById === 'function') {
+                player.loadVideoById({ videoId: track.id });
+            }
+        }
+
+        window.onYouTubeIframeAPIReady = function() {
+            player = new YT.Player('yt-player', {
+                width: '100%',
+                height: '100%',
+                playerVars: {
+                    autoplay: 0,
+                    controls: 1,
+                    rel: 0,
+                    modestbranding: 1,
+                    fs: 1,
+                    enablejsapi: 1
+                },
+                events: {
+                    onReady: function() {
+                        if (queue.length) {
+                            player.cueVideoById(queue[0].id);
+                        }
+                    },
+                    onStateChange: function(event) {
+                        if (event.data === YT.PlayerState.ENDED && !ended) {
+                            ended = true;
+                            playTrack(currentIndex + 1);
+                        }
+                    }
+                }
+            });
+        };
+
+        document.querySelectorAll('#video-grid .video').forEach(function(el) {
+            el.addEventListener('click', function() {
+                if (!queue.length) buildQueue();
+                var idx = queue.findIndex(function(t) { return t.el === el; });
+                if (idx !== -1) playTrack(idx);
+            });
+        });
+
+        document.getElementById('prev-btn').addEventListener('click', function() {
+            if (!queue.length) buildQueue();
+            playTrack(currentIndex - 1);
+        });
+
+        document.getElementById('next-btn').addEventListener('click', function() {
+            if (!queue.length) buildQueue();
+            playTrack(currentIndex + 1);
+        });
+
+        document.getElementById('shuffle-btn').addEventListener('click', function() {
+            var grid = document.getElementById('video-grid');
+            var cards = Array.from(grid.querySelectorAll('.video'));
+            for (var i = cards.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                grid.appendChild(cards[j]);
+                var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp;
+            }
+            buildQueue();
+            var stillPlaying = queue.findIndex(function(t) { return t.el.classList.contains('is-playing'); });
+            if (stillPlaying !== -1) {
+                currentIndex = stillPlaying;
+            } else {
+                currentIndex = 0;
+                if (player && typeof player.cueVideoById === 'function') {
+                    player.cueVideoById(queue[0].id);
+                }
+            }
+        });
+
+        buildQueue();
+    </script>
+    <script src="https://www.youtube.com/iframe_api" async></script>
 </body>
 </html>
