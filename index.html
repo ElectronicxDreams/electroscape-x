@@ -76,10 +76,10 @@
         nav a {
             color: #fff;
             text-decoration: none;          /* Remove underline from links */
-            margin: 0 20px;                 /* Space between each link */
-            font-size: 13px;
+            margin: 0 25px;                 /* Space between each link — increased for wider spacing */
+            font-size: 10px;                /* Smaller to match header aesthetic */
             text-transform: uppercase;      /* Force link text to CAPS */
-            letter-spacing: 2px;            /* Spread letters apart slightly */
+            letter-spacing: 8px;            /* Wide spacing to echo header style */
         }
 
         nav a:hover {
@@ -286,10 +286,15 @@
            To change the mobile letter spacing: update BOTH values
            (letter-spacing and text-indent must match).
         ---------------------------------------------------------- */
-        @media (max-width: 700px) {
+            @media (max-width: 700px) {
             h1 {
-                letter-spacing: 20px;       /* smaller than desktop 50px */
-                text-indent: 20px;           /* Must match letter-spacing */
+                letter-spacing: 20px;
+                text-indent: 20px;          /* Fixed — now matches */
+            }
+            nav a {
+                font-size: 9px;             /* Slightly smaller on mobile */
+                letter-spacing: 5px;        /* Reduced spacing on mobile */
+                margin: 0 12px;             /* Tighter margins */
             }
         }
 
@@ -313,9 +318,11 @@
          To add a link: copy one <a> line and update the href and text.
          target='_blank' means the link opens in a new browser tab.
     -->
-    <nav>
+       <nav>
         <a href='https://www.youtube.com/@ElectroscapeX' target='_blank'>YouTube</a>
         <a href='https://beacons.ai/weblinks' target='_blank'>Weblinks</a>
+        <a href='#' target='https://open.spotify.com/user/3147hrg3uxl6ywo7dja4zzwhrdha/playlists'>Spotify</a>
+        <!-- Replace # above with your actual Spotify URL when ready -->
     </nav>
 
     <!-- SECTION 3B: PAGE TITLE
