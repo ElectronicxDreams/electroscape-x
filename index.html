@@ -181,37 +181,36 @@
 
         /* ----------------------------------------------------------
            SECTION 2F: VIDEO GRID
-           Responsive grid with different card sizes per device.
-           Desktop: 390px cards
-           Tablet (≤900px): 260px flexible cards for more columns
-           Phone (≤600px): single column full width
-           To change card widths: update the minmax values below.
-           To change gap between cards: update the gap values.
+           Desktop (>1400px): 390px cards
+           Portrait tablet: 260px cards (2 columns)
+           Landscape tablet: 220px cards (3-4 columns)
         ---------------------------------------------------------- */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(390px, 390px)); /* Desktop: 390px cards */
-            gap: 25px;                      /* Desktop gap */
+            grid-template-columns: repeat(auto-fill, minmax(390px, 390px)); /* Desktop */
+            gap: 25px;
             max-width: 100%;
             margin: 0 auto;
             justify-content: center;
         }
 
-        /* Tablet: smaller cards for more columns */
-        @media (max-width: 900px) {
+        /* Tablet/Phone Portrait: 2 columns */
+        @media (max-width: 1400px) {
             .grid {
-                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* Tablet: 260px cards */
-                gap: 18px;                  /* Slightly tighter gap on tablet */
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 18px;
             }
         }
 
-        /* Phone: single column for easy scrolling */
-        @media (max-width: 600px) {
+        /* Tablet Landscape: more columns with smaller cards */
+        @media (orientation: landscape) and (max-width: 1400px) {
             .grid {
-                grid-template-columns: 1fr;  /* Phone: full width cards */
-                gap: 15px;                  /* Tighter gap on phone */
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 15px;
             }
         }
+
+
 
         /* ----------------------------------------------------------
            SECTION 2G: VIDEO CARDS
