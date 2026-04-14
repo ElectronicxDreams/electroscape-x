@@ -1,5 +1,5 @@
 <!--
-    Name: index.html | Version: 1.4
+    Name: index.html | Version: 1.6
     Project: Electroscape
     Description: Music video gallery page with YouTube IFrame API player.
                  Clicking a card loads it into the featured player at the top.
@@ -181,20 +181,28 @@
 
         /* ----------------------------------------------------------
            SECTION 2F: VIDEO GRID
-           Desktop (>1400px): 390px cards
-           Portrait tablet: 260px cards (2 columns)
-           Landscape tablet: 220px cards (3-4 columns)
+           Rules apply top-to-bottom. A more specific rule below
+           overrides a broader rule above for that screen size.
+
+           [M1]  Desktop (>1400px)          : 390px fixed cards  — 6 columns
+           [T1]  Tablet portrait (<1400px)  : auto-fill 260px    — 2 columns
+           [T1]  Tablet landscape (<1400px) : auto-fill 280px    — 3 columns
+           [S]   Phone portrait (<500px)    : exactly 2 columns  — forced 2
+           [S]   Phone landscape            : inherits tablet landscape rule — 3 columns
+
+           To change phone portrait columns: edit repeat(2, 1fr) in the
+           max-width: 500px block below. Change 2 to 1 for single column.
         ---------------------------------------------------------- */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(390px, 390px)); /* Desktop */
+            grid-template-columns: repeat(auto-fill, minmax(390px, 390px)); /* [M1] Desktop: fixed 390px cards */
             gap: 25px;
             max-width: 100%;
             margin: 0 auto;
             justify-content: center;
         }
 
-        /* Tablet/Phone Portrait: 2 columns */
+        /* [T1] Tablet/large phone portrait: auto-fill gives 2 columns at tablet width */
         @media (max-width: 1400px) {
             .grid {
                 grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -202,11 +210,21 @@
             }
         }
 
-        /* Tablet Landscape: more columns with smaller cards */
+        /* [T1] Tablet landscape: slightly wider cards, still auto-fills to 3 columns */
         @media (orientation: landscape) and (max-width: 1400px) {
             .grid {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
                 gap: 15px;
+            }
+        }
+
+        /* [S] Phone portrait: force exactly 2 columns regardless of card width.
+           Targets portrait screens narrower than 500px CSS width (covers S25 portrait).
+           Change repeat(2, 1fr) to repeat(1, 1fr) for single-column layout instead. */
+        @media (max-width: 1900px) and (orientation: portrait) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
             }
         }
 
@@ -752,7 +770,7 @@
 <!-- Must match the Version number in the file header comment.     -->
 <!-- ============================================================ -->
 <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a;">
-    <!-- change version --><span style="color: #00ffcc;">1.4</span><!-- end change version -->
+    <!-- change version --><span style="color: #00ffcc;">1900</span><!-- end change version -->
 </div>
 
 </body>
