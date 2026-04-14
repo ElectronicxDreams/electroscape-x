@@ -1,53 +1,264 @@
+<!--
+    Name: index.html | Version: 1.1
+    Project: Electroscape
+    Description: Music video gallery page with YouTube IFrame API player.
+                 Clicking a card loads it into the featured player at the top.
+                 Prev / Next buttons step through the playlist in order.
+                 Shuffle randomises the card grid and resets the queue.
+    Stages:
+        Stage 1 — HEAD        : Page setup, font import
+        Stage 2 — CSS STYLES  : All visual rules (body, nav, player, buttons, grid, cards)
+        Stage 3 — BODY HTML   : The visible page structure (nav, player, buttons, video grid)
+        Stage 4 — JAVASCRIPT  : Queue logic, playback control, button events
+-->
+
+<!-- ============================================================ -->
+<!-- STAGE 1 START: HEAD — Page setup, title, font import         -->
+<!-- ============================================================ -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+    <!-- Sets the character encoding so special characters display correctly -->
     <meta charset="UTF-8">
-    <title>Electroscape.X</title>
+
+    <!-- The text shown in the browser tab -->
+    <title>Electroscape</title>
+
+    <!--
+        Loads the "Orbitron" font from Google Fonts.
+        This is the futuristic-style font used everywhere on the page.
+        Weights loaded: 300 (light), 400 (normal), 700 (bold).
+        To change font: replace "Orbitron" with another Google Font name
+        in BOTH this URL and in the body { font-family } rule in Stage 2.
+    -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;700&display=swap" rel="stylesheet">
+
+<!-- ============================================================ -->
+<!-- STAGE 1 END                                                   -->
+<!-- ============================================================ -->
+
+
+<!-- ============================================================ -->
+<!-- STAGE 2 START: CSS STYLES — All visual rules                 -->
+<!-- ============================================================ -->
     <style>
-        body { background: #000; color: #fff; font-family: 'Orbitron', sans-serif; margin: 0; padding: 20px; text-align: center; overflow-x: hidden; }
-        nav { margin-bottom: 30px; display: flex; justify-content: center; align-items: center; }
-        nav a { color: #fff; text-decoration: none; margin: 0 20px; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; }
-        nav a:hover { color: #00ffcc; }
-        h1 { font-size: 18px; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 40px; color: #00ffcc; }
 
-        .featured-box { max-width: 1200px; margin: 0 auto 30px auto; position: relative; }
-        #player-container { aspect-ratio: 16 / 9; border-radius: 4px; width: 100%; border: 1px solid #222; background: #000; overflow: hidden; }
-        #now-playing-label { font-size: 10px; color: #ffffff; text-transform: uppercase; letter-spacing: 5px; margin-bottom: 15px; min-height: 15px; }
+        /* ----------------------------------------------------------
+           SECTION 2A: PAGE BASE
+           Sets the overall page background, text colour, font,
+           and prevents a horizontal scrollbar appearing.
+        ---------------------------------------------------------- */
+        body {
+            background: #000;               /* Black page background */
+            color: #fff;                    /* Default text colour: white */
+            font-family: 'Orbitron', sans-serif; /* Futuristic font (loaded above) */
+            margin: 0;
+            padding: 20px;                  /* Small gap around the page edge */
+            text-align: center;             /* Centre-align everything by default */
+            overflow-x: hidden;             /* Hide any accidental horizontal scroll */
+        }
 
-        .action-bar { margin: 40px 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+
+        /* ----------------------------------------------------------
+           SECTION 2B: TOP NAVIGATION BAR
+           The row of links at the very top of the page (YouTube, Weblinks).
+           To add a link: add an <a> tag inside the <nav> block in Stage 3.
+           To change hover colour: update the color value in nav a:hover.
+        ---------------------------------------------------------- */
+        nav {
+            margin-bottom: 30px;            /* Gap below the nav before the page title */
+            display: flex;                  /* Lay links out in a horizontal row */
+            justify-content: center;        /* Centre the row horizontally */
+            align-items: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;          /* Remove underline from links */
+            margin: 0 20px;                 /* Space between each link */
+            font-size: 13px;
+            text-transform: uppercase;      /* Force link text to CAPS */
+            letter-spacing: 2px;            /* Spread letters apart slightly */
+        }
+
+        nav a:hover {
+            color: #00ffcc;                 /* Accent green glow on mouse-over */
+        }
+
+
+        /* ----------------------------------------------------------
+           SECTION 2C: PAGE TITLE (H1)
+           The large "ELECTROSCAPE" heading below the nav.
+           To change the accent colour: update both color here and
+           the .shuffle-btn border/color values in Section 2E.
+        ---------------------------------------------------------- */
+        h1 {
+            font-size: 13px;		    /* electroscape */
+            font-weight: 300;               /* Light weight for a minimal look */
+            letter-spacing: 40px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            color: #00ffcc;                 /* Accent green — matches nav hover and shuffle btn */
+	    text-indent: 40px; 
+        }
+
+
+        /* ----------------------------------------------------------
+           SECTION 2D: FEATURED VIDEO PLAYER
+           The large video player at the top of the page.
+           .featured-box    — the outer wrapper that sets max width
+           #player-container — the box that holds the YouTube player
+           #now-playing-label — the small text above the player
+                                showing the current track name
+        ---------------------------------------------------------- */
+        .featured-box {
+            max-width: 1200px;              /* Player will not stretch wider than this */
+            margin: 0 auto 30px auto;       /* Centre the player, add gap below */
+            position: relative;
+        }
+
+        #player-container {
+            aspect-ratio: 16 / 9;           /* Keeps the player in widescreen ratio */
+            border-radius: 4px;
+            width: 100%;
+            border: 1px solid #222;         /* Subtle dark border around the player */
+            background: #000;
+            overflow: hidden;               /* Clips the YouTube player to the rounded corners */
+        }
+
+        #now-playing-label {
+            font-size: 10px;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 15px;
+            min-height: 15px;               /* Reserves space so page doesn't jump on load */
+        }
+
+
+        /* ----------------------------------------------------------
+           SECTION 2E: ACTION BAR BUTTONS (Prev / Shuffle / Next)
+           The three buttons that appear below the featured player.
+           .action-bar  — the container row for all three buttons
+           .ctrl-btn    — shared style for all three buttons
+           .shuffle-btn — additional style applied only to Shuffle
+                          (gives it the green accent border/colour)
+        ---------------------------------------------------------- */
+        .action-bar {
+            margin: 40px 0;                 /* Space above and below the button row */
+            display: flex;
+            justify-content: center;        /* Centre the buttons horizontally */
+            gap: 15px;                      /* Space between the three buttons */
+            flex-wrap: wrap;                /* Allows buttons to wrap on small screens */
+        }
+
         .ctrl-btn {
             background: transparent;
-            border: 1px solid #333;
-            color: #888;
+            border: 1px solid #333;         /* Subtle dark border by default */
+            color: #888;                    /* Grey text by default */
             padding: 12px 25px;
             font-family: 'Orbitron', sans-serif;
             font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 6px;
             cursor: pointer;
-            transition: 0.4s;
+            transition: 0.4s;               /* Smooth colour change on hover */
             border-radius: 2px;
         }
-        .ctrl-btn:hover { border-color: #00ffcc; color: #fff; }
-        .shuffle-btn { border-color: #00ffcc; color: #00ffcc; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(390px, 390px)); gap: 25px; max-width: 100%; margin: 0 auto; justify-content: center; }
-        .video { background: #080808; border-radius: 4px; transition: 0.3s; position: relative; cursor: pointer; border: 1px solid #1a1a1a; overflow: hidden; }
-        .video:hover { transform: scale(1.03); background: #111; }
-        .video.is-playing { border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.15); }
+        .ctrl-btn:hover {
+            border-color: #00ffcc;          /* Accent green border on hover */
+            color: #fff;                    /* Text turns white on hover */
+        }
 
-        .thumb-container { width: 100%; aspect-ratio: 16 / 9; background-size: cover; background-position: center; }
-        .video-label { padding: 15px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #fff; text-align: left; }
+        /* Shuffle button has the accent colour applied by default (not just on hover) */
+        .shuffle-btn {
+            border-color: #00ffcc;
+            color: #00ffcc;
+        }
 
+
+        /* ----------------------------------------------------------
+           SECTION 2F: VIDEO GRID
+           The responsive grid of video thumbnail cards below the player.
+           Cards are fixed at 390px wide. The grid fills available width
+           and wraps automatically.
+           To change card width: update both minmax values (keep them equal).
+           To change gap between cards: update the gap value.
+        ---------------------------------------------------------- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(390px, 390px)); /* Fixed 390px cards */
+            gap: 25px;                      /* Space between cards */
+            max-width: 100%;
+            margin: 0 auto;
+            justify-content: center;        /* Centre the grid if it doesn't fill the page */
+        }
+
+
+        /* ----------------------------------------------------------
+           SECTION 2G: VIDEO CARDS
+           Each individual track card in the grid.
+           .video           — the card itself
+           .video:hover     — slightly enlarged when mouse is over it
+           .video.is-playing — green border + glow when this track is active
+           .thumb-container — the thumbnail image area (set via inline style)
+           .video-label     — the track title text below the thumbnail
+           .overlay-btn     — the "> ACTIVATE <" button that appears on hover
+        ---------------------------------------------------------- */
+        .video {
+            background: #080808;
+            border-radius: 4px;
+            transition: 0.3s;               /* Smooth scale and background change on hover */
+            position: relative;             /* Required so .overlay-btn can be positioned over it */
+            cursor: pointer;
+            border: 1px solid #1a1a1a;      /* Very subtle border when idle */
+            overflow: hidden;               /* Clips thumbnail to card's rounded corners */
+        }
+
+        .video:hover {
+            transform: scale(1.03);         /* Slightly zoom in the card on hover */
+            background: #111;
+        }
+
+        /* Applied by JavaScript to whichever card is currently playing */
+        .video.is-playing {
+            border-color: #00ffcc;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.15); /* Soft green glow */
+        }
+
+        /* The thumbnail image area — image is set per-card via inline style in Stage 3 */
+        .thumb-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;           /* Keeps thumbnails in widescreen ratio */
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* The track title shown below the thumbnail */
+        .video-label {
+            padding: 15px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #fff;
+            text-align: left;
+        }
+
+        /*
+            The hover overlay button that appears centred over the thumbnail.
+            Uses a frosted glass effect (backdrop-filter: blur).
+            pointer-events: none means clicks pass through to the card itself.
+        */
         .overlay-btn {
             position: absolute;
             top: 40%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); /* Centre the button over the thumbnail */
             background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);      /* Frosted glass blur effect */
+            -webkit-backdrop-filter: blur(20px); /* Safari support */
             color: #00ffcc;
             font-size: 10px;
             font-weight: 500;
@@ -57,34 +268,103 @@
             border: 1px solid rgba(0, 255, 204, 0.25);
             border-radius: 2px;
             padding: 10px 18px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
+            opacity: 0;                       /* Hidden by default */
+            transition: opacity 0.3s ease;    /* Fades in smoothly on hover */
+            pointer-events: none;             /* Clicks pass through to the card */
         }
-        .video:hover .overlay-btn { opacity: 1; }
+
+        /* Makes the overlay button visible when the card is hovered */
+        .video:hover .overlay-btn {
+            opacity: 1;
+        }
+
+        /* ----------------------------------------------------------
+           SECTION 2H: MOBILE ADJUSTMENTS /* electroscape mobile title */
+           These styles only apply when the screen is 700px or less.
+           They reduce the wide letter spacing so the header doesn't
+           overflow or wrap on phones and small tablets.
+           To change the mobile letter spacing: update BOTH values
+           (letter-spacing and text-indent must match).
+        ---------------------------------------------------------- */
+        @media (max-width: 700px) {
+            h1 {
+                letter-spacing: 20px;       /* smaller than desktop 50px */
+                text-indent: 20px;           /* Must match letter-spacing */
+            }
+        }
+
+
     </style>
+
+<!-- ============================================================ -->
+<!-- STAGE 2 END                                                   -->
+<!-- ============================================================ -->
+
 </head>
+
+
+<!-- ============================================================ -->
+<!-- STAGE 3 START: BODY HTML — Visible page structure            -->
+<!-- ============================================================ -->
 <body>
+
+    <!-- SECTION 3A: TOP NAVIGATION
+         Links shown at the top of the page.
+         To add a link: copy one <a> line and update the href and text.
+         target='_blank' means the link opens in a new browser tab.
+    -->
     <nav>
         <a href='https://www.youtube.com/@ElectroscapeX' target='_blank'>YouTube</a>
         <a href='https://beacons.ai/weblinks' target='_blank'>Weblinks</a>
     </nav>
-    <h1>Electroscape.X</h1>
 
+    <!-- SECTION 3B: PAGE TITLE
+         The main heading displayed below the nav bar.
+         To change the text: edit the text between the <h1> tags.
+    -->
+    <h1>Electroscape</h1>
+
+
+    <!-- SECTION 3C: FEATURED VIDEO PLAYER
+         The large player at the top. On page load it shows "Initiate Audio Sequence".
+         When a card is clicked, JavaScript replaces this text with the track title
+         and loads the video into the #yt-player div via the YouTube IFrame API.
+         Do not rename the IDs — the JavaScript in Stage 4 references them by name.
+    -->
     <div class="featured-box">
         <div id="now-playing-label">Initiate Audio Sequence</div>
         <div id="player-container">
+            <!-- YouTube IFrame API injects the actual player into this empty div -->
             <div id="yt-player"></div>
         </div>
     </div>
 
+
+    <!-- SECTION 3D: ACTION BAR — Prev / Shuffle / Next buttons
+         These three buttons control playback order.
+         [ Previous ]       — plays the track before the current one
+         [ Shuffle Gallery ] — randomises the card grid and rebuilds the queue
+         [ Next ]           — plays the track after the current one
+         IDs must not be changed — Stage 4 JavaScript references them by ID.
+    -->
     <div class="action-bar">
         <button class="ctrl-btn" id="prev-btn">[ Previous ]</button>
         <button class="ctrl-btn shuffle-btn" id="shuffle-btn">[ Shuffle Gallery ]</button>
         <button class="ctrl-btn" id="next-btn">[ Next ]</button>
     </div>
 
+
+    <!-- SECTION 3E: VIDEO GRID
+         Each .video card represents one track.
+         data-id    = the YouTube video ID (the part after ?v= in the URL)
+         data-title = the track name shown in the now-playing label
+         The thumbnail URL is built from the data-id automatically.
+         To add a track: copy any one .video block and update data-id,
+         data-title, the background-image URL, and the .video-label text.
+         To remove a track: delete the entire .video block for that card.
+    -->
     <div class="grid" id="video-grid">
+
         <div class="video" data-id="t_gSy_5Ntic" data-title="12 Moons - Pilot"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/t_gSy_5Ntic/maxresdefault.jpg');"></div><div class="video-label">12 Moons - Pilot</div><div class="overlay-btn">> ACTIVATE <</div></div>
         <div class="video" data-id="JcfV8wX3eD0" data-title="Mike Koglin - The Silence (Matt Darey Tekara Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/JcfV8wX3eD0/maxresdefault.jpg');"></div><div class="video-label">Mike Koglin - The Silence (Matt Darey Tekara Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
         <div class="video" data-id="b8GiBNgFE68" data-title="Quench - Dreams"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/b8GiBNgFE68/maxresdefault.jpg');"></div><div class="video-label">Quench - Dreams</div><div class="overlay-btn">> ACTIVATE <</div></div>
@@ -124,8 +404,8 @@
         <div class="video" data-id="jI34hvMuEgQ" data-title="HI-LO, Reinier Zonneveld, Oliver Heldens - String Theory"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/jI34hvMuEgQ/maxresdefault.jpg');"></div><div class="video-label">HI-LO, Reinier Zonneveld, Oliver Heldens - String Theory</div><div class="overlay-btn">> ACTIVATE <</div></div>
         <div class="video" data-id="tceq-bOzEDY" data-title="Pulser - My Religion (Extended Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/tceq-bOzEDY/maxresdefault.jpg');"></div><div class="video-label">Pulser - My Religion (Extended Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
         <div class="video" data-id="q6Ei7uL0ABU" data-title="Trance Wax, Dusky - Northern Sky (Dusky Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/q6Ei7uL0ABU/maxresdefault.jpg');"></div><div class="video-label">Trance Wax, Dusky - Northern Sky (Dusky Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
-        <div class="video" data-id="MUwjbgNLv-Q" data-title="Masters & Nickson - Out There (5th Dimension) (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/MUwjbgNLv-Q/maxresdefault.jpg');"></div><div class="video-label">Masters &amp; Nickson - Out There (5th Dimension) (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
-        <div class="video" data-id="2EYBTupJbWE" data-title="G&M Project - Sunday Afternoon (M.O.R.P.H. Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/2EYBTupJbWE/maxresdefault.jpg');"></div><div class="video-label">G&amp;M Project - Sunday Afternoon (M.O.R.P.H. Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="MUwjbgNLv-Q" data-title="Masters &amp; Nickson - Out There (5th Dimension) (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/MUwjbgNLv-Q/maxresdefault.jpg');"></div><div class="video-label">Masters &amp; Nickson - Out There (5th Dimension) (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+        <div class="video" data-id="2EYBTupJbWE" data-title="G&amp;M Project - Sunday Afternoon (M.O.R.P.H. Remix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/2EYBTupJbWE/maxresdefault.jpg');"></div><div class="video-label">G&amp;M Project - Sunday Afternoon (M.O.R.P.H. Remix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
         <div class="video" data-id="_YuzAW51yCU" data-title="Perry O'Neil - Numb (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/_YuzAW51yCU/maxresdefault.jpg');"></div><div class="video-label">Perry O'Neil - Numb (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
         <div class="video" data-id="vGQEcFCK6TE" data-title="Tinlicker, Robert Miles - Children (Extended Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/vGQEcFCK6TE/maxresdefault.jpg');"></div><div class="video-label">Tinlicker, Robert Miles - Children (Extended Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
         <div class="video" data-id="Nw_5n5jupeA" data-title="Grace - Skin on Skin (Orange Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/Nw_5n5jupeA/maxresdefault.jpg');"></div><div class="video-label">Grace - Skin on Skin (Orange Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
@@ -163,14 +443,69 @@
         <div class="video" data-id="kBw_pTgju18" data-title="Cinematrik - Ghosts (Original Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/kBw_pTgju18/maxresdefault.jpg');"></div><div class="video-label">Cinematrik - Ghosts (Original Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
         <div class="video" data-id="vYE7g36IfvA" data-title="Emir Guven - Goodbye (Extended Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/vYE7g36IfvA/maxresdefault.jpg');"></div><div class="video-label">Emir Guven - Goodbye (Extended Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
         <div class="video" data-id="2qJRgZrtreQ" data-title="Slam Duck - Sunset Haze (Extended Mix)"><div class="thumb-container" style="background-image: url('https://img.youtube.com/vi/2qJRgZrtreQ/maxresdefault.jpg');"></div><div class="video-label">Slam Duck - Sunset Haze (Extended Mix)</div><div class="overlay-btn">> ACTIVATE <</div></div>
+
     </div>
+    <!-- END OF VIDEO GRID — add new tracks above this line -->
 
+<!-- ============================================================ -->
+<!-- STAGE 3 END                                                   -->
+<!-- ============================================================ -->
+
+
+<!-- ============================================================ -->
+<!-- STAGE 4 START: JAVASCRIPT — Playback queue and controls      -->
+<!-- ============================================================ -->
     <script>
-        var player = null;
-        var currentIndex = 0;
-        var queue = [];
-        var ended = false;
+        /*
+         * HOW THIS WORKS — PLAIN ENGLISH OVERVIEW
+         * ----------------------------------------
+         * This page uses the YouTube IFrame API, which is Google's official
+         * way to control a YouTube player from JavaScript.
+         *
+         * On page load:
+         *   1. buildQueue() reads all the video cards in the grid and builds
+         *      an ordered list (the "queue") of { id, title, element } objects.
+         *   2. When the YouTube API is ready (onYouTubeIframeAPIReady fires),
+         *      the player is created and the first video is loaded but not played.
+         *
+         * When you click a card:
+         *   playTrack(index) is called, which:
+         *   - Removes the green "is-playing" border from all cards
+         *   - Adds it to the clicked card
+         *   - Updates the "now playing" label above the player
+         *   - Tells the YouTube player to load and play that video
+         *
+         * When a video ends:
+         *   onStateChange detects the ENDED state and automatically
+         *   calls playTrack(currentIndex + 1) to advance to the next track.
+         *
+         * Prev / Next buttons simply call playTrack with currentIndex -1 or +1.
+         * The modulo arithmetic wraps around (last track -> first, first -> last).
+         *
+         * Shuffle physically moves the card elements in the DOM into a new
+         * random order, then rebuilds the queue to match.
+         *
+         * DO NOT RENAME: player, queue, currentIndex, ended,
+         *                buildQueue, setActiveCard, playTrack,
+         *                onYouTubeIframeAPIReady
+         * These names are referenced in multiple places and must stay consistent.
+        */
 
+        /* --- SECTION 4A: GLOBAL STATE VARIABLES ---
+           These four variables track the current state of the player.
+           They are declared here so all functions below can access them.
+        */
+        var player       = null;    // Holds the YouTube player object once created
+        var currentIndex = 0;       // Which track in the queue is currently playing
+        var queue        = [];      // The ordered list of all video cards
+        var ended        = false;   // Prevents the "track ended" event firing twice
+
+
+        /* --- SECTION 4B: buildQueue ---
+           Reads every .video card currently in the grid and stores them in
+           the queue array. Called once on load and again after every shuffle.
+           Each entry is: { id: "youtubeID", title: "Track Name", el: <div element> }
+        */
         function buildQueue() {
             var cards = document.querySelectorAll('#video-grid .video');
             queue = Array.from(cards).map(function(el) {
@@ -178,6 +513,11 @@
             });
         }
 
+
+        /* --- SECTION 4C: setActiveCard ---
+           Removes the green "is-playing" highlight from all cards,
+           then adds it to the card at the given index in the queue.
+        */
         function setActiveCard(index) {
             document.querySelectorAll('#video-grid .video').forEach(function(el) {
                 el.classList.remove('is-playing');
@@ -187,21 +527,49 @@
             }
         }
 
+
+        /* --- SECTION 4D: playTrack ---
+           The main playback function. Takes an index number,
+           wraps it to stay within the queue length (so it loops),
+           updates the now-playing label, highlights the active card,
+           and tells the YouTube player to load and play the video.
+        */
         function playTrack(index) {
-            if (!queue.length) return;
+            if (!queue.length) return; // Do nothing if queue is empty
+
+            // Wrap index so it loops: going past the last track returns to first,
+            // going before the first track jumps to the last.
             index = ((index % queue.length) + queue.length) % queue.length;
             currentIndex = index;
-            ended = false;
+            ended = false; // Reset the ended flag for the new track
 
             var track = queue[currentIndex];
+
+            // Update the label above the player with the current track title
             document.getElementById('now-playing-label').textContent = track.title;
+
+            // Highlight the active card in the grid
             setActiveCard(currentIndex);
 
+            // Tell the YouTube player to load and play this video
             if (player && typeof player.loadVideoById === 'function') {
                 player.loadVideoById({ videoId: track.id });
             }
         }
 
+
+        /* --- SECTION 4E: onYouTubeIframeAPIReady ---
+           This function name is REQUIRED by YouTube — the API calls it
+           automatically when the YouTube script (loaded at the bottom) is ready.
+           It creates the player inside the #yt-player div.
+           playerVars control the player's default behaviour:
+             autoplay: 0        — do not auto-play on page load
+             controls: 1        — show the YouTube player controls bar
+             rel: 0             — do not show related videos at the end
+             modestbranding: 1  — minimal YouTube branding
+             fs: 1              — allow fullscreen button
+             enablejsapi: 1     — required for JavaScript control to work
+        */
         window.onYouTubeIframeAPIReady = function() {
             player = new YT.Player('yt-player', {
                 width: '100%',
@@ -215,14 +583,16 @@
                     enablejsapi: 1
                 },
                 events: {
+                    // When the player is ready: load the first track (but don't play it)
                     onReady: function() {
                         if (queue.length) {
                             player.cueVideoById(queue[0].id);
                         }
                     },
+                    // When a track ends: advance to the next track automatically
                     onStateChange: function(event) {
                         if (event.data === YT.PlayerState.ENDED && !ended) {
-                            ended = true;
+                            ended = true; // Set flag first to prevent double-trigger
                             playTrack(currentIndex + 1);
                         }
                     }
@@ -230,6 +600,12 @@
             });
         };
 
+
+        /* --- SECTION 4F: CARD CLICK EVENT ---
+           Adds a click listener to every video card.
+           When clicked: finds that card's position in the queue
+           and calls playTrack with that index.
+        */
         document.querySelectorAll('#video-grid .video').forEach(function(el) {
             el.addEventListener('click', function() {
                 if (!queue.length) buildQueue();
@@ -238,29 +614,58 @@
             });
         });
 
+
+        /* --- SECTION 4G: PREV BUTTON ---
+           Plays the track one position before the current one.
+           Wraps to the last track if currently on the first.
+        */
         document.getElementById('prev-btn').addEventListener('click', function() {
             if (!queue.length) buildQueue();
             playTrack(currentIndex - 1);
         });
 
+
+        /* --- SECTION 4H: NEXT BUTTON ---
+           Plays the track one position after the current one.
+           Wraps to the first track if currently on the last.
+        */
         document.getElementById('next-btn').addEventListener('click', function() {
             if (!queue.length) buildQueue();
             playTrack(currentIndex + 1);
         });
 
+
+        /* --- SECTION 4I: SHUFFLE BUTTON ---
+           Randomly reorders the video cards in the grid (Fisher-Yates shuffle).
+           After shuffling, rebuilds the queue to match the new card order.
+           If a track is currently playing, keeps currentIndex pointing at it.
+           If nothing is playing, resets to position 0.
+        */
         document.getElementById('shuffle-btn').addEventListener('click', function() {
-            var grid = document.getElementById('video-grid');
+            var grid  = document.getElementById('video-grid');
             var cards = Array.from(grid.querySelectorAll('.video'));
+
+            // Fisher-Yates shuffle: walks backwards through the array,
+            // swapping each card with a random earlier card.
             for (var i = cards.length - 1; i > 0; i--) {
                 var j = Math.floor(Math.random() * (i + 1));
                 grid.appendChild(cards[j]);
                 var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp;
             }
+
+            // Rebuild the queue to reflect the new card order
             buildQueue();
-            var stillPlaying = queue.findIndex(function(t) { return t.el.classList.contains('is-playing'); });
+
+            // Find where the currently-playing card ended up after the shuffle
+            var stillPlaying = queue.findIndex(function(t) {
+                return t.el.classList.contains('is-playing');
+            });
+
             if (stillPlaying !== -1) {
+                // Keep currentIndex pointing at the playing track's new position
                 currentIndex = stillPlaying;
             } else {
+                // Nothing was playing — reset to position 0
                 currentIndex = 0;
                 if (player && typeof player.cueVideoById === 'function') {
                     player.cueVideoById(queue[0].id);
@@ -268,8 +673,36 @@
             }
         });
 
+
+        /* --- SECTION 4J: INITIALISATION ---
+           Builds the queue as soon as the page loads so it is ready
+           before the YouTube API script finishes loading.
+        */
         buildQueue();
+
     </script>
+
+    <!--
+        Loads the YouTube IFrame API script from Google.
+        async means it loads in the background without blocking the page.
+        When it finishes loading it automatically calls onYouTubeIframeAPIReady (Section 4E).
+        This MUST stay at the bottom of the page, after the <script> block above.
+    -->
     <script src="https://www.youtube.com/iframe_api" async></script>
+
+<!-- ============================================================ -->
+<!-- STAGE 4 END                                                   -->
+<!-- ============================================================ -->
+
+    <!-- ============================================================ -->
+    <!-- FOOTER VERSION DISPLAY                                        -->
+    <!-- To update version: change the number between the <span> tags  -->
+    <!-- Must match the Version number in the file header comment.     -->
+    <!-- ============================================================ -->
+    <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a;">
+        Version 
+        <!-- change version --><span style="color: #00ffcc;">1.1</span><!-- end change version -->
+    </div>
+
 </body>
 </html>
