@@ -1,5 +1,5 @@
 <!--
-    Name: index.html | Version: 2.0
+    Name: index.html | Version: 2.3
     Project: Electroscape
     Description: Music video gallery page with YouTube IFrame API player.
                  Track data is loaded from tracks.json — edit that file to
@@ -8,6 +8,7 @@
                  Clicking a card loads it into the featured player at the top.
                  Prev / Next buttons step through the playlist in order.
                  Shuffle randomises the card grid and resets the queue.
+                 v2.1 — Orbital HUD footer added (persistent mini-player bar).
     Stages:
         Stage 1 — HEAD        : Page setup, font import, stylesheet link
         Stage 2 — CSS STYLES  : Moved to style.css
@@ -129,9 +130,38 @@
     <!-- To update version: change the number inside the <span> tags  -->
     <!-- Must match the Version number in the file header comment.     -->
     <!-- ============================================================ -->
-    <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a;">
-        <!-- change version --><span style="color: #00ffcc;">2.0</span><!-- end change version -->
+    <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
+        <!-- change version --><span style="color: #00ffcc;">2.3</span><!-- end change version -->
     </div>
+
+
+    <!-- ============================================================ -->
+    <!-- SECTION 3F: ORBITAL HUD — Persistent footer mini-player      -->
+    <!-- A fixed bar pinned to the bottom of the screen.              -->
+    <!-- Stays visible while the user scrolls the grid.               -->
+    <!-- Shows: progress line / track title / Prev, Play/Pause, Next  -->
+    <!-- Do not rename any IDs — player.js references them by name.   -->
+    <!-- ============================================================ -->
+    <div id="hud-dock">
+        <!-- Thin progress line across the very top of the HUD bar.
+             Click anywhere on hud-progress-container to seek. -->
+        <div id="hud-progress-container">
+            <div id="hud-progress-bar"></div>
+        </div>
+
+        <!-- Inner row: track title on the left, controls on the right -->
+        <div id="hud-inner">
+            <div id="hud-track-title">Initiate Audio Sequence</div>
+            <div id="hud-controls">
+                <button class="hud-btn" id="hud-prev">&#9664;&#9664;</button>
+                <button class="hud-btn hud-playpause" id="hud-playpause">&#9654;</button>
+                <button class="hud-btn" id="hud-next">&#9654;&#9654;</button>
+            </div>
+        </div>
+    </div>
+    <!-- ============================================================ -->
+    <!-- SECTION 3F END                                               -->
+    <!-- ============================================================ -->
 
 
     <!--

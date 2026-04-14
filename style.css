@@ -1,11 +1,12 @@
 /*
-    Name: style.css | Version: 2.0
+    Name: style.css | Version: 2.1
     Project: Electroscape
     Description: All visual styles for the Electroscape music video gallery.
                  Imported by index.html via <link> tag in the <head>.
                  Edit this file to change colours, fonts, layout, spacing.
                  The JavaScript (player.js) and track data (tracks.json)
                  are separate files — changes here will not affect playback logic.
+                 v2.1 — Orbital HUD footer styles added (Section 2I).
 */
 
 
@@ -171,7 +172,7 @@ h1 {
 }
 
 /* [T1] Tablet/large phone portrait */
-@media (max-width: 1400px) {
+@media (max-width: 1900px) {
     .grid {
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 18px;
@@ -187,7 +188,7 @@ h1 {
 }
 
 /* [S] Phone portrait: force exactly 2 columns */
-@media (max-width: 500px) and (orientation: portrait) {
+@media (max-width: 900px) and (orientation: portrait) {
     .grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
@@ -221,10 +222,17 @@ h1 {
     background: #111;
 }
 
+/* Heartbeat glow animation for the active card */
+@keyframes activePulse {
+    0%   { box-shadow: 0 0 5px rgba(0, 255, 204, 0.2); }
+    50%  { box-shadow: 0 0 20px rgba(0, 255, 204, 0.6); }
+    100% { box-shadow: 0 0 5px rgba(0, 255, 204, 0.2); }
+}
+
 /* Applied by JavaScript to whichever card is currently playing */
 .video.is-playing {
-    border-color: #00ffcc;
-    box-shadow: 0 0 20px rgba(0, 255, 204, 0.15);
+    border-color: #00ffcc !important;
+    animation: activePulse 2s infinite ease-in-out;
 }
 
 .thumb-container {
@@ -235,12 +243,15 @@ h1 {
 }
 
 .video-label {
+    display: block;       /* Force the label to be its own block */
+    width: 100%;         /* Ensure it spans the full width of the card */
     padding: 15px;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     color: #fff;
-    text-align: left;
+    text-align: center;   /* Now it has the full width to center within */
+    box-sizing: border-box; /* Prevents padding from breaking the width */
 }
 
 .overlay-btn {
@@ -278,7 +289,7 @@ h1 {
 /* To change mobile letter spacing: update BOTH letter-spacing */
 /* and text-indent — they must always match.                   */
 /* ============================================================ */
-@media (max-width: 700px) {
+@media (max-width:900px) {
     h1 {
         letter-spacing: 20px;
         text-indent: 20px;
@@ -287,5 +298,161 @@ h1 {
         font-size: 9px;
         letter-spacing: 5px;
         margin: 0 12px;
+    }
+}
+
+
+/* ============================================================ */
+/* SECTION 2I: ORBITAL HUD — Persistent footer mini-player      */
+/*                                                             */
+/* #hud-dock            — the fixed bar itself, pinned bottom  */
+/* #hud-progress-container — clickable full-width seek area    */
+/* #hud-progress-bar    — green fill that tracks playback      */
+/* #hud-inner           — flex row: title on left, btns right  */
+/* #hud-track-title     — current track name                   */
+/* #hud-controls        — Prev / Play-Pause / Next buttons     */
+/* .hud-btn             — base style for HUD control buttons   */
+/* .hud-playpause       — accent style for the play/pause btn  */
+/*                                                             */
+/* The HUD starts hidden (opacity: 0; pointer-events: none)    */
+/* and becomes visible once a track starts playing.            */
+/* player.js adds the class .hud-active to #hud-dock to show  */
+/* it. Remove that class logic to always show the bar.         */
+/* ============================================================ */
+#hud-dock {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    box-sizing: border-box;
+}
+
+/* Shown once a track is loaded — player.js adds this class */
+#hud-dock.hud-active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Thin 2px seek-bar strip across the top of the HUD */
+#hud-progress-container {
+    width: 100%;
+    height: 3px;
+    background: #1a1a1a;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+}
+
+#hud-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #00ffcc;
+    transition: width 0.15s linear;
+    pointer-events: none;
+}
+
+/* Invisible Hitbox: 
+   Extends the clickable area to 50px high for tablet/mobile.
+   Centered: 23.5px above + 3px bar + 23.5px below = 50px total.
+*/
+#hud-progress-container::before {
+    content: '';
+    position: absolute;
+    top: -23.5px; 
+    left: 0;
+    right: 0;
+    height: 50px;
+    z-index: 10;
+    background: transparent; 
+}
+
+/* Inner row containing title and controls */
+#hud-inner {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    gap: 16px;
+    min-width: 0;
+}
+
+/* Track title — truncates with ellipsis if too long */
+#hud-track-title {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #aaa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+/* Control buttons group */
+#hud-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Base HUD button style */
+.hud-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: #666;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: 0.3s;
+    line-height: 1;
+    letter-spacing: 1px;
+}
+
+.hud-btn:hover {
+    border-color: #00ffcc;
+    color: #fff;
+}
+
+/* Play/Pause button — green accent to stand out */
+.hud-playpause {
+    border-color: #00ffcc;
+    color: #00ffcc;
+    padding: 6px 14px;
+}
+
+.hud-playpause:hover {
+    background: rgba(0, 255, 204, 0.1);
+}
+
+/* Tighter layout on small screens */
+@media (max-width: 500px) {
+    #hud-inner {
+        padding: 0 10px;
+        gap: 8px;
+    }
+    #hud-track-title {
+        font-size: 7px;
+        letter-spacing: 1.5px;
+    }
+    .hud-btn {
+        padding: 5px 8px;
+        font-size: 8px;
     }
 }

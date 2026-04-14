@@ -1,10 +1,12 @@
 /*
-    Name: player.js | Version: 2.0
+    Name: player.js | Version: 2.1
     Project: Electroscape
     Description: All playback logic for the Electroscape music video gallery.
                  Loads track data from tracks.json, builds the video card grid,
                  and controls the YouTube IFrame API player.
                  Imported by index.html via <script> tag at the bottom of <body>.
+                 v2.1 — Orbital HUD footer integrated (Sections 4L, 4M, 4N).
+                       Card clicks no longer scroll back to top.
 
     Stages map:
         Section 4A — Track loader   : Fetches tracks.json and builds the card grid
@@ -18,6 +20,9 @@
         Section 4I — Shuffle button : Randomises the card grid and rebuilds queue
         Section 4J — Initialisation : Entry point — loads tracks and builds queue
         Section 4K — End card guard : Auto-skips YouTube end cards
+        Section 4L — HUD tracker    : Updates HUD progress bar and title every 500ms
+        Section 4M — HUD seek       : Seek on progress bar click
+        Section 4N — HUD controls   : Wires up HUD Prev / Play-Pause / Next buttons
 */
 
 
@@ -110,7 +115,9 @@ function buildQueue() {
 /* SECTION 4C: ACTIVE CARD HIGHLIGHTER                          */
 /* Removes the green "is-playing" border from all cards,       */
 /* then applies it only to the card at the given queue index.  */
-/* Also scrolls that card into view smoothly.                  */
+/* Scrolls that card into view smoothly (nearest — does NOT    */
+/* scroll the whole page to the top, just enough to show the   */
+/* card within the grid).                                      */
 /* ============================================================ */
 function setActiveCard(index) {
     document.querySelectorAll('#video-grid .video').forEach(function(el) {
@@ -149,6 +156,7 @@ function playTrack(index) {
 
     setActiveCard(currentIndex);
     startEndCardGuard(); /* Restart the end card timer for the new track */
+    updateHudTitle(track.title); /* Sync HUD title immediately */
 }
 
 
@@ -199,11 +207,21 @@ function createPlayer() {
                 }
                 startEndCardGuard();
                 attachNowPlayingClick();
+                startHudTracker();   /* Start the HUD progress updater */
+                setupHudSeeking();   /* Wire up seek on progress bar click */
+                attachHudControls(); /* Wire up HUD Prev / Play-Pause / Next */
             },
             onStateChange: function(event) {
+                /* Auto-advance when track ends */
                 if (event.data === YT.PlayerState.ENDED && !ended) {
                     ended = true;
                     playTrack(currentIndex + 1);
+                }
+                /* Update the HUD play/pause button icon on every state change */
+                updateHudPlayPauseIcon(event.data);
+                /* Show the HUD as soon as something starts playing or is cued */
+                if (event.data !== -1) {
+                    document.getElementById('hud-dock').classList.add('hud-active');
                 }
             }
         }
@@ -242,16 +260,17 @@ function attachNowPlayingClick() {
 /* SECTION 4F: CARD CLICK EVENT                                 */
 /* Attaches a click listener to every video card in the grid.  */
 /* Called after the cards have been built from tracks.json.    */
-/* When clicked: finds that card's position in the queue,      */
-/* plays the track, and scrolls smoothly back to the top       */
-/* so the featured player is immediately visible.              */
+/* When clicked: finds that card's position in the queue and   */
+/* plays the track. The page does NOT scroll to the top —      */
+/* the Orbital HUD footer gives full playback control wherever */
+/* the user is in the grid.                                    */
 /* ============================================================ */
 function attachCardClicks() {
     document.querySelectorAll('#video-grid .video').forEach(function(el) {
         el.addEventListener('click', function() {
             var idx = queue.findIndex(function(t) { return t.el === el; });
             if (idx !== -1) playTrack(idx);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            /* Scroll removed — HUD provides controls at any scroll position */
         });
     });
 }
@@ -347,4 +366,110 @@ function startEndCardGuard() {
             }
         }
     }, 1000);
+}
+
+
+/* ============================================================ */
+/* SECTION 4L: HUD TRACKER                                      */
+/* Polls the YouTube player every 500ms while a track is       */
+/* playing and updates:                                        */
+/*   - The green progress bar width (% of track complete)      */
+/*   - The HUD track title (in case it got out of sync)        */
+/* Only runs when the player is in state 1 (playing).          */
+/* ============================================================ */
+function startHudTracker() {
+    setInterval(function() {
+        if (!player || typeof player.getPlayerState !== 'function') return;
+        if (player.getPlayerState() === 1) { /* 1 = YT.PlayerState.PLAYING */
+            var current = player.getCurrentTime();
+            var total   = player.getDuration();
+            if (total > 0) {
+                var pct = (current / total) * 100;
+                document.getElementById('hud-progress-bar').style.width = pct + '%';
+            }
+        }
+    }, 500);
+}
+
+/* Helper: sync the HUD track title text */
+function updateHudTitle(title) {
+    document.getElementById('hud-track-title').textContent = title || '';
+}
+
+
+/* ============================================================ */
+/* SECTION 4M: HUD SEEK                                         */
+/* Clicking anywhere on the progress bar container seeks the    */
+/* YouTube player to that position in the track.                */
+/* Added: Immediate UI feedback to counter YouTube server lag.  */
+/* ============================================================ */
+function setupHudSeeking() {
+    var barContainer = document.getElementById('hud-progress-container');
+    var visualBar = document.getElementById('hud-progress-bar');
+
+    barContainer.addEventListener('click', function(e) {
+        if (!player || typeof player.getDuration !== 'function') return;
+
+        var rect = barContainer.getBoundingClientRect();
+        var pos  = (e.clientX - rect.left) / rect.width;
+        pos = Math.max(0, Math.min(1, pos)); /* Clamp to 0–1 */
+
+        // 1. IMMEDIATE UI FEEDBACK
+        // We manually move the green bar to the click spot so it feels instant
+        if (visualBar) {
+            visualBar.style.width = (pos * 100) + '%';
+        }
+
+        // 2. TRIGGER SEEK
+        // Using 'true' allows the player to seek to unbuffered parts of the video
+        var newTime = pos * player.getDuration();
+        player.seekTo(newTime, true);
+    });
+}
+
+/* ============================================================ */
+/* SECTION 4N: HUD CONTROLS                                     */
+/* Wires up the three buttons inside the Orbital HUD footer.   */
+/*   hud-prev      — play the previous track                   */
+/*   hud-playpause — toggle play / pause                       */
+/*   hud-next      — play the next track                       */
+/*                                                             */
+/* updateHudPlayPauseIcon() is called from onStateChange to    */
+/* keep the button icon in sync with the actual player state.  */
+/*   state 1 (playing)  → show pause symbol  ❚❚               */
+/*   all other states   → show play symbol   ▶                */
+/* ============================================================ */
+function attachHudControls() {
+    document.getElementById('hud-prev').addEventListener('click', function() {
+        if (!queue.length) buildQueue();
+        playTrack(currentIndex - 1);
+    });
+
+    document.getElementById('hud-playpause').addEventListener('click', function() {
+        if (!player || typeof player.getPlayerState !== 'function') return;
+        var state = player.getPlayerState();
+        if (state === -1 || state === YT.PlayerState.UNSTARTED || state === YT.PlayerState.CUED) {
+            /* Nothing playing yet — start from current position */
+            playTrack(currentIndex === -1 ? 0 : currentIndex);
+        } else if (state === YT.PlayerState.PLAYING) {
+            player.pauseVideo();
+        } else {
+            player.playVideo();
+        }
+    });
+
+    document.getElementById('hud-next').addEventListener('click', function() {
+        if (!queue.length) buildQueue();
+        playTrack(currentIndex + 1);
+    });
+}
+
+function updateHudPlayPauseIcon(state) {
+    var btn = document.getElementById('hud-playpause');
+    if (!btn) return;
+    if (state === 1) { /* YT.PlayerState.PLAYING */
+        btn.innerHTML = '&#10074;&#10074;'; /* Pause ❚❚ */
+    } else {
+        btn.innerHTML = '&#9654;';          /* Play ▶ */
+    }
 }
