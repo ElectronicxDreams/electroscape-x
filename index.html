@@ -1,5 +1,5 @@
 <!--
-    Name: index.html | Version: 1.2
+    Name: index.html | Version: 1.3
     Project: Electroscape
     Description: Music video gallery page with YouTube IFrame API player.
                  Clicking a card loads it into the featured player at the top.
@@ -181,21 +181,37 @@
 
         /* ----------------------------------------------------------
            SECTION 2F: VIDEO GRID
-           The responsive grid of video thumbnail cards below the player.
-           Cards are fixed at 390px wide. The grid fills available width
-           and wraps automatically.
-           To change card width: update both minmax values (keep them equal).
-           To change gap between cards: update the gap value.
+           Responsive grid with different card sizes per device.
+           Desktop: 390px cards
+           Tablet (≤900px): 260px flexible cards for more columns
+           Phone (≤600px): single column full width
+           To change card widths: update the minmax values below.
+           To change gap between cards: update the gap values.
         ---------------------------------------------------------- */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(390px, 390px)); /* Fixed 390px cards */
-            gap: 25px;                      /* Space between cards */
+            grid-template-columns: repeat(auto-fill, minmax(390px, 390px)); /* Desktop: 390px cards */
+            gap: 25px;                      /* Desktop gap */
             max-width: 100%;
             margin: 0 auto;
-            justify-content: center;        /* Centre the grid if it doesn't fill the page */
+            justify-content: center;
         }
 
+        /* Tablet: smaller cards for more columns */
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* Tablet: 260px cards */
+                gap: 18px;                  /* Slightly tighter gap on tablet */
+            }
+        }
+
+        /* Phone: single column for easy scrolling */
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;  /* Phone: full width cards */
+                gap: 15px;                  /* Tighter gap on phone */
+            }
+        }
 
         /* ----------------------------------------------------------
            SECTION 2G: VIDEO CARDS
@@ -708,7 +724,7 @@
     <!-- ============================================================ -->
     <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a;">
         Version 
-        <!-- change version --><span style="color: #00ffcc;">1.2</span><!-- end change version -->
+        <!-- change version --><span style="color: #00ffcc;">1.3</span><!-- end change version -->
     </div>
 
 </body>
