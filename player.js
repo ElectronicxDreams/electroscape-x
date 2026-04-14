@@ -1,5 +1,5 @@
 /*
-    Name: player.js | Version: 2.1
+    Name: player.js | Version: 2.4
     Project: Electroscape
     Description: All playback logic for the Electroscape music video gallery.
                  Loads track data from tracks.json, builds the video card grid,
@@ -200,10 +200,13 @@ function createPlayer() {
             enablejsapi: 1
         },
         events: {
-            onReady: function() {
+       onReady: function() {
                 if (queue.length) {
                     player.cueVideoById(queue[0].id);
                     currentIndex = 0; /* Fix: ensures Next/Prev start from correct position */
+                    
+                    /* --- UPDATE: Apply pulse animation to first card on load --- */
+                    setActiveCard(0); 
                 }
                 startEndCardGuard();
                 attachNowPlayingClick();

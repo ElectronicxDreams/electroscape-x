@@ -1,5 +1,5 @@
 /*
-    Name: style.css | Version: 2.1
+    Name: style.css | Version: 2.4
     Project: Electroscape
     Description: All visual styles for the Electroscape music video gallery.
                  Imported by index.html via <link> tag in the <head>.
@@ -198,14 +198,13 @@ h1 {
 
 /* ============================================================ */
 /* SECTION 2G: VIDEO CARDS                                      */
-/* Each individual track card in the grid.                     */
-/* .video           — the card itself                          */
-/* .video:hover     — slightly enlarged on mouse-over          */
-/* .video.is-playing — green border + glow when active         */
-/* .thumb-container — thumbnail image area                     */
-/* .video-label     — track title text below the thumbnail     */
-/* .overlay-btn     — "> ACTIVATE <" button that appears       */
-/*                    on hover over a card                     */
+/* Each individual track card in the grid.                      */
+/* .video           — the card itself                           */
+/* .video:hover     — slightly enlarged on mouse-over           */
+/* .video.is-playing — green border + soft glow pulse           */
+/* .thumb-container — thumbnail image area                      */
+/* .video-label     — track title text below the thumbnail      */
+/* .overlay-btn     — "> ACTIVATE <" button on hover            */
 /* ============================================================ */
 .video {
     background: #080808;
@@ -214,7 +213,8 @@ h1 {
     position: relative;
     cursor: pointer;
     border: 1px solid #1a1a1a;
-    overflow: hidden;
+    /* Set to visible so the activePulse glow is not clipped */
+    overflow: visible;
 }
 
 .video:hover {
@@ -222,11 +222,13 @@ h1 {
     background: #111;
 }
 
-/* Heartbeat glow animation for the active card */
+/* Active card breathing glow (v2.4)
+   Lowered opacity for a more subtle, professional shimmer.
+*/
 @keyframes activePulse {
-    0%   { box-shadow: 0 0 5px rgba(0, 255, 204, 0.2); }
-    50%  { box-shadow: 0 0 20px rgba(0, 255, 204, 0.6); }
-    100% { box-shadow: 0 0 5px rgba(0, 255, 204, 0.2); }
+    0%   { box-shadow: 0 0 5px rgba(0, 255, 204, 0.1); }
+    50%  { box-shadow: 0 0 20px rgba(0, 255, 204, 0.35); }
+    100% { box-shadow: 0 0 5px rgba(0, 255, 204, 0.1); }
 }
 
 /* Applied by JavaScript to whichever card is currently playing */
@@ -240,18 +242,20 @@ h1 {
     aspect-ratio: 16 / 9;
     background-size: cover;
     background-position: center;
+    /* Added top radius since parent overflow is now visible */
+    border-radius: 4px 4px 0 0;
 }
 
 .video-label {
-    display: block;       /* Force the label to be its own block */
-    width: 100%;         /* Ensure it spans the full width of the card */
+    display: block;
+    width: 100%;
     padding: 15px;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     color: #fff;
-    text-align: center;   /* Now it has the full width to center within */
-    box-sizing: border-box; /* Prevents padding from breaking the width */
+    text-align: center;
+    box-sizing: border-box;
 }
 
 .overlay-btn {
@@ -261,7 +265,7 @@ h1 {
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);    /* Safari support */
+    -webkit-backdrop-filter: blur(20px);
     color: #00ffcc;
     font-size: 10px;
     font-weight: 500;
@@ -273,13 +277,12 @@ h1 {
     padding: 10px 18px;
     opacity: 0;
     transition: opacity 0.3s ease;
-    pointer-events: none;                   /* Clicks pass through to the card */
+    pointer-events: none;
 }
 
 .video:hover .overlay-btn {
     opacity: 1;
 }
-
 
 /* ============================================================ */
 /* SECTION 2H: MOBILE ADJUSTMENTS                               */
