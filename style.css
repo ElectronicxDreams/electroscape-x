@@ -1,5 +1,5 @@
 /*
-    Name: style.css | Version: 2.4
+    Name: style.css | Version: 2.5
     Project: Electroscape
     Description: All visual styles for the Electroscape music video gallery.
                  Imported by index.html via <link> tag in the <head>.
@@ -113,7 +113,14 @@ h1 {
 /* SECTION 2E: ACTION BAR BUTTONS (Prev / Shuffle / Next)       */
 /* .action-bar  — container row for all three buttons          */
 /* .ctrl-btn    — shared style for all three buttons           */
-/* .shuffle-btn — extra style for Shuffle (green accent)       */
+/*                                                             */
+/* All three buttons share a permanent faint green border      */
+/* This avoids Android touch leaving one button stuck with a   */
+/* bright green :focus border while others remain grey.        */
+/* On desktop: hover brightens border + text as before.        */
+/* On Android: all buttons always look identical — no state.   */
+/* :focus style explicitly matches rest state so touch focus   */
+/* can never produce an unexpected highlight.                  */
 /* ============================================================ */
 .action-bar {
     margin: 40px 0;
@@ -125,26 +132,37 @@ h1 {
 
 .ctrl-btn {
     background: transparent;
-    border: 1px solid #333;
+    border: 1px solid rgba(0, 255, 204, 0.5);  /* — always on, all buttons */
     color: #888;
     padding: 12px 25px;
-    font-family: 'Orbitron', sans-serif;    /* Must match the font loaded in index.html */
+    font-family: 'Orbitron', sans-serif;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 6px;
     cursor: pointer;
     transition: 0.4s;
     border-radius: 2px;
+    outline: none;                               /* Remove default browser focus ring */
 }
 
 .ctrl-btn:hover {
-    border-color: #00ffcc;
+    border-color: #00ffcc;                       /* Full green on desktop hover */
     color: #fff;
 }
 
-/* Shuffle button has accent colour by default (not just on hover) */
+/* Neutralise focus — matches rest state so Android touch focus
+   is invisible and can never get stuck looking different */
+.ctrl-btn:focus {
+    border-color: rgba(0, 255, 204, 0.25);
+    color: #888;
+}
+
+/* Override Sequence keeps its accent text colour to stay distinct */
 .shuffle-btn {
-    border-color: #00ffcc;
+    color: #00ffcc;
+}
+
+.shuffle-btn:focus {
     color: #00ffcc;
 }
 

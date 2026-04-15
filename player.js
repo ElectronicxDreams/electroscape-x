@@ -147,7 +147,8 @@ function setActiveCard(index) {
     });
     if (queue[index]) {
         queue[index].el.classList.add('is-playing');
-        queue[index].el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        /* Scroll intentionally removed — page position is always user choice.
+           The HUD footer gives full playback control at any scroll position. */
     }
 }
 
@@ -314,10 +315,13 @@ function attachCardClicks() {
 /* SECTION 4G: PREV BUTTON                                      */
 /* Plays the track one position before the current one.        */
 /* Wraps to the last track if currently on the first.          */
+/* .blur() called after click so Android touch does not leave  */
+/* the button stuck in its hover/focus green state.            */
 /* ============================================================ */
 document.getElementById('prev-btn').addEventListener('click', function() {
     if (!queue.length) buildQueue();
     playTrack(currentIndex - 1);
+    this.blur();
 });
 
 
@@ -325,10 +329,13 @@ document.getElementById('prev-btn').addEventListener('click', function() {
 /* SECTION 4H: NEXT BUTTON                                      */
 /* Plays the track one position after the current one.         */
 /* Wraps to the first track if currently on the last.          */
+/* .blur() called after click so Android touch does not leave  */
+/* the button stuck in its hover/focus green state.            */
 /* ============================================================ */
 document.getElementById('next-btn').addEventListener('click', function() {
     if (!queue.length) buildQueue();
     playTrack(currentIndex + 1);
+    this.blur();
 });
 
 
@@ -339,6 +346,8 @@ document.getElementById('next-btn').addEventListener('click', function() {
 /* swapping each card with a random earlier card).             */
 /* After shuffling, rebuilds the queue to match new card order.*/
 /* If a track is playing, keeps currentIndex pointing at it.   */
+/* .blur() called after click so Android touch does not leave  */
+/* the button stuck in its hover/focus green state.            */
 /* ============================================================ */
 document.getElementById('shuffle-btn').addEventListener('click', function() {
     var grid  = document.getElementById('video-grid');
@@ -364,6 +373,8 @@ document.getElementById('shuffle-btn').addEventListener('click', function() {
             player.cueVideoById(queue[0].id);
         }
     }
+
+    this.blur();
 });
 
 
