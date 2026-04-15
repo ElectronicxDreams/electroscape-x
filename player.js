@@ -1,5 +1,5 @@
 /*
-    Name: player.js | Version: 2.4
+    Name: player.js | Version: 2.5
     Project: Electroscape
     Description: All playback logic for the Electroscape music video gallery.
                  Loads track data from tracks.json, builds the video card grid,
@@ -7,22 +7,33 @@
                  Imported by index.html via <script> tag at the bottom of <body>.
                  v2.1 — Orbital HUD footer integrated (Sections 4L, 4M, 4N).
                        Card clicks no longer scroll back to top.
+                 v2.5 — Bug fixes:
+                       - HUD title now syncs on page load (first card cued).
+                       - HUD progress tracker interval is now stored and cleared
+                         between tracks so intervals cannot stack up.
+                       - Progress bar resets to 0% at the start of each new track.
+                       - HUD visibility trigger tightened to states 1 and 5 only
+                         (PLAYING and CUED), preventing flicker on state -1.
+                       - End card guard no longer starts on page load before
+                         anything is playing.
+                       - Section numbering corrected (4C2 folded into 4C).
 
     Stages map:
-        Section 4A — Track loader   : Fetches tracks.json and builds the card grid
-        Section 4B — Queue builder  : Reads the card grid into a playback queue
-        Section 4C — Active card    : Highlights the currently playing card
-        Section 4D — Play track     : Loads and plays a track by queue position
-        Section 4E — YouTube ready  : Creates the player when the YouTube API loads
-        Section 4F — Card click     : Plays a track when its card is clicked
-        Section 4G — Prev button    : Steps back one track
-        Section 4H — Next button    : Steps forward one track
-        Section 4I — Shuffle button : Randomises the card grid and rebuilds queue
-        Section 4J — Initialisation : Entry point — loads tracks and builds queue
-        Section 4K — End card guard : Auto-skips YouTube end cards
-        Section 4L — HUD tracker    : Updates HUD progress bar and title every 500ms
-        Section 4M — HUD seek       : Seek on progress bar click
-        Section 4N — HUD controls   : Wires up HUD Prev / Play-Pause / Next buttons
+        Section 4A — Track loader        : Fetches tracks.json and builds the card grid
+        Section 4B — Queue builder       : Reads the card grid into a playback queue
+        Section 4C — Active card         : Highlights the currently playing card
+                     Now-playing click   : Makes the label above the player clickable
+        Section 4D — Play track          : Loads and plays a track by queue position
+        Section 4E — YouTube ready       : Creates the player when the YouTube API loads
+        Section 4F — Card click          : Plays a track when its card is clicked
+        Section 4G — Prev button         : Steps back one track
+        Section 4H — Next button         : Steps forward one track
+        Section 4I — Shuffle button      : Randomises the card grid and rebuilds queue
+        Section 4J — Initialisation      : Entry point — loads tracks and builds queue
+        Section 4K — End card guard      : Auto-skips YouTube end cards
+        Section 4L — HUD tracker         : Updates HUD progress bar every 500ms
+        Section 4M — HUD seek            : Seek on progress bar click
+        Section 4N — HUD controls        : Wires up HUD Prev / Play-Pause / Next buttons
 */
 
 
@@ -93,11 +104,12 @@ function loadTracks() {
 /*   el    — the card's DOM element (used to highlight it)     */
 /* Called on page load and again after every shuffle.          */
 /* ============================================================ */
-var queue        = [];   /* The ordered playlist */
-var currentIndex = -1;   /* Which position in the queue is playing (-1 = nothing yet) */
-var player;              /* The YouTube IFrame player object — do not rename */
-var ended        = false;/* Prevents the ENDED event firing twice in a row */
-var endCardCheck;        /* Holds the interval timer for the end card guard */
+var queue              = [];    /* The ordered playlist */
+var currentIndex       = -1;    /* Which position in the queue is playing (-1 = nothing yet) */
+var player;                     /* The YouTube IFrame player object — do not rename */
+var ended              = false; /* Prevents the ENDED event firing twice in a row */
+var endCardCheck;               /* Holds the interval timer for the end card guard */
+var hudTrackerInterval;         /* FIX: Stores the HUD progress interval so it can be cleared */
 
 function buildQueue() {
     queue = [];
@@ -112,12 +124,22 @@ function buildQueue() {
 
 
 /* ============================================================ */
-/* SECTION 4C: ACTIVE CARD HIGHLIGHTER                          */
+/* SECTION 4C: ACTIVE CARD HIGHLIGHTER & NOW-PLAYING CLICK      */
+/*                                                             */
+/* setActiveCard(index):                                       */
 /* Removes the green "is-playing" border from all cards,       */
 /* then applies it only to the card at the given queue index.  */
 /* Scrolls that card into view smoothly (nearest — does NOT    */
-/* scroll the whole page to the top, just enough to show the   */
-/* card within the grid).                                      */
+/* scroll the whole page to the top, just enough to reveal     */
+/* the card within the grid).                                  */
+/*                                                             */
+/* attachNowPlayingClick():                                    */
+/* Makes the now-playing label above the player clickable.     */
+/* Before anything plays: clicking starts track 0.             */
+/* While playing: clicking pauses.                             */
+/* While paused / buffering: clicking resumes.                 */
+/* Uses .onclick so it is safe to call again — no duplicate    */
+/* listeners can accumulate.                                   */
 /* ============================================================ */
 function setActiveCard(index) {
     document.querySelectorAll('#video-grid .video').forEach(function(el) {
@@ -127,6 +149,23 @@ function setActiveCard(index) {
         queue[index].el.classList.add('is-playing');
         queue[index].el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+}
+
+function attachNowPlayingClick() {
+    var label = document.getElementById('now-playing-label');
+    label.onclick = function() {
+        if (!player || typeof player.getPlayerState !== 'function') return;
+        var state = player.getPlayerState();
+        if (state === -1 || state === YT.PlayerState.UNSTARTED || state === YT.PlayerState.CUED) {
+            /* Nothing playing yet — use playTrack so title updates correctly */
+            playTrack(currentIndex === -1 ? 0 : currentIndex);
+        } else if (state === YT.PlayerState.PLAYING) {
+            player.pauseVideo();
+        } else {
+            /* Paused, buffering, or any other state — resume */
+            player.playVideo();
+        }
+    };
 }
 
 
@@ -148,6 +187,11 @@ function playTrack(index) {
     /* Update the "now playing" label above the player */
     document.getElementById('now-playing-label').textContent = track.title;
 
+    /* FIX: Reset the progress bar to 0% immediately when a new track starts.
+       Without this the bar holds the previous track's end position for up
+       to 500ms until the HUD tracker interval catches up. */
+    document.getElementById('hud-progress-bar').style.width = '0%';
+
     /* Tell the YouTube player to load and play this video */
     if (player && typeof player.loadVideoById === 'function') {
         ended = false; /* Reset the end-of-video flag */
@@ -155,7 +199,7 @@ function playTrack(index) {
     }
 
     setActiveCard(currentIndex);
-    startEndCardGuard(); /* Restart the end card timer for the new track */
+    startEndCardGuard();         /* Restart the end card timer for the new track */
     updateHudTitle(track.title); /* Sync HUD title immediately */
 }
 
@@ -200,15 +244,23 @@ function createPlayer() {
             enablejsapi: 1
         },
         events: {
-       onReady: function() {
+            onReady: function() {
                 if (queue.length) {
                     player.cueVideoById(queue[0].id);
-                    currentIndex = 0; /* Fix: ensures Next/Prev start from correct position */
-                    
-                    /* --- UPDATE: Apply pulse animation to first card on load --- */
-                    setActiveCard(0); 
+                    currentIndex = 0;
+
+                    /* Highlight the first card on load.
+                       FIX: updateHudTitle was missing here in v2.4, so the HUD
+                       showed "Initiate Audio Sequence" instead of the first
+                       track's title until the user clicked something. */
+                    setActiveCard(0);
+                    updateHudTitle(queue[0].title);
                 }
-                startEndCardGuard();
+
+                /* FIX: End card guard removed from here. Starting it on page
+                   load before anything is playing created a needless polling
+                   interval. It now only starts when playTrack() is called. */
+
                 attachNowPlayingClick();
                 startHudTracker();   /* Start the HUD progress updater */
                 setupHudSeeking();   /* Wire up seek on progress bar click */
@@ -220,42 +272,21 @@ function createPlayer() {
                     ended = true;
                     playTrack(currentIndex + 1);
                 }
+
                 /* Update the HUD play/pause button icon on every state change */
                 updateHudPlayPauseIcon(event.data);
-                /* Show the HUD as soon as something starts playing or is cued */
-                if (event.data !== -1) {
+
+                /* FIX: Show HUD only on PLAYING (1) or CUED (5).
+                   Old condition was (event.data !== -1), which let state -1
+                   (UNSTARTED) briefly suppress or flicker the HUD during track
+                   transitions. Checking only the two meaningful states is safer. */
+                if (event.data === YT.PlayerState.PLAYING ||
+                    event.data === YT.PlayerState.CUED) {
                     document.getElementById('hud-dock').classList.add('hud-active');
                 }
             }
         }
     });
-}
-
-
-/* ============================================================ */
-/* SECTION 4C2: NOW PLAYING LABEL CLICK                         */
-/* Makes the now-playing label clickable with green hover.     */
-/* Before anything plays: clicking starts the first track      */
-/* and updates the title. While playing: pauses. While         */
-/* paused or buffering: resumes playback.                      */
-/* Called once from onReady. Replaces onclick each call so     */
-/* it is safe to call again — no duplicate listeners.          */
-/* ============================================================ */
-function attachNowPlayingClick() {
-    var label = document.getElementById('now-playing-label');
-    label.onclick = function() {
-        if (!player || typeof player.getPlayerState !== 'function') return;
-        var state = player.getPlayerState();
-        if (state === -1 || state === YT.PlayerState.UNSTARTED) {
-            /* Nothing playing yet — use playTrack so title updates correctly */
-            playTrack(currentIndex === -1 ? 0 : currentIndex);
-        } else if (state === YT.PlayerState.PLAYING) {
-            player.pauseVideo();
-        } else {
-            /* Paused, buffering, or any other state — resume */
-            player.playVideo();
-        }
-    };
 }
 
 
@@ -374,14 +405,21 @@ function startEndCardGuard() {
 
 /* ============================================================ */
 /* SECTION 4L: HUD TRACKER                                      */
-/* Polls the YouTube player every 500ms while a track is       */
-/* playing and updates:                                        */
-/*   - The green progress bar width (% of track complete)      */
-/*   - The HUD track title (in case it got out of sync)        */
-/* Only runs when the player is in state 1 (playing).          */
+/* Polls the YouTube player every 500ms and updates the green  */
+/* progress bar width to reflect how far through the track     */
+/* the playback position currently is.                         */
+/*                                                             */
+/* FIX (v2.5): The interval reference is now stored in         */
+/* hudTrackerInterval so it can be cleared and restarted       */
+/* cleanly. In v2.4 a new interval was created on every call   */
+/* with no way to stop old ones — they would stack up and      */
+/* fight each other on rapid track changes.                    */
 /* ============================================================ */
 function startHudTracker() {
-    setInterval(function() {
+    /* Clear any existing tracker before starting a new one */
+    if (hudTrackerInterval) clearInterval(hudTrackerInterval);
+
+    hudTrackerInterval = setInterval(function() {
         if (!player || typeof player.getPlayerState !== 'function') return;
         if (player.getPlayerState() === 1) { /* 1 = YT.PlayerState.PLAYING */
             var current = player.getCurrentTime();
@@ -394,7 +432,7 @@ function startHudTracker() {
     }, 500);
 }
 
-/* Helper: sync the HUD track title text */
+/* Helper: syncs the HUD footer track title to the given string */
 function updateHudTitle(title) {
     document.getElementById('hud-track-title').textContent = title || '';
 }
@@ -402,13 +440,14 @@ function updateHudTitle(title) {
 
 /* ============================================================ */
 /* SECTION 4M: HUD SEEK                                         */
-/* Clicking anywhere on the progress bar container seeks the    */
-/* YouTube player to that position in the track.                */
-/* Added: Immediate UI feedback to counter YouTube server lag.  */
+/* Clicking anywhere on the progress bar container seeks the   */
+/* YouTube player to that position in the track.               */
+/* Gives immediate visual feedback by moving the bar to the    */
+/* click position instantly, before YouTube confirms the seek. */
 /* ============================================================ */
 function setupHudSeeking() {
     var barContainer = document.getElementById('hud-progress-container');
-    var visualBar = document.getElementById('hud-progress-bar');
+    var visualBar    = document.getElementById('hud-progress-bar');
 
     barContainer.addEventListener('click', function(e) {
         if (!player || typeof player.getDuration !== 'function') return;
@@ -417,18 +456,17 @@ function setupHudSeeking() {
         var pos  = (e.clientX - rect.left) / rect.width;
         pos = Math.max(0, Math.min(1, pos)); /* Clamp to 0–1 */
 
-        // 1. IMMEDIATE UI FEEDBACK
-        // We manually move the green bar to the click spot so it feels instant
+        /* Immediate UI feedback — move bar to click position instantly */
         if (visualBar) {
             visualBar.style.width = (pos * 100) + '%';
         }
 
-        // 2. TRIGGER SEEK
-        // Using 'true' allows the player to seek to unbuffered parts of the video
+        /* Seek the player — true allows seeking into unbuffered sections */
         var newTime = pos * player.getDuration();
         player.seekTo(newTime, true);
     });
 }
+
 
 /* ============================================================ */
 /* SECTION 4N: HUD CONTROLS                                     */
