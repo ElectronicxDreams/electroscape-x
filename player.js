@@ -242,7 +242,6 @@ function createPlayer() {
             modestbranding: 1,
             fs: 1,
             enablejsapi: 1
- 'origin': 'http://localhost:5500'  // <-- THIS IS THE NEW LINE TO ADD
         },
         events: {
             onReady: function() {
