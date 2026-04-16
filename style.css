@@ -208,7 +208,7 @@ h1 {
 /* [S] Phone portrait: force exactly 2 columns */
 @media (max-width: 1300px) and (orientation: portrait) {
     .grid {
-        grid-template-columns: repeat(1, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
 }
