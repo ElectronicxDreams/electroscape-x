@@ -1,14 +1,11 @@
 /*
-    Name: style.css | Version: 2.5
+    Name: style.css | Version: 3.0
     Project: Electroscape
     Description: All visual styles for the Electroscape music video gallery.
-                 Imported by index.html via <link> tag in the <head>.
-                 Edit this file to change colours, fonts, layout, spacing.
-                 The JavaScript (player.js) and track data (tracks.json)
-                 are separate files — changes here will not affect playback logic.
-                 v2.1 — Orbital HUD footer styles added (Section 2I).
+                        Added Custom Grid View sizes and unified view box.
+                 
+               
 */
-
 
 /* ============================================================ */
 /* SECTION 2A: PAGE BASE                                        */
@@ -18,20 +15,15 @@
 body {
     background: #000;                       /* Black page background */
     color: #fff;                            /* Default text colour: white */
-    font-family: 'Orbitron', sans-serif;    /* Futuristic font — loaded in index.html <head> */
+    font-family: 'Orbitron', sans-serif;    /* Futuristic font */
     margin: 0;
     padding: 20px;                          /* Small gap around the page edge */
     text-align: center;                     /* Centre-align everything by default */
     overflow-x: hidden;                     /* Hide any accidental horizontal scroll */
 }
 
-
 /* ============================================================ */
 /* SECTION 2B: TOP NAVIGATION BAR                               */
-/* The row of links at the very top of the page.               */
-/* To add a link: add an <a> tag inside the <nav> in           */
-/* index.html — no changes needed here.                        */
-/* To change hover colour: update the color value in nav a:hover */
 /* ============================================================ */
 nav {
     margin-bottom: 30px;
@@ -54,35 +46,7 @@ nav a:hover {
 }
 
 /* ============================================================ */
-/* SECTION 2B: NAVIGATION LINKS                                 */
-/* Restores Original Font/Spacing + Adds Sequential Fade-In      */
-/* ============================================================ */
-nav {
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-nav a {
-    color: #fff;
-    text-decoration: none;
-    margin: 0 25px;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 8px;
-}
-
-nav a:hover {
-    color: #00ffcc;                         /* Accent green glow on mouse-over */
-}
-
-
-
-
-
-/* ============================================================ */
-/* SECTION 2C: PAGE TITLE (H1) [Keywords: title animation]                  */
+/* SECTION 2C: PAGE TITLE (H1)                                  */
 /* Animation: Sequential Left-Entry with Elastic Snap           */
 /* Based on Michroma font with 28px spacing / 2.4s duration     */
 /* ============================================================ */
@@ -105,10 +69,6 @@ nav a:hover {
     opacity: 0;
     /* Custom Bezier: Creates the 'Overshoot and Snap' effect */
     animation: elasticAssemble 2.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-/* ALL LETTERS: Start far off-screen to the left */
-.fly-in-title span {
     transform: translateX(-100vw);
 }
 
@@ -140,15 +100,8 @@ nav a:hover {
     }
 }
 
-
-
-
 /* ============================================================ */
 /* SECTION 2D: FEATURED VIDEO PLAYER                            */
-/* The large player at the top of the page.                    */
-/* .featured-box    — outer wrapper that sets max width        */
-/* #player-container — box that holds the YouTube player       */
-/* #now-playing-label — small text above the player           */
 /* ============================================================ */
 .featured-box {
     max-width: 1200px;
@@ -180,22 +133,11 @@ nav a:hover {
     color: #00ffcc;
 }
 
-
 /* ============================================================ */
 /* SECTION 2E: ACTION BAR BUTTONS (Prev / Shuffle / Next)       */
-/* .action-bar  — container row for all three buttons          */
-/* .ctrl-btn    — shared style for all three buttons           */
-/*                                                             */
-/* All three buttons share a permanent faint green border      */
-/* This avoids Android touch leaving one button stuck with a   */
-/* bright green :focus border while others remain grey.        */
-/* On desktop: hover brightens border + text as before.        */
-/* On Android: all buttons always look identical — no state.   */
-/* :focus style explicitly matches rest state so touch focus   */
-/* can never produce an unexpected highlight.                  */
 /* ============================================================ */
 .action-bar {
-    margin: 40px 0;
+    margin: 40px auto;
     display: flex;
     justify-content: center;
     gap: 15px;
@@ -204,8 +146,8 @@ nav a:hover {
 
 .ctrl-btn {
     background: transparent;
-    border: 1px solid rgba(0, 255, 204, 0.5);  /* — always on, all buttons */
-    color: #888;
+    border: 1px solid rgba(0, 255, 204, 0.5);
+    color: rgba(0, 255, 204, 0.6); 
     padding: 12px 25px;
     font-family: 'Orbitron', sans-serif;
     font-size: 10px;
@@ -214,54 +156,101 @@ nav a:hover {
     cursor: pointer;
     transition: 0.4s;
     border-radius: 2px;
-    outline: none;                               /* Remove default browser focus ring */
+    outline: none;
+    white-space: nowrap; /* Prevents text from wrapping to a new line */
 }
 
 .ctrl-btn:hover {
-    border-color: #00ffcc;                       /* Full green on desktop hover */
-    color: #fff;
+    border-color: #00ffcc;
+    color: #00ffcc; 
 }
 
-/* Neutralise focus — matches rest state so Android touch focus
-   is invisible and can never get stuck looking different */
 .ctrl-btn:focus {
     border-color: rgba(0, 255, 204, 0.25);
-    color: #888;
+    color: rgba(0, 255, 204, 0.6); 
 }
 
-/* Override Sequence keeps its accent text colour to stay distinct */
 .shuffle-btn {
-    color: #00ffcc;
+    color: rgba(0, 255, 204, 0.85); 
 }
 
 .shuffle-btn:focus {
-    color: #00ffcc;
+    color: rgba(0, 255, 204, 0.85);
 }
 
+/* FIX: Forces perfect symmetry so "Override Sequence" is dead-center */
+#prev-btn, #next-btn {
+    width: 220px;
+    box-sizing: border-box;
+}
+
+/* TABLET FIX: Shrink buttons so all three sit on one line at mid-range widths */
+@media (max-width: 1024px) and (min-width: 601px) {
+    .ctrl-btn {
+        font-size: 9px;
+        letter-spacing: 3px;
+        padding: 10px 14px;
+    }
+    #prev-btn, #next-btn {
+        width: 160px;
+    }
+}
+
+/* Mobile wrapping adjustment so fixed widths don't break phones */
+@media (max-width: 600px) {
+    #prev-btn, #next-btn {
+        width: 100%;
+    }
+}
 
 /* ============================================================ */
-/* SECTION 2F: VIDEO GRID                                       */
-/* Responsive column layout for the track cards.               */
-/*                                                             */
-/* [M1]  Desktop  (>1400px)         : 390px fixed — 6 cols    */
-/* [T1]  Tablet portrait ( )  : auto-fill 260px — 2 cols */
-/* [T1]  Tablet landscape ( ) : auto-fill 280px — 3 cols */
-/* [S]   Phone portrait ()    : exactly 2 columns        */
-/* [S]   Phone landscape            : inherits tablet rule     */
-/*                                                             */
-/* To change phone portrait columns: edit repeat(2, 1fr)      */
-/* in the max-width: 500px block. Change 2 to 1 for single col */
+/* SECTION 2E-2: UNIFIED VIEW BOX                               */
+/* ============================================================ */
+.view-box {
+    border: 1px solid rgba(0, 255, 204, 0.5);
+    border-radius: 2px;
+    padding: 8px 18px; 
+    font-size: 9px; 
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(0, 255, 204, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: transparent;
+    margin: 0 auto;
+}
+
+.grid-btn {
+    cursor: pointer;
+    transition: color 0.3s, text-shadow 0.3s;
+    color: rgba(0, 255, 204, 0.6);
+    padding: 4px 6px; 
+}
+
+.grid-btn:hover {
+    color: #fff;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.grid-btn.grid-btn-active {
+    color: #00ffcc;
+    text-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+}
+
+/* ============================================================ */
+/* SECTION 2F: VIDEO GRID DEFAULT                               */
 /* ============================================================ */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(390px, 390px)); /* [M1] Desktop */
+    grid-template-columns: repeat(auto-fill, minmax(390px, 390px));
     gap: 25px;
     max-width: 100%;
     margin: 0 auto;
     justify-content: center;
 }
 
-/* [T1] Tablet */
 @media (max-width: 1900px) {
     .grid {
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -269,7 +258,6 @@ nav a:hover {
     }
 }
 
-/* [T1] Tablet landscape */
 @media (orientation: landscape) and (max-width: 1400px) {
     .grid {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -277,7 +265,6 @@ nav a:hover {
     }
 }
 
-/* [S] Phone portrait: force exactly 2 columns */
 @media (max-width: 1300px) and (orientation: portrait) {
     .grid {
         grid-template-columns: repeat(2, 1fr);
@@ -285,16 +272,52 @@ nav a:hover {
     }
 }
 
+/* ============================================================ */
+/* SECTION 2F-2: CUSTOM GRID VIEWS (ALL DEVICES)                */
+/* Works on desktop, tablet, and phone.                         */
+/* Portrait mobile: MICRO=1col, CORE=2col, MAX=2col             */
+/* Landscape mobile/tablet: MICRO=3col, CORE=3-4col, MAX=2col   */
+/* Desktop: full range as intended                              */
+/* ============================================================ */
+
+/* --- PORTRAIT MOBILE (up to 600px) --- */
+@media (max-width: 600px) and (orientation: portrait) {
+    .grid.view-dense {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 10px;
+    }
+    .grid.view-max {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 14px;
+    }
+}
+
+/* --- LANDSCAPE MOBILE & SMALL TABLET (601px–1300px) --- */
+@media (min-width: 601px) and (max-width: 1300px) {
+    .grid.view-dense {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+    }
+    .grid.view-max {
+        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+        gap: 20px;
+    }
+}
+
+/* --- DESKTOP (1301px and above) --- */
+@media (min-width: 1301px) {
+    .grid.view-dense {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+    }
+    .grid.view-max {
+        grid-template-columns: repeat(auto-fill, minmax(550px, 1fr));
+        gap: 30px;
+    }
+}
 
 /* ============================================================ */
 /* SECTION 2G: VIDEO CARDS                                      */
-/* Each individual track card in the grid.                      */
-/* .video           — the card itself                           */
-/* .video:hover     — slightly enlarged on mouse-over           */
-/* .video.is-playing — green border + soft glow pulse           */
-/* .thumb-container — thumbnail image area                      */
-/* .video-label     — track title text below the thumbnail      */
-/* .overlay-btn     — "> ACTIVATE <" button on hover            */
 /* ============================================================ */
 .video {
     background: #080808;
@@ -303,7 +326,6 @@ nav a:hover {
     position: relative;
     cursor: pointer;
     border: 1px solid #1a1a1a;
-    /* Set to visible so the activePulse glow is not clipped */
     overflow: visible;
 }
 
@@ -312,16 +334,12 @@ nav a:hover {
     background: #111;
 }
 
-/* Active card breathing glow (v2.4)
-   Lowered opacity for a more subtle, professional shimmer.
-*/
 @keyframes activePulse {
     0%   { box-shadow: 0 0 5px rgba(0, 255, 204, 0.1); }
     50%  { box-shadow: 0 0 20px rgba(0, 255, 204, 0.35); }
     100% { box-shadow: 0 0 5px rgba(0, 255, 204, 0.1); }
 }
 
-/* Applied by JavaScript to whichever card is currently playing */
 .video.is-playing {
     border-color: #00ffcc !important;
     animation: activePulse 2s infinite ease-in-out;
@@ -332,7 +350,6 @@ nav a:hover {
     aspect-ratio: 16 / 9;
     background-size: cover;
     background-position: center;
-    /* Added top radius since parent overflow is now visible */
     border-radius: 4px 4px 0 0;
 }
 
@@ -376,11 +393,6 @@ nav a:hover {
 
 /* ============================================================ */
 /* SECTION 2H: MOBILE ADJUSTMENTS                               */
-/* Applies only when screen is 700px wide or less.             */
-/* Reduces letter spacing so the header doesn't overflow       */
-/* on phones and small tablets.                                */
-/* To change mobile letter spacing: update BOTH letter-spacing */
-/* and text-indent — they must always match.                   */
 /* ============================================================ */
 @media (max-width:900px) {
     h1 {
@@ -394,23 +406,8 @@ nav a:hover {
     }
 }
 
-
 /* ============================================================ */
 /* SECTION 2I: ORBITAL HUD — Persistent footer mini-player      */
-/*                                                             */
-/* #hud-dock            — the fixed bar itself, pinned bottom  */
-/* #hud-progress-container — clickable full-width seek area    */
-/* #hud-progress-bar    — green fill that tracks playback      */
-/* #hud-inner           — flex row: title on left, btns right  */
-/* #hud-track-title     — current track name                   */
-/* #hud-controls        — Prev / Play-Pause / Next buttons     */
-/* .hud-btn             — base style for HUD control buttons   */
-/* .hud-playpause       — accent style for the play/pause btn  */
-/*                                                             */
-/* The HUD starts hidden (opacity: 0; pointer-events: none)    */
-/* and becomes visible once a track starts playing.            */
-/* player.js adds the class .hud-active to #hud-dock to show  */
-/* it. Remove that class logic to always show the bar.         */
 /* ============================================================ */
 #hud-dock {
     position: fixed;
@@ -431,13 +428,11 @@ nav a:hover {
     box-sizing: border-box;
 }
 
-/* Shown once a track is loaded — player.js adds this class */
 #hud-dock.hud-active {
     opacity: 1;
     pointer-events: all;
 }
 
-/* Thin 2px seek-bar strip across the top of the HUD */
 #hud-progress-container {
     width: 100%;
     height: 3px;
@@ -455,10 +450,6 @@ nav a:hover {
     pointer-events: none;
 }
 
-/* Invisible Hitbox: 
-   Extends the clickable area to 50px high for tablet/mobile.
-   Centered: 23.5px above + 3px bar + 23.5px below = 50px total.
-*/
 #hud-progress-container::before {
     content: '';
     position: absolute;
@@ -470,7 +461,6 @@ nav a:hover {
     background: transparent; 
 }
 
-/* Inner row containing title and controls */
 #hud-inner {
     flex: 1;
     display: flex;
@@ -481,8 +471,6 @@ nav a:hover {
     min-width: 0;
 }
 
-/* Track title — truncates with ellipsis if too long */
- 
 #hud-track-title {
     font-size: 9px;
     letter-spacing: 3px;
@@ -496,8 +484,6 @@ nav a:hover {
     text-align: left;
 }
 
-
-/* Control buttons group */
 #hud-controls {
     display: flex;
     align-items: center;
@@ -505,7 +491,6 @@ nav a:hover {
     flex-shrink: 0;
 }
 
-/* Base HUD button style */
 .hud-btn {
     background: transparent;
     border: 1px solid #333;
@@ -525,7 +510,6 @@ nav a:hover {
     color: #fff;
 }
 
-/* Play/Pause button — green accent to stand out */
 .hud-playpause {
     border-color: #00ffcc;
     color: #00ffcc;
@@ -536,7 +520,6 @@ nav a:hover {
     background: rgba(0, 255, 204, 0.1);
 }
 
-/* Tighter layout on small screens */
 @media (max-width: 500px) {
     #hud-inner {
         padding: 0 10px;
