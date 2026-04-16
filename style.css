@@ -189,7 +189,7 @@ h1 {
     justify-content: center;
 }
 
-/* [T1] Tablet/large phone portrait */
+/* [T1] Tablet */
 @media (max-width: 1900px) {
     .grid {
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -208,7 +208,7 @@ h1 {
 /* [S] Phone portrait: force exactly 2 columns */
 @media (max-width: 1300px) and (orientation: portrait) {
     .grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(1, 1fr);
         gap: 12px;
     }
 }
