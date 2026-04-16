@@ -56,20 +56,19 @@ nav a:hover {
 
 /* ============================================================ */
 /* SECTION 2C: PAGE TITLE (H1)                                  */
-/* The large "ELECTROSCAPE" heading below the nav.             */
-/* To change the accent colour: update color here AND          */
-/* the .shuffle-btn border/color values in Section 2E.         */
+/* The large "ELECTROSCAPE" heading below the nav.              */
+/* Font: Michroma (Logo Style)                                  */
 /* ============================================================ */
 h1 {
+    font-family: 'Michroma', sans-serif;    /* Targeted font swap for title only */
     font-size: 13px;
-    font-weight: 300;
-    letter-spacing: 40px;
+    font-weight: 400;                       /* Michroma standard weight */
+    letter-spacing: 36px;                   /* Reduced ~10% to accommodate wider font */
     text-transform: uppercase;
     margin-bottom: 40px;
     color: #00ffcc;                         /* Accent green — matches nav hover and shuffle btn */
-    text-indent: 40px;
+    text-indent: 36px;                      /* Matches letter-spacing to keep text centered */
 }
-
 
 /* ============================================================ */
 /* SECTION 2D: FEATURED VIDEO PLAYER                            */
