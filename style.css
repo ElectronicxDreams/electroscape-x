@@ -172,9 +172,9 @@ h1 {
 /* Responsive column layout for the track cards.               */
 /*                                                             */
 /* [M1]  Desktop  (>1400px)         : 390px fixed — 6 cols    */
-/* [T1]  Tablet portrait (<1400px)  : auto-fill 260px — 2 cols */
-/* [T1]  Tablet landscape (<1400px) : auto-fill 280px — 3 cols */
-/* [S]   Phone portrait (<500px)    : exactly 2 columns        */
+/* [T1]  Tablet portrait ( )  : auto-fill 260px — 2 cols */
+/* [T1]  Tablet landscape ( ) : auto-fill 280px — 3 cols */
+/* [S]   Phone portrait ()    : exactly 2 columns        */
 /* [S]   Phone landscape            : inherits tablet rule     */
 /*                                                             */
 /* To change phone portrait columns: edit repeat(2, 1fr)      */
@@ -206,7 +206,7 @@ h1 {
 }
 
 /* [S] Phone portrait: force exactly 2 columns */
-@media (max-width: 900px) and (orientation: portrait) {
+@media (max-width: 1300px) and (orientation: portrait) {
     .grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
