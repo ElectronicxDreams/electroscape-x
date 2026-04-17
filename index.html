@@ -46,7 +46,7 @@
         Loads all visual styles from the external stylesheet.
         To change colours, layout, or spacing — edit style.css, not this file.
     -->
-    <link rel="stylesheet" href="style.css?v=3.0.0">
+    <link rel="stylesheet" href="style.css?v=3.1.0">
 
 </head>
 <!-- ============================================================ -->
@@ -91,16 +91,76 @@
         <button class="ctrl-btn" id="next-btn">[ Next ]</button>
     </div>
 
-    <!-- SECTION 3D-2: ACTION BAR — Unified Grid View Controls -->
-    <div class="action-bar" style="margin-top: 0;">
-        <div class="view-box">
-            <span class="grid-btn" data-size="dense">MICRO</span>
-            <span style="opacity: 0.2; pointer-events: none;">|</span>
-            <span class="grid-btn" data-size="default">CORE</span>
-            <span style="opacity: 0.2; pointer-events: none;">|</span>
-            <span class="grid-btn" data-size="max">MAX</span>
+    <!-- SECTION 3D-2: GRID VIEW CONTROLS -->
+    <!-- ============================================================ -->
+    <!-- OPTION B — Bare icon buttons (ACTIVE)                        -->
+    <!-- Three SVG grid icons, no container. Active = teal, inactive  -->
+    <!-- = ghosted. To disable: comment out this block and enable D.  -->
+    <!-- ============================================================ -->
+    <div class="action-bar view-controls-bar" style="margin-top: 0;">
+        <div class="bare-view-wrap">
+            <button class="grid-btn bare-view-btn" data-size="dense" aria-label="Micro grid">
+                <!-- 4x4 dense grid icon -->
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1"   y="1"   width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5" y="1"   width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"  y="1"   width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="14.5" y="1"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="1"   y="5.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5" y="5.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"  y="5.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="14.5" y="5.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="1"   y="10"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5" y="10"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"  y="10"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="14.5" y="10" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="1"   y="14.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5" y="14.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"  y="14.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="14.5" y="14.5" width="3.5" height="3.5" rx="0.4"/>
+                </svg>
+            </button>
+            <button class="grid-btn bare-view-btn" data-size="default" aria-label="Core grid">
+                <!-- 3x3 standard grid icon -->
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1"   y="1"   width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="6.75" y="1"  width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="12.5" y="1"  width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="1"   y="6.75" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="6.75" y="6.75" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="12.5" y="6.75" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="1"   y="12.5" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="6.75" y="12.5" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="12.5" y="12.5" width="4.5" height="4.5" rx="0.5"/>
+                </svg>
+            </button>
+            <button class="grid-btn bare-view-btn" data-size="max" aria-label="Max grid">
+                <!-- 2x2 large grid icon -->
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1"   y="1"   width="7" height="7" rx="0.8"/>
+                    <rect x="10"  y="1"   width="7" height="7" rx="0.8"/>
+                    <rect x="1"   y="10"  width="7" height="7" rx="0.8"/>
+                    <rect x="10"  y="10"  width="7" height="7" rx="0.8"/>
+                </svg>
+            </button>
         </div>
     </div>
+    <!-- OPTION B END =============================================== -->
+
+    <!--
+    ================================================================
+    OPTION D — Single cycling button (INACTIVE — remove comment tags
+    to enable, and comment out OPTION B above to disable it)
+    Shows the current mode name alongside its icon. Cycles through
+    dense → default → max on each click. Matches ctrl-btn style.
+    ================================================================
+    <div class="action-bar view-controls-bar" style="margin-top: 0;">
+        <button class="ctrl-btn" id="cycle-view-btn">
+            <span id="cycle-view-icon"></span>
+            <span id="cycle-view-label">Core</span>
+        </button>
+    </div>
+    OPTION D END ================================================== -->
 
 
     <!-- SECTION 3E: VIDEO GRID -->
@@ -117,7 +177,7 @@
     <!-- FOOTER VERSION DISPLAY                                        -->
     <!-- ============================================================ -->
     <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-        <!-- change version vx --><span style="color: #00ffcc;">3.0.0</span><!-- end change version -->
+        <!-- change version vx --><span style="color: #00ffcc;">3.1.0</span><!-- end change version -->
     </div>
 
 
@@ -146,7 +206,7 @@
 
 
     <!-- Scripts MUST stay at the bottom of the body -->
-    <script src="player.js?v=3.0.0"></script>
+    <script src="player.js?v=3.1.0"></script>
     <script src="https://www.youtube.com/iframe_api" async></script>
 
 </body>

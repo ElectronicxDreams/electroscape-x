@@ -1,5 +1,5 @@
 /*
-    Name: style.css | Version: 3.0
+    Name: style.css | Version: 3.1.0
     Project: Electroscape
     Description: All visual styles for the Electroscape music video gallery.
                         Added Custom Grid View sizes and unified view box.
@@ -204,39 +204,80 @@ nav a:hover {
 }
 
 /* ============================================================ */
-/* SECTION 2E-2: UNIFIED VIEW BOX                               */
+/* SECTION 2E-2: GRID VIEW CONTROLS                             */
 /* ============================================================ */
-.view-box {
-    border: 1px solid rgba(0, 255, 204, 0.5);
-    border-radius: 2px;
-    padding: 8px 18px; 
-    font-size: 9px; 
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: rgba(0, 255, 204, 0.6);
+
+/* Shared: tighten the action-bar margin for the view row only */
+.view-controls-bar {
+    margin-top: 0 !important;
+    margin-bottom: 30px;
+}
+
+/* ----------------------------------------------------------  */
+/* OPTION B — Bare icon buttons                                 */
+/* ----------------------------------------------------------  */
+.bare-view-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bare-view-btn {
+    background: transparent;
+    border: none;
+    padding: 7px 9px;
+    cursor: pointer;
+    border-radius: 3px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: opacity 0.25s;
+    outline: none;
+}
+
+.bare-view-btn svg rect {
+    fill: #00ffcc;
+    transition: fill 0.25s;
+}
+
+/* Inactive state — ghosted */
+.bare-view-btn {
+    opacity: 0.2;
+}
+
+/* Active state — full teal */
+.bare-view-btn.grid-btn-active {
+    opacity: 1;
+}
+
+/* Hover on inactive buttons */
+.bare-view-btn:hover {
+    opacity: 0.6;
+}
+
+/* Focus ring suppression (matches rest of site) */
+.bare-view-btn:focus {
+    outline: none;
+}
+
+/* ----------------------------------------------------------  */
+/* OPTION D — Single cycling button                             */
+/* Uses existing .ctrl-btn styles — only icon gap needed        */
+/* ----------------------------------------------------------  */
+#cycle-view-btn {
+    display: inline-flex;
+    align-items: center;
     gap: 10px;
-    background: transparent;
-    margin: 0 auto;
+    letter-spacing: 4px;
 }
 
-.grid-btn {
-    cursor: pointer;
-    transition: color 0.3s, text-shadow 0.3s;
-    color: rgba(0, 255, 204, 0.6);
-    padding: 4px 6px; 
+#cycle-view-icon svg rect {
+    fill: rgba(0, 255, 204, 0.7);
+    transition: fill 0.25s;
 }
 
-.grid-btn:hover {
-    color: #fff;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-}
-
-.grid-btn.grid-btn-active {
-    color: #00ffcc;
-    text-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+#cycle-view-btn:hover #cycle-view-icon svg rect {
+    fill: #00ffcc;
 }
 
 /* ============================================================ */

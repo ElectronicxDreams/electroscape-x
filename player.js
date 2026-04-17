@@ -1,5 +1,5 @@
 /*
-    Name: player.js | Version: 3.0.0
+    Name: player.js | Version: 3.1.0
     Project: Electroscape
     Description: All playback logic for the Electroscape music video gallery.
                  Loads track data from tracks.json, builds the video card grid,
@@ -373,35 +373,32 @@ function updateHudPlayPauseIcon(state) {
 /* SECTION 4O: GRID VIEW CONTROLS & LOCAL STORAGE               */
 /* Allows user to swap between Dense, Standard, and Max grids.  */
 /* Saves the choice to localStorage so it persists on reload.   */
+/*                                                               */
+/* Two UI options below — OPTION B is active, OPTION D is       */
+/* commented out. To swap: comment B out, uncomment D.          */
 /* ============================================================ */
 function initGridControls() {
-    var buttons = document.querySelectorAll('.grid-btn');
     var grid = document.getElementById('video-grid');
-    
-    // Load saved preference (defaulting to 'default' if none saved)
     var savedSize = localStorage.getItem('electroscape_grid_size') || 'default';
-    applyGridSize(savedSize);
 
-    // Attach click events to the buttons
-    buttons.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var size = this.getAttribute('data-size');
-            applyGridSize(size);
-            localStorage.setItem('electroscape_grid_size', size); // Save to memory
-        });
-    });
-
-    // Helper function to apply CSS classes and update button colors
+    /* Shared helper — applies grid CSS class and saves preference */
     function applyGridSize(size) {
-        // Reset grid classes
         grid.classList.remove('view-dense', 'view-max');
-        
-        // Apply new class if not standard
         if (size !== 'default') {
             grid.classList.add('view-' + size);
         }
+        localStorage.setItem('electroscape_grid_size', size);
+        return size;
+    }
 
-        // Update button visual states
+    /* ---------------------------------------------------------- */
+    /* OPTION B — Bare icon buttons (ACTIVE)                      */
+    /* Each button carries data-size and gets grid-btn-active      */
+    /* when selected. Matches .bare-view-btn in style.css.         */
+    /* ---------------------------------------------------------- */
+    var buttons = document.querySelectorAll('.grid-btn');
+
+    function updateBareActive(size) {
         buttons.forEach(function(b) {
             if (b.getAttribute('data-size') === size) {
                 b.classList.add('grid-btn-active');
@@ -410,6 +407,92 @@ function initGridControls() {
             }
         });
     }
+
+    applyGridSize(savedSize);
+    updateBareActive(savedSize);
+
+    buttons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var size = this.getAttribute('data-size');
+            applyGridSize(size);
+            updateBareActive(size);
+        });
+    });
+    /* OPTION B END ---------------------------------------------- */
+
+    /*
+    ------------------------------------------------------------
+    OPTION D — Single cycling button (INACTIVE)
+    To enable: comment out OPTION B above, then remove the
+    outer comment markers wrapping this block.
+    ------------------------------------------------------------
+    var cycleOrder = ['dense', 'default', 'max'];
+    var cycleLabels = { dense: 'Micro', 'default': 'Core', max: 'Max' };
+
+    var cycleSVGs = {
+        dense:
+            '<svg width="15" height="15" viewBox="0 0 18 18" fill="none">' +
+            '<rect x="1" y="1" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="5.5" y="1" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="10" y="1" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="14.5" y="1" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="1" y="5.5" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="5.5" y="5.5" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="10" y="5.5" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="14.5" y="5.5" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="1" y="10" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="5.5" y="10" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="10" y="10" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="14.5" y="10" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="1" y="14.5" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="5.5" y="14.5" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="10" y="14.5" width="3.5" height="3.5" rx="0.4"/>' +
+            '<rect x="14.5" y="14.5" width="3.5" height="3.5" rx="0.4"/>' +
+            '</svg>',
+        'default':
+            '<svg width="15" height="15" viewBox="0 0 18 18" fill="none">' +
+            '<rect x="1" y="1" width="4.5" height="4.5" rx="0.5"/>' +
+            '<rect x="6.75" y="1" width="4.5" height="4.5" rx="0.5"/>' +
+            '<rect x="12.5" y="1" width="4.5" height="4.5" rx="0.5"/>' +
+            '<rect x="1" y="6.75" width="4.5" height="4.5" rx="0.5"/>' +
+            '<rect x="6.75" y="6.75" width="4.5" height="4.5" rx="0.5"/>' +
+            '<rect x="12.5" y="6.75" width="4.5" height="4.5" rx="0.5"/>' +
+            '<rect x="1" y="12.5" width="4.5" height="4.5" rx="0.5"/>' +
+            '<rect x="6.75" y="12.5" width="4.5" height="4.5" rx="0.5"/>' +
+            '<rect x="12.5" y="12.5" width="4.5" height="4.5" rx="0.5"/>' +
+            '</svg>',
+        max:
+            '<svg width="15" height="15" viewBox="0 0 18 18" fill="none">' +
+            '<rect x="1" y="1" width="7" height="7" rx="0.8"/>' +
+            '<rect x="10" y="1" width="7" height="7" rx="0.8"/>' +
+            '<rect x="1" y="10" width="7" height="7" rx="0.8"/>' +
+            '<rect x="10" y="10" width="7" height="7" rx="0.8"/>' +
+            '</svg>'
+    };
+
+    var cycleBtn = document.getElementById('cycle-view-btn');
+
+    function updateCycleBtn(size) {
+        var iconEl  = document.getElementById('cycle-view-icon');
+        var labelEl = document.getElementById('cycle-view-label');
+        if (iconEl)  iconEl.innerHTML  = cycleSVGs[size];
+        if (labelEl) labelEl.textContent = cycleLabels[size];
+    }
+
+    var currentSize = savedSize;
+    applyGridSize(currentSize);
+    updateCycleBtn(currentSize);
+
+    if (cycleBtn) {
+        cycleBtn.addEventListener('click', function() {
+            var idx = cycleOrder.indexOf(currentSize);
+            currentSize = cycleOrder[(idx + 1) % cycleOrder.length];
+            applyGridSize(currentSize);
+            updateCycleBtn(currentSize);
+            this.blur();
+        });
+    }
+    OPTION D END ------------------------------------------------ */
 }
 
 
