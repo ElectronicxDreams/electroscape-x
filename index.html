@@ -1,5 +1,5 @@
 <!--
-    Name: index.html | Version: 3.2.0
+    Name: index.html | Version: 3.3.0
     Project: Electroscape
     Description: Music video gallery page with YouTube IFrame API player.
                  Track data is loaded from tracks.json — edit that file to
@@ -15,7 +15,10 @@
         v3.0.0 — Michroma title font; elastic fly-in animation; HUD seek + progress
         v3.1.0 — Grid view switcher replaced with SVG icon buttons (Option B active,
                   Option D — single cycle button — commented out and ready to enable)
-	v3.2.0 - New Previous/Next Buttons 
+        v3.2.0 — New Previous/Next Buttons
+        v3.3.0 — Favourites sidebar: heart button on each card, slide-out right panel,
+                  drag-to-reorder, localStorage persistence (Section 4P in player.js,
+                  Section 2J in style.css)
 
     Sections in this file:
         Stage 1 — HEAD : Page setup, font imports, stylesheet link
@@ -55,7 +58,7 @@
         Edit that file for colour, layout, or spacing changes — not here.
         Cache-busted with version query string.
     -->
-    <link rel="stylesheet" href="style.css?v=3.2.0">
+    <link rel="stylesheet" href="style.css?v=3.3.0">
 
 </head>
 <!-- ============================================================ -->
@@ -109,31 +112,11 @@
 
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3D: PLAYBACK CONTROLS                            -->
-    <!-- Prev / Override Sequence (shuffle) / Next.               -->
-    <!-- Fixed widths on Prev and Next keep Override Sequence      -->
-    <!-- perfectly centred regardless of label length.            -->
-    <!--                                                          -->
-    <!-- BUTTON STYLE OPTIONS — only one block active at a time:  -->
-    <!--   Text buttons (INACTIVE) — original [ Previous ] style  -->
-    <!--   Pill buttons (ACTIVE)   — SVG triangle arrow pills      -->
-    <!-- To revert to text buttons: comment out the Pill block    -->
-    <!-- below and uncomment the Text block.                      -->
+    <!-- Prev / Override Sequence (shuffle) / Next / Favourites.  -->
+    <!-- Favourites button opens the slide-out sidebar (3.3.0).   -->
     <!-- -------------------------------------------------------- -->
 
-    <!-- Text buttons — INACTIVE
-         To restore: remove the comment markers around this block,
-         then comment out or remove the Pill buttons block below.
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    <div class="action-bar" style="margin-bottom: 20px;">
-        <button class="ctrl-btn" id="prev-btn">[ Previous ]</button>
-        <button class="ctrl-btn shuffle-btn" id="shuffle-btn">[ Override Sequence ]</button>
-        <button class="ctrl-btn" id="next-btn">[ Next ]</button>
-    </div>
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
     <!-- Pill buttons — ACTIVE -->
-    <!-- Left pill: triangle points LEFT, flat edge faces Override Sequence (on the right) -->
-    <!-- Right pill: triangle points RIGHT, flat edge faces Override Sequence (on the left) -->
     <div class="action-bar" style="margin-bottom: 20px;">
         <button class="ctrl-btn" id="prev-btn" style="background:transparent; border:1px solid #00ffcc; border-radius:22px; width:64px; height:36px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0;">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -146,24 +129,12 @@
                 <polygon points="9,6 3,1 3,11" fill="#00ffcc"/>
             </svg>
         </button>
+
     </div>
-    <!-- Pill buttons END -->
 
 
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3E: GRID VIEW CONTROLS                           -->
-    <!-- Switches the video grid between three density modes:     -->
-    <!--   dense   = Micro  (4x4 compact)                         -->
-    <!--   default = Core   (3x3 standard)                        -->
-    <!--   max     = Max    (2x2 large)                            -->
-    <!-- player.js handles click logic, active state, and saving  -->
-    <!-- the preference to localStorage (Section 4O).             -->
-    <!--                                                          -->
-    <!-- TWO UI OPTIONS — only one active at a time:              -->
-    <!--   Option B (ACTIVE)   — three bare SVG icon buttons      -->
-    <!--   Option D (INACTIVE) — single cycling button, below     -->
-    <!-- To swap: comment out the active block, uncomment the     -->
-    <!-- other. No changes needed in style.css or player.js.      -->
     <!-- -------------------------------------------------------- -->
 
     <!-- OPTION B: Bare SVG icon buttons — ACTIVE -->
@@ -216,29 +187,23 @@
                     <rect x="10" y="10" width="7" height="7" rx="0.8"/>
                 </svg>
             </button>
-
         </div>
     </div>
     <!-- OPTION B END -->
 
-    <!--
-    OPTION D: Single cycling button — INACTIVE
-    One button cycles Micro → Core → Max → Micro on each click.
-    The icon and label update to reflect the current mode.
-    Matches the existing .ctrl-btn style exactly.
-    To enable: remove these comment markers and comment out Option B above.
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    <div class="action-bar view-controls-bar">
-        <button class="ctrl-btn" id="cycle-view-btn">
-            <span id="cycle-view-icon"></span>
-            <span id="cycle-view-label">Core</span>
+    <!-- SECTION 3F: FAVOURITES TOGGLE (Dedicated symmetric row) -->
+    <div class="action-bar" style="margin-top: 0 !important; margin-bottom: 30px;">
+        <button class="ctrl-btn" id="fav-toggle-btn" style="background:transparent; border:1px solid rgba(0,255,204,0.5); border-radius:22px; width:auto; min-width:180px; height:36px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0 25px;" aria-label="Favourites">
+            <svg id="fav-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="#00ffcc" stroke-width="1.5" fill="none"/>
+            </svg>
+            <span style="margin-left: 12px; letter-spacing: 4px; font-size: 10px;">FAVOURITES</span>
         </button>
     </div>
-    OPTION D END -->
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3F: VIDEO GRID                                   -->
+    <!-- SECTION 3G: VIDEO GRID                                   -->
     <!-- Empty on load. player.js fetches tracks.json and injects -->
     <!-- one .video card per track. Do not add cards manually.    -->
     <!-- -------------------------------------------------------- -->
@@ -252,21 +217,14 @@
 
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3G: FOOTER — Version display                     -->
-    <!-- Update the version number here when releasing changes.   -->
     <!-- -------------------------------------------------------- -->
     <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-        <!-- version --><span style="color: #00ffcc;">3.2.0</span><!-- end version -->
+        <!-- version --><span style="color: #00ffcc;">3.3.0</span><!-- end version -->
     </div>
 
 
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3H: ORBITAL HUD — Persistent footer mini-player  -->
-    <!-- Fixed to the bottom of the viewport. Hidden (opacity 0)  -->
-    <!-- until playback starts; player.js adds .hud-active to     -->
-    <!-- reveal it. Contains a seekable progress bar, track title,-->
-    <!-- and Prev / Play-Pause / Next transport controls.         -->
-    <!-- Progress bar click-to-seek is wired in player.js         -->
-    <!-- (Section 4M). Play state syncs via onStateChange.        -->
     <!-- -------------------------------------------------------- -->
     <div id="hud-dock">
 
@@ -290,11 +248,47 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SCRIPTS — must remain at the bottom of <body>            -->
-    <!-- player.js loads first so its globals exist before the    -->
-    <!-- YouTube API fires onYouTubeIframeAPIReady.               -->
+    <!-- SECTION 3I: FAVOURITES SIDEBAR (v3.3.0)                  -->
+    <!-- Slide-out panel from the right edge. Toggled by the      -->
+    <!-- heart button in the action bar (#fav-toggle-btn).        -->
+    <!-- player.js (Section 4P) manages all data and interaction. -->
+    <!-- Clicking the backdrop (#fav-backdrop) closes the panel.  -->
     <!-- -------------------------------------------------------- -->
-    <script src="player.js?v=3.2.0"></script>
+
+    <!-- Semi-transparent backdrop — click to close -->
+    <div id="fav-backdrop"></div>
+
+    <!-- The sidebar panel itself -->
+    <div id="fav-sidebar">
+
+        <!-- Header row: title + close button -->
+        <div id="fav-header">
+            <span id="fav-title">Favourites</span>
+            <button id="fav-close-btn" aria-label="Close favourites">&#x2715;</button>
+        </div>
+
+        <!-- Empty-state message — shown when no favourites saved -->
+        <div id="fav-empty">
+            <span>No favourites yet.</span>
+            <span>Click the ♥ on any track card to add it here.</span>
+        </div>
+
+        <!-- Scrollable list — populated by player.js -->
+        <ul id="fav-list"></ul>
+
+        <!-- Footer: clear-all button -->
+        <div id="fav-footer">
+            <button id="fav-clear-btn" class="ctrl-btn">[ Clear All ]</button>
+        </div>
+
+    </div>
+    <!-- SECTION 3I END -->
+
+
+    <!-- -------------------------------------------------------- -->
+    <!-- SCRIPTS — must remain at the bottom of <body>            -->
+    <!-- -------------------------------------------------------- -->
+    <script src="player.js?v=3.3.0"></script>
     <script src="https://www.youtube.com/iframe_api" async></script>
 
 </body>

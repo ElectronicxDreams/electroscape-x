@@ -633,3 +633,313 @@ nav a:hover {
         font-size: 8px;
     }
 }
+
+
+/* ============================================================ */
+/* SECTION 2J: FAVOURITES SIDEBAR (v3.3.0)                      */
+/* All styles for the slide-out favourites panel, backdrop,     */
+/* card heart buttons, sidebar rows, and drag-to-reorder UX.    */
+/* Injected markup lives in index.html Section 3I.              */
+/* Interaction logic lives in player.js Section 4P.             */
+/* ============================================================ */
+
+/* ---- Backdrop — semi-transparent overlay behind the panel ---- */
+#fav-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1199;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#fav-backdrop.fav-backdrop-visible {
+    display: block;
+    opacity: 1;
+}
+
+/* ---- Sidebar panel ---- */
+#fav-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 360px;
+    max-width: 92vw;
+    height: 100%;
+    background: #0a0a0a;
+    border-left: 1px solid #1e1e1e;
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);          /* Hidden off-screen to the right */
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
+}
+
+#fav-sidebar.fav-sidebar-open {
+    transform: translateX(0);            /* Slide in */
+}
+
+/* ---- Sidebar header ---- */
+#fav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 14px 20px;
+    border-bottom: 1px solid #1a1a1a;
+    flex-shrink: 0;
+}
+
+#fav-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #00ffcc;
+}
+
+#fav-close-btn {
+    background: transparent;
+    border: none;
+    color: #555;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 6px;
+    line-height: 1;
+    transition: color 0.2s;
+    border-radius: 2px;
+}
+
+#fav-close-btn:hover {
+    color: #00ffcc;
+}
+
+/* ---- Empty state message ---- */
+#fav-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex: 1;
+    padding: 40px 24px;
+    color: #333;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.8;
+}
+
+/* ---- Scrollable favourites list ---- */
+#fav-list {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: #222 transparent;
+}
+
+#fav-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+#fav-list::-webkit-scrollbar-thumb {
+    background: #222;
+    border-radius: 2px;
+}
+
+/* ---- Individual favourite row ---- */
+.fav-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px 8px 12px;
+    border-bottom: 1px solid #111;
+    cursor: grab;
+    transition: background 0.2s;
+    user-select: none;
+}
+
+.fav-row:hover {
+    background: #111;
+}
+
+.fav-row:active {
+    cursor: grabbing;
+}
+
+/* Drag source: ghost while dragging */
+.fav-row-dragging {
+    opacity: 0.4;
+}
+
+/* Drop target: teal top-border highlight */
+.fav-row-over {
+    border-top: 2px solid rgba(0, 255, 204, 0.5);
+    background: #0d0d0d;
+}
+
+/* ---- Drag handle dots ---- */
+.fav-drag-handle {
+    flex-shrink: 0;
+    width: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.25;
+    cursor: grab;
+}
+
+.fav-row:hover .fav-drag-handle {
+    opacity: 0.6;
+}
+
+/* ---- Row thumbnail ---- */
+.fav-row-thumb {
+    flex-shrink: 0;
+    width: 60px;
+    height: 34px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 2px;
+    background-color: #111;
+}
+
+/* ---- Row title ---- */
+.fav-row-title {
+    flex: 1;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #bbb;
+    line-height: 1.4;
+    min-width: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ---- Row control buttons (play + remove) ---- */
+.fav-row-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.fav-row-btn {
+    background: transparent;
+    border: 1px solid #2a2a2a;
+    cursor: pointer;
+    border-radius: 2px;
+    padding: 5px 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.fav-play-btn svg {
+    width: 10px;
+    height: 10px;
+}
+
+.fav-play-btn:hover {
+    border-color: #00ffcc;
+}
+
+.fav-remove-btn {
+    color: #444;
+    font-size: 11px;
+    line-height: 1;
+}
+
+.fav-remove-btn:hover {
+    border-color: #ff4466;
+    color: #ff4466;
+}
+
+/* ---- Sidebar footer (Clear All button) ---- */
+#fav-footer {
+    display: none;                       /* Hidden when list is empty */
+    justify-content: center;
+    padding: 14px 20px;
+    border-top: 1px solid #1a1a1a;
+    flex-shrink: 0;
+}
+
+#fav-clear-btn {
+    font-size: 9px;
+    letter-spacing: 4px;
+    padding: 8px 20px;
+    color: rgba(255, 68, 102, 0.6);
+    border-color: rgba(255, 68, 102, 0.3);
+    border-radius: 22px;
+}
+
+#fav-clear-btn:hover {
+    color: #ff4466;
+    border-color: #ff4466;
+}
+
+/* ---- Heart button on each video card ---- */
+.fav-heart-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 255, 204, 0.2);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0;                          /* Hidden until card is hovered */
+    transition: opacity 0.25s, border-color 0.25s, background 0.25s;
+    padding: 0;
+}
+
+/* Show heart on card hover, or when already favourited */
+.video:hover .fav-heart-btn,
+.fav-heart-btn.fav-heart-active {
+    opacity: 1;
+}
+
+.fav-heart-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+    border-color: #00ffcc;
+}
+
+.fav-heart-svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+}
+
+/* ---- Tablet adjustments ---- */
+@media (max-width: 1024px) {
+    #fav-sidebar {
+        width: 320px;
+    }
+}
+
+/* ---- Small phone: full-width panel ---- */
+@media (max-width: 500px) {
+    #fav-sidebar {
+        width: 100vw;
+        max-width: 100vw;
+        border-left: none;
+    }
+}

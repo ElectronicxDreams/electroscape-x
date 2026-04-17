@@ -1,5 +1,5 @@
 /*
-    Name: player.js | Version: 3.2.0
+    Name: player.js | Version: 3.3.0
     Project: Electroscape
     Description: All playback logic for the Electroscape music video gallery.
                  Loads track data from tracks.json, builds the video card grid,
@@ -13,6 +13,10 @@
         v3.1.0 — initGridControls refactored to support Option B (bare SVG icons, active)
                   and Option D (single cycling button, commented out). Both options share
                   a common applyGridSize() helper.
+        v3.2.0 — New Previous/Next Buttons
+        v3.3.0 — Favourites sidebar added (Section 4P):
+                  Heart button on each card, slide-out right sidebar, drag-to-reorder,
+                  play-from-sidebar, localStorage persistence under 'electroscape_favourites'.
 
     Sections:
         4A — Track loader       : Fetches tracks.json, builds the card grid
@@ -29,6 +33,8 @@
         4M — HUD seek           : Click-to-seek on the HUD progress bar
         4N — HUD controls       : Wires up HUD Prev / Play-Pause / Next buttons
         4O — Grid view controls : Switches grid density; saves preference to localStorage
+        4P — Favourites sidebar : Heart toggles, sidebar open/close, drag-to-reorder,
+                                  play-from-list, clear-all, localStorage persistence
         4J — Initialisation     : Entry point — calls loadTracks() and initGridControls()
 */
 
@@ -63,13 +69,20 @@ function loadTracks() {
                 card.innerHTML =
                     '<div class="thumb-container" style="background-image: url(\'' + thumbUrl + '\');"></div>' +
                     '<div class="video-label">' + track.title + '</div>' +
-                    '<div class="overlay-btn">&gt; ACTIVATE &lt;</div>';
+                    '<div class="overlay-btn">&gt; ACTIVATE &lt;</div>' +
+                    /* Heart button — added in v3.3.0; stops propagation so card click doesn't fire */
+                    '<button class="fav-heart-btn" data-id="' + track.id + '" data-title="' + track.title.replace(/"/g, '&quot;') + '" aria-label="Add to favourites">' +
+                        '<svg class="fav-heart-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                            '<path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="#00ffcc" stroke-width="1.5" fill="none" class="fav-heart-path"/>' +
+                        '</svg>' +
+                    '</button>';
 
                 grid.appendChild(card);
             });
 
             buildQueue();
             attachCardClicks();
+            initFavourites();   /* Section 4P — wire up all favourites logic */
 
             if (window.youtubeAPIReady) {
                 createPlayer();
@@ -352,8 +365,6 @@ function updateHudTitle(title) {
 /* Clicking anywhere on the HUD progress bar container seeks    */
 /* to that position. Gives immediate visual feedback by         */
 /* updating the bar width before the player confirms the seek.  */
-/* An invisible ::before pseudo-element on the container        */
-/* (styled in style.css) extends the click target upward.       */
 /* ============================================================ */
 function setupHudSeeking() {
     var barContainer = document.getElementById('hud-progress-container');
@@ -378,10 +389,6 @@ function setupHudSeeking() {
 /* ============================================================ */
 /* SECTION 4N: HUD CONTROLS                                     */
 /* Wires the HUD Prev / Play-Pause / Next buttons.              */
-/* Play-Pause mirrors the same logic as the now-playing label   */
-/* click handler (Section 4C).                                  */
-/* updateHudPlayPauseIcon keeps the button icon in sync with    */
-/* the player state on every onStateChange event (Section 4E).  */
 /* ============================================================ */
 function attachHudControls() {
     document.getElementById('hud-prev').addEventListener('click', function() {
@@ -416,19 +423,7 @@ function updateHudPlayPauseIcon(state) {
 
 /* ============================================================ */
 /* SECTION 4O: GRID VIEW CONTROLS & LOCAL STORAGE               */
-/* Switches the video grid between three density modes by       */
-/* toggling CSS classes on #video-grid:                         */
-/*   data-size="dense"   → adds .view-dense (Micro)             */
-/*   data-size="default" → no extra class   (Core)              */
-/*   data-size="max"     → adds .view-max   (Max)               */
-/* The active button receives .grid-btn-active.                 */
-/* Preference is saved to localStorage and restored on reload.  */
-/*                                                              */
-/* TWO UI OPTIONS — matches the active option in index.html:    */
-/*   Option B (ACTIVE)   — three bare SVG icon buttons          */
-/*   Option D (INACTIVE) — single cycling button                */
-/* To swap: comment out the active option below, uncomment the  */
-/* other, and make the matching change in index.html (3E).      */
+/* Switches the video grid between three density modes.         */
 /* ============================================================ */
 function initGridControls() {
     var grid      = document.getElementById('video-grid');
@@ -446,8 +441,6 @@ function initGridControls() {
 
     /* -------------------------------------------------------- */
     /* OPTION B: Bare SVG icon buttons — ACTIVE                 */
-    /* Reads data-size from each .grid-btn and applies          */
-    /* .grid-btn-active to the selected one.                    */
     /* -------------------------------------------------------- */
     var buttons = document.querySelectorAll('.grid-btn');
 
@@ -472,79 +465,313 @@ function initGridControls() {
     /*
     --------------------------------------------------------
     OPTION D: Single cycling button — INACTIVE
-    Click cycles dense → default → max → dense.
-    Icon and label update to reflect the current mode.
-    To enable: remove these comment markers and comment out
-    Option B above. Also update index.html Section 3E.
     --------------------------------------------------------
+    [commented-out option D code preserved as-is]
+    */
+}
 
-    var cycleOrder  = ['dense', 'default', 'max'];
-    var cycleLabels = { dense: 'Micro', 'default': 'Core', max: 'Max' };
 
-    var cycleSVGs = {
-        dense:
-            '<svg width="15" height="15" viewBox="0 0 18 18" fill="none">' +
-            '<rect x="1" y="1" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="5.5" y="1" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="10" y="1" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="14.5" y="1" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="1" y="5.5" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="5.5" y="5.5" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="10" y="5.5" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="14.5" y="5.5" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="1" y="10" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="5.5" y="10" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="10" y="10" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="14.5" y="10" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="1" y="14.5" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="5.5" y="14.5" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="10" y="14.5" width="3.5" height="3.5" rx="0.4"/>' +
-            '<rect x="14.5" y="14.5" width="3.5" height="3.5" rx="0.4"/>' +
-            '</svg>',
-        'default':
-            '<svg width="15" height="15" viewBox="0 0 18 18" fill="none">' +
-            '<rect x="1" y="1" width="4.5" height="4.5" rx="0.5"/>' +
-            '<rect x="6.75" y="1" width="4.5" height="4.5" rx="0.5"/>' +
-            '<rect x="12.5" y="1" width="4.5" height="4.5" rx="0.5"/>' +
-            '<rect x="1" y="6.75" width="4.5" height="4.5" rx="0.5"/>' +
-            '<rect x="6.75" y="6.75" width="4.5" height="4.5" rx="0.5"/>' +
-            '<rect x="12.5" y="6.75" width="4.5" height="4.5" rx="0.5"/>' +
-            '<rect x="1" y="12.5" width="4.5" height="4.5" rx="0.5"/>' +
-            '<rect x="6.75" y="12.5" width="4.5" height="4.5" rx="0.5"/>' +
-            '<rect x="12.5" y="12.5" width="4.5" height="4.5" rx="0.5"/>' +
-            '</svg>',
-        max:
-            '<svg width="15" height="15" viewBox="0 0 18 18" fill="none">' +
-            '<rect x="1" y="1" width="7" height="7" rx="0.8"/>' +
-            '<rect x="10" y="1" width="7" height="7" rx="0.8"/>' +
-            '<rect x="1" y="10" width="7" height="7" rx="0.8"/>' +
-            '<rect x="10" y="10" width="7" height="7" rx="0.8"/>' +
-            '</svg>'
-    };
+/* ============================================================ */
+/* SECTION 4P: FAVOURITES SIDEBAR                               */
+/*                                                              */
+/* Overview:                                                    */
+/*   - Each card gets a .fav-heart-btn injected in Section 4A.  */
+/*   - Favourites stored as an array of {id, title} objects in  */
+/*     localStorage under 'electroscape_favourites'.            */
+/*   - The sidebar (#fav-sidebar) slides in from the right.     */
+/*   - Rows in the list are draggable for reordering.           */
+/*   - Clicking a row's play button finds the matching card in  */
+/*     the queue by data-id and calls playTrack().              */
+/*                                                              */
+/* Key DOM IDs (defined in index.html Section 3I):              */
+/*   #fav-sidebar    — the panel itself                         */
+/*   #fav-backdrop   — click-to-close overlay behind the panel  */
+/*   #fav-list       — <ul> populated by renderFavList()        */
+/*   #fav-empty      — empty-state message div                  */
+/*   #fav-header     — title bar with close button              */
+/*   #fav-close-btn  — X button inside the header              */
+/*   #fav-clear-btn  — clear-all button in the footer           */
+/*   #fav-toggle-btn — heart pill in the action bar             */
+/*   #fav-toggle-icon — SVG inside the toggle button            */
+/* ============================================================ */
+function initFavourites() {
 
-    var cycleBtn    = document.getElementById('cycle-view-btn');
-    var currentSize = savedSize;
+    /* ---- Storage key ---- */
+    var STORAGE_KEY = 'electroscape_favourites';
 
-    function updateCycleBtn(size) {
-        var iconEl  = document.getElementById('cycle-view-icon');
-        var labelEl = document.getElementById('cycle-view-label');
-        if (iconEl)  iconEl.innerHTML   = cycleSVGs[size];
-        if (labelEl) labelEl.textContent = cycleLabels[size];
+    /* ---- Load saved favourites from localStorage ---- */
+    function loadFavs() {
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch(e) {
+            return [];
+        }
     }
 
-    applyGridSize(currentSize);
-    updateCycleBtn(currentSize);
+    /* ---- Save current favourites array to localStorage ---- */
+    function saveFavs(favs) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(favs));
+        } catch(e) { /* storage full — silently skip */ }
+    }
 
-    if (cycleBtn) {
-        cycleBtn.addEventListener('click', function() {
-            var idx     = cycleOrder.indexOf(currentSize);
-            currentSize = cycleOrder[(idx + 1) % cycleOrder.length];
-            applyGridSize(currentSize);
-            updateCycleBtn(currentSize);
-            this.blur();
+    /* ---- Check if a video ID is currently favourited ---- */
+    function isFav(id, favs) {
+        return favs.some(function(f) { return f.id === id; });
+    }
+
+    /* ---- SVG paths for heart: outline vs filled ---- */
+    var HEART_PATH = 'M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z';
+
+    /* ---- Update the visual state of a heart button on a card ---- */
+    function updateHeartBtn(btn, active) {
+        var path = btn.querySelector('.fav-heart-path');
+        if (!path) return;
+        if (active) {
+            path.setAttribute('fill', '#00ffcc');
+            path.setAttribute('stroke', '#00ffcc');
+            btn.classList.add('fav-heart-active');
+        } else {
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', '#00ffcc');
+            btn.classList.remove('fav-heart-active');
+        }
+    }
+
+    /* ---- Update the toggle button icon (outline/filled) ---- */
+    function updateToggleIcon(open) {
+        var icon = document.getElementById('fav-toggle-icon');
+        if (!icon) return;
+        var path = icon.querySelector('path');
+        if (!path) return;
+        if (open) {
+            path.setAttribute('fill', '#00ffcc');
+            path.setAttribute('stroke', '#00ffcc');
+        } else {
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', '#00ffcc');
+        }
+    }
+
+    /* ---- Sync all card heart buttons against current favs array ---- */
+    function syncAllHearts(favs) {
+        document.querySelectorAll('.fav-heart-btn').forEach(function(btn) {
+            updateHeartBtn(btn, isFav(btn.getAttribute('data-id'), favs));
         });
     }
-    OPTION D END */
+
+    /* ---- Drag-and-drop state ---- */
+    var dragSrcIndex = null;   /* Index of the row being dragged */
+
+    /* ---- Build and render the sidebar list from the favs array ---- */
+    function renderFavList() {
+        var favs    = loadFavs();
+        var list    = document.getElementById('fav-list');
+        var empty   = document.getElementById('fav-empty');
+        var footer  = document.getElementById('fav-footer');
+
+        /* Clear existing rows */
+        list.innerHTML = '';
+
+        if (!favs.length) {
+            empty.style.display  = 'flex';
+            footer.style.display = 'none';
+            return;
+        }
+
+        empty.style.display  = 'none';
+        footer.style.display = 'flex';
+
+        favs.forEach(function(fav, idx) {
+            var li = document.createElement('li');
+            li.className = 'fav-row';
+            li.setAttribute('draggable', 'true');
+            li.setAttribute('data-idx', idx);
+
+            /* Thumbnail */
+            var thumb = document.createElement('div');
+            thumb.className = 'fav-row-thumb';
+            thumb.style.backgroundImage = 'url(https://img.youtube.com/vi/' + fav.id + '/mqdefault.jpg)';
+
+            /* Title */
+            var title = document.createElement('span');
+            title.className = 'fav-row-title';
+            title.textContent = fav.title;
+
+            /* Controls: play + remove */
+            var controls = document.createElement('div');
+            controls.className = 'fav-row-controls';
+
+            /* Play button */
+            var playBtn = document.createElement('button');
+            playBtn.className = 'fav-row-btn fav-play-btn';
+            playBtn.setAttribute('aria-label', 'Play ' + fav.title);
+            playBtn.innerHTML =
+                '<svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                '<polygon points="2,1 10,6 2,11" fill="#00ffcc"/>' +
+                '</svg>';
+
+            /* Remove button */
+            var removeBtn = document.createElement('button');
+            removeBtn.className = 'fav-row-btn fav-remove-btn';
+            removeBtn.setAttribute('aria-label', 'Remove ' + fav.title);
+            removeBtn.innerHTML = '&#x2715;';
+
+            /* Drag handle */
+            var handle = document.createElement('div');
+            handle.className = 'fav-drag-handle';
+            handle.innerHTML =
+                '<svg viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                '<circle cx="2" cy="2"  r="1.2" fill="#555"/>' +
+                '<circle cx="6" cy="2"  r="1.2" fill="#555"/>' +
+                '<circle cx="2" cy="7"  r="1.2" fill="#555"/>' +
+                '<circle cx="6" cy="7"  r="1.2" fill="#555"/>' +
+                '<circle cx="2" cy="12" r="1.2" fill="#555"/>' +
+                '<circle cx="6" cy="12" r="1.2" fill="#555"/>' +
+                '</svg>';
+
+            controls.appendChild(playBtn);
+            controls.appendChild(removeBtn);
+
+            li.appendChild(handle);
+            li.appendChild(thumb);
+            li.appendChild(title);
+            li.appendChild(controls);
+            list.appendChild(li);
+
+            /* --- Play from sidebar --- */
+            playBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                /* Find the queue index for this video ID */
+                var qIdx = queue.findIndex(function(t) { return t.id === fav.id; });
+                if (qIdx !== -1) {
+                    playTrack(qIdx);
+                }
+            });
+
+            /* --- Remove from favourites --- */
+            removeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var current = loadFavs();
+                current = current.filter(function(f) { return f.id !== fav.id; });
+                saveFavs(current);
+                syncAllHearts(current);
+                renderFavList();
+            });
+
+            /* --- Drag-to-reorder: dragstart --- */
+            li.addEventListener('dragstart', function(e) {
+                dragSrcIndex = idx;
+                li.classList.add('fav-row-dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                /* Required for Firefox */
+                e.dataTransfer.setData('text/plain', idx);
+            });
+
+            li.addEventListener('dragend', function() {
+                li.classList.remove('fav-row-dragging');
+                /* Remove any lingering drop-target highlights */
+                document.querySelectorAll('.fav-row-over').forEach(function(el) {
+                    el.classList.remove('fav-row-over');
+                });
+            });
+
+            li.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                li.classList.add('fav-row-over');
+            });
+
+            li.addEventListener('dragleave', function() {
+                li.classList.remove('fav-row-over');
+            });
+
+            li.addEventListener('drop', function(e) {
+                e.preventDefault();
+                li.classList.remove('fav-row-over');
+                if (dragSrcIndex === null || dragSrcIndex === idx) return;
+
+                /* Reorder the array and persist */
+                var current = loadFavs();
+                var moved   = current.splice(dragSrcIndex, 1)[0];
+                current.splice(idx, 0, moved);
+                saveFavs(current);
+                renderFavList();   /* Re-render with new order */
+                dragSrcIndex = null;
+            });
+        });
+    }
+
+    /* ---- Open / close the sidebar ---- */
+    function openSidebar() {
+        document.getElementById('fav-sidebar').classList.add('fav-sidebar-open');
+        document.getElementById('fav-backdrop').classList.add('fav-backdrop-visible');
+        updateToggleIcon(true);
+        renderFavList();   /* Always refresh on open */
+    }
+
+    function closeSidebar() {
+        document.getElementById('fav-sidebar').classList.remove('fav-sidebar-open');
+        document.getElementById('fav-backdrop').classList.remove('fav-backdrop-visible');
+        updateToggleIcon(false);
+    }
+
+    /* ---- Wire up the toggle button in the action bar ---- */
+    var toggleBtn = document.getElementById('fav-toggle-btn');
+    toggleBtn.addEventListener('click', function() {
+        var sidebar = document.getElementById('fav-sidebar');
+        if (sidebar.classList.contains('fav-sidebar-open')) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
+        this.blur();
+    });
+
+    /* ---- Close on backdrop click ---- */
+    document.getElementById('fav-backdrop').addEventListener('click', closeSidebar);
+
+    /* ---- Close on X button ---- */
+    document.getElementById('fav-close-btn').addEventListener('click', closeSidebar);
+
+    /* ---- Clear all favourites ---- */
+    document.getElementById('fav-clear-btn').addEventListener('click', function() {
+        saveFavs([]);
+        syncAllHearts([]);
+        renderFavList();
+    });
+
+    /* ---- Wire up each card's heart button ---- */
+    document.querySelectorAll('.fav-heart-btn').forEach(function(btn) {
+        /* Stop propagation — heart click must not trigger card play */
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var id    = btn.getAttribute('data-id');
+            var title = btn.getAttribute('data-title');
+            var favs  = loadFavs();
+
+            if (isFav(id, favs)) {
+                /* Already favourited — remove */
+                favs = favs.filter(function(f) { return f.id !== id; });
+            } else {
+                /* Not yet favourited — add */
+                favs.push({ id: id, title: title });
+            }
+
+            saveFavs(favs);
+            updateHeartBtn(btn, isFav(id, favs));
+
+            /* If sidebar is open, refresh the list live */
+            var sidebar = document.getElementById('fav-sidebar');
+            if (sidebar.classList.contains('fav-sidebar-open')) {
+                renderFavList();
+            }
+        });
+    });
+
+    /* ---- Restore heart states from localStorage on load ---- */
+    syncAllHearts(loadFavs());
 }
 
 
@@ -553,6 +780,8 @@ function initGridControls() {
 /* Entry point. loadTracks() fetches tracks.json and builds the */
 /* grid; initGridControls() wires up the view switcher and      */
 /* restores the saved grid preference from localStorage.        */
+/* initFavourites() is called inside loadTracks() once the      */
+/* card DOM is ready (heart buttons must exist first).          */
 /* ============================================================ */
 loadTracks();
 initGridControls();
