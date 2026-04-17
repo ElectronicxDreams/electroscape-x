@@ -1,5 +1,5 @@
 <!--
-    Name: index.html | Version (vx): 3.0.0
+    Name: index.html | Version: 3.1.0
     Project: Electroscape
     Description: Music video gallery page with YouTube IFrame API player.
                  Track data is loaded from tracks.json — edit that file to
@@ -7,44 +7,52 @@
                  Styles live in style.css. Playback logic lives in player.js.
                  Clicking a card loads it into the featured player at the top.
                  Prev / Next buttons step through the playlist in order.
-                 Shuffle randomises the card grid and resets the queue.
-                 v2.1 — Orbital HUD footer added (persistent mini-player bar).
-                 v2.9.0 — Unified view controls and centered action bar.
-    Stages:
-        Stage 1 — HEAD        : Page setup, font import, stylesheet link
-        Stage 2 — CSS STYLES  : Moved to style.css
-        Stage 3 — BODY HTML   : The visible page structure (nav, player, buttons, video grid)
-        Stage 4 — JAVASCRIPT  : Moved to player.js (loaded at bottom of body)
+                 Override Sequence randomises the card grid and resets the queue.
 
-    File structure — all files must sit in the same folder on GitHub:
-        index.html   ← this file (page structure only — rarely needs editing)
+    Changelog:
+        v2.1.0 — Orbital HUD footer added (persistent mini-player bar)
+        v2.9.0 — Unified view controls and centred action bar
+        v3.0.0 — Michroma title font; elastic fly-in animation; HUD seek + progress
+        v3.1.0 — Grid view switcher replaced with SVG icon buttons (Option B active,
+                  Option D — single cycle button — commented out and ready to enable)
+
+    Sections in this file:
+        Stage 1 — HEAD : Page setup, font imports, stylesheet link
+        Stage 3 — BODY : Visible page structure (nav, player, controls, grid, HUD)
+        (Stage 2 = style.css | Stage 4 = player.js)
+
+    File structure — all files must sit in the same folder:
+        index.html   ← this file  (page structure — rarely needs editing)
         style.css    ← all visual styles (edit for colour/layout changes)
         player.js    ← all playback logic (edit for behaviour changes)
         tracks.json  ← track list only (THIS is the file you edit day-to-day)
 -->
 
+
 <!-- ============================================================ -->
-<!-- STAGE 1 START: HEAD — Page setup, title, font, stylesheet    -->
+<!-- STAGE 1: HEAD — Page setup, fonts, stylesheet                -->
 <!-- ============================================================ -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 
-    <!-- Sets the character encoding so special characters display correctly -->
+    <!-- Character encoding: ensures special characters display correctly -->
     <meta charset="UTF-8">
 
-    <!-- The text shown in the browser tab -->
+    <!-- Browser tab title -->
     <title>Electroscape</title>
 
     <!--
-        Loads the "Orbitron" font from Google Fonts.
-        This is the futuristic-style font used everywhere on the page.
+        Google Fonts:
+        - Orbitron : main UI font used across the whole page
+        - Michroma : used exclusively for the ELECTROSCAPE page title (h1)
     -->
     <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
     <!--
-        Loads all visual styles from the external stylesheet.
-        To change colours, layout, or spacing — edit style.css, not this file.
+        All visual styles live in style.css.
+        Edit that file for colour, layout, or spacing changes — not here.
+        Cache-busted with version query string.
     -->
     <link rel="stylesheet" href="style.css?v=3.1.0">
 
@@ -55,11 +63,15 @@
 
 
 <!-- ============================================================ -->
-<!-- STAGE 3 START: BODY HTML — Visible page structure            -->
+<!-- STAGE 3: BODY — Visible page structure                       -->
 <!-- ============================================================ -->
 <body>
 
-    <!-- SECTION 3A: TOP NAVIGATION -->
+    <!-- -------------------------------------------------------- -->
+    <!-- SECTION 3A: TOP NAVIGATION                               -->
+    <!-- External links: Weblinks hub, YouTube playlist, Spotify, -->
+    <!-- and a YouTube autoplay direct link (labelled X).         -->
+    <!-- -------------------------------------------------------- -->
     <nav>
         <a href='https://beacons.ai/weblinks' target='_blank'>Weblinks</a>
         <a href='https://www.youtube.com/playlist?list=PLdd12CvCHG0sdBwilp-LipaZkgzR2gJVq' target='_blank'>YouTube</a>
@@ -68,129 +80,171 @@
     </nav>
 
 
-    <!-- SECTION 3B: PAGE TITLE -->
+    <!-- -------------------------------------------------------- -->
+    <!-- SECTION 3B: PAGE TITLE                                   -->
+    <!-- Each letter is a separate <span> so the CSS animation    -->
+    <!-- (elasticAssemble, defined in style.css) can stagger them -->
+    <!-- one by one on load. Font: Michroma.                      -->
+    <!-- -------------------------------------------------------- -->
     <h1 class="fly-in-title">
         <span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span>
     </h1>
 
 
-    <!-- SECTION 3C: FEATURED VIDEO PLAYER -->
+    <!-- -------------------------------------------------------- -->
+    <!-- SECTION 3C: FEATURED VIDEO PLAYER                        -->
+    <!-- #now-playing-label displays the current track title and  -->
+    <!-- is clickable to toggle play/pause (wired in player.js).  -->
+    <!-- The YouTube IFrame API replaces #yt-player with an       -->
+    <!-- <iframe> at runtime — do not put anything inside it.     -->
+    <!-- -------------------------------------------------------- -->
     <div class="featured-box">
         <div id="now-playing-label">Initiate Audio Sequence</div>
         <div id="player-container">
-            <!-- YouTube IFrame API injects the actual player into this empty div -->
             <div id="yt-player"></div>
         </div>
     </div>
 
 
-    <!-- SECTION 3D: ACTION BAR — Prev / Shuffle / Next buttons -->
+    <!-- -------------------------------------------------------- -->
+    <!-- SECTION 3D: PLAYBACK CONTROLS                            -->
+    <!-- Prev / Override Sequence (shuffle) / Next.               -->
+    <!-- Fixed widths on Prev and Next keep Override Sequence      -->
+    <!-- perfectly centred regardless of label length.            -->
+    <!-- -------------------------------------------------------- -->
     <div class="action-bar" style="margin-bottom: 20px;">
         <button class="ctrl-btn" id="prev-btn">[ Previous ]</button>
         <button class="ctrl-btn shuffle-btn" id="shuffle-btn">[ Override Sequence ]</button>
         <button class="ctrl-btn" id="next-btn">[ Next ]</button>
     </div>
 
-    <!-- SECTION 3D-2: GRID VIEW CONTROLS -->
-    <!-- ============================================================ -->
-    <!-- OPTION B — Bare icon buttons (ACTIVE)                        -->
-    <!-- Three SVG grid icons, no container. Active = teal, inactive  -->
-    <!-- = ghosted. To disable: comment out this block and enable D.  -->
-    <!-- ============================================================ -->
-    <div class="action-bar view-controls-bar" style="margin-top: 0;">
+
+    <!-- -------------------------------------------------------- -->
+    <!-- SECTION 3E: GRID VIEW CONTROLS                           -->
+    <!-- Switches the video grid between three density modes:     -->
+    <!--   dense   = Micro  (4x4 compact)                         -->
+    <!--   default = Core   (3x3 standard)                        -->
+    <!--   max     = Max    (2x2 large)                            -->
+    <!-- player.js handles click logic, active state, and saving  -->
+    <!-- the preference to localStorage (Section 4O).             -->
+    <!--                                                          -->
+    <!-- TWO UI OPTIONS — only one active at a time:              -->
+    <!--   Option B (ACTIVE)   — three bare SVG icon buttons      -->
+    <!--   Option D (INACTIVE) — single cycling button, below     -->
+    <!-- To swap: comment out the active block, uncomment the     -->
+    <!-- other. No changes needed in style.css or player.js.      -->
+    <!-- -------------------------------------------------------- -->
+
+    <!-- OPTION B: Bare SVG icon buttons — ACTIVE -->
+    <div class="action-bar view-controls-bar">
         <div class="bare-view-wrap">
+
+            <!-- Micro: 4×4 dense grid icon -->
             <button class="grid-btn bare-view-btn" data-size="dense" aria-label="Micro grid">
-                <!-- 4x4 dense grid icon -->
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="1"   y="1"   width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="5.5" y="1"   width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="10"  y="1"   width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="14.5" y="1"  width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="1"   y="5.5" width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="5.5" y="5.5" width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="10"  y="5.5" width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="14.5" y="5.5" width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="1"   y="10"  width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="5.5" y="10"  width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="10"  y="10"  width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="14.5" y="10" width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="1"   y="14.5" width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="5.5" y="14.5" width="3.5" height="3.5" rx="0.4"/>
-                    <rect x="10"  y="14.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="1"    y="1"    width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5"  y="1"    width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"   y="1"    width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="14.5" y="1"    width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="1"    y="5.5"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5"  y="5.5"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"   y="5.5"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="14.5" y="5.5"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="1"    y="10"   width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5"  y="10"   width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"   y="10"   width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="14.5" y="10"   width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="1"    y="14.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5"  y="14.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"   y="14.5" width="3.5" height="3.5" rx="0.4"/>
                     <rect x="14.5" y="14.5" width="3.5" height="3.5" rx="0.4"/>
                 </svg>
             </button>
+
+            <!-- Core: 3×3 standard grid icon -->
             <button class="grid-btn bare-view-btn" data-size="default" aria-label="Core grid">
-                <!-- 3x3 standard grid icon -->
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="1"   y="1"   width="4.5" height="4.5" rx="0.5"/>
-                    <rect x="6.75" y="1"  width="4.5" height="4.5" rx="0.5"/>
-                    <rect x="12.5" y="1"  width="4.5" height="4.5" rx="0.5"/>
-                    <rect x="1"   y="6.75" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="1"    y="1"    width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="6.75" y="1"    width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="12.5" y="1"    width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="1"    y="6.75" width="4.5" height="4.5" rx="0.5"/>
                     <rect x="6.75" y="6.75" width="4.5" height="4.5" rx="0.5"/>
                     <rect x="12.5" y="6.75" width="4.5" height="4.5" rx="0.5"/>
-                    <rect x="1"   y="12.5" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="1"    y="12.5" width="4.5" height="4.5" rx="0.5"/>
                     <rect x="6.75" y="12.5" width="4.5" height="4.5" rx="0.5"/>
                     <rect x="12.5" y="12.5" width="4.5" height="4.5" rx="0.5"/>
                 </svg>
             </button>
+
+            <!-- Max: 2×2 large grid icon -->
             <button class="grid-btn bare-view-btn" data-size="max" aria-label="Max grid">
-                <!-- 2x2 large grid icon -->
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="1"   y="1"   width="7" height="7" rx="0.8"/>
-                    <rect x="10"  y="1"   width="7" height="7" rx="0.8"/>
-                    <rect x="1"   y="10"  width="7" height="7" rx="0.8"/>
-                    <rect x="10"  y="10"  width="7" height="7" rx="0.8"/>
+                    <rect x="1"  y="1"  width="7" height="7" rx="0.8"/>
+                    <rect x="10" y="1"  width="7" height="7" rx="0.8"/>
+                    <rect x="1"  y="10" width="7" height="7" rx="0.8"/>
+                    <rect x="10" y="10" width="7" height="7" rx="0.8"/>
                 </svg>
             </button>
+
         </div>
     </div>
-    <!-- OPTION B END =============================================== -->
+    <!-- OPTION B END -->
 
     <!--
-    ================================================================
-    OPTION D — Single cycling button (INACTIVE — remove comment tags
-    to enable, and comment out OPTION B above to disable it)
-    Shows the current mode name alongside its icon. Cycles through
-    dense → default → max on each click. Matches ctrl-btn style.
-    ================================================================
-    <div class="action-bar view-controls-bar" style="margin-top: 0;">
+    OPTION D: Single cycling button — INACTIVE
+    One button cycles Micro → Core → Max → Micro on each click.
+    The icon and label update to reflect the current mode.
+    Matches the existing .ctrl-btn style exactly.
+    To enable: remove these comment markers and comment out Option B above.
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    <div class="action-bar view-controls-bar">
         <button class="ctrl-btn" id="cycle-view-btn">
             <span id="cycle-view-icon"></span>
             <span id="cycle-view-label">Core</span>
         </button>
     </div>
-    OPTION D END ================================================== -->
+    OPTION D END -->
 
 
-    <!-- SECTION 3E: VIDEO GRID -->
-    <div class="grid" id="video-grid">
-        <!-- Cards are injected here automatically from tracks.json -->
-    </div>
+    <!-- -------------------------------------------------------- -->
+    <!-- SECTION 3F: VIDEO GRID                                   -->
+    <!-- Empty on load. player.js fetches tracks.json and injects -->
+    <!-- one .video card per track. Do not add cards manually.    -->
+    <!-- -------------------------------------------------------- -->
+    <div class="grid" id="video-grid"></div>
+
 
 <!-- ============================================================ -->
-<!-- STAGE 3 END                                                   -->
+<!-- STAGE 3 MAIN CONTENT END                                     -->
 <!-- ============================================================ -->
 
 
-    <!-- ============================================================ -->
-    <!-- FOOTER VERSION DISPLAY                                        -->
-    <!-- ============================================================ -->
+    <!-- -------------------------------------------------------- -->
+    <!-- SECTION 3G: FOOTER — Version display                     -->
+    <!-- Update the version number here when releasing changes.   -->
+    <!-- -------------------------------------------------------- -->
     <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-        <!-- change version vx --><span style="color: #00ffcc;">3.1.0</span><!-- end change version -->
+        <!-- version --><span style="color: #00ffcc;">3.1.0</span><!-- end version -->
     </div>
 
 
-    <!-- ============================================================ -->
-    <!-- SECTION 3F: ORBITAL HUD — Persistent footer mini-player      -->
-    <!-- ============================================================ -->
+    <!-- -------------------------------------------------------- -->
+    <!-- SECTION 3H: ORBITAL HUD — Persistent footer mini-player  -->
+    <!-- Fixed to the bottom of the viewport. Hidden (opacity 0)  -->
+    <!-- until playback starts; player.js adds .hud-active to     -->
+    <!-- reveal it. Contains a seekable progress bar, track title,-->
+    <!-- and Prev / Play-Pause / Next transport controls.         -->
+    <!-- Progress bar click-to-seek is wired in player.js         -->
+    <!-- (Section 4M). Play state syncs via onStateChange.        -->
+    <!-- -------------------------------------------------------- -->
     <div id="hud-dock">
-        <!-- Thin progress line across the very top of the HUD bar. -->
+
+        <!-- Thin seekable progress bar across the very top of the HUD -->
         <div id="hud-progress-container">
             <div id="hud-progress-bar"></div>
         </div>
 
-        <!-- Inner row: track title on the left, controls on the right -->
+        <!-- Inner row: track title (left) and transport controls (right) -->
         <div id="hud-inner">
             <div id="hud-track-title">Initiate Audio Sequence</div>
             <div id="hud-controls">
@@ -199,13 +253,16 @@
                 <button class="hud-btn" id="hud-next">&#9654;&#9654;</button>
             </div>
         </div>
+
     </div>
-    <!-- ============================================================ -->
-    <!-- SECTION 3F END                                               -->
-    <!-- ============================================================ -->
+    <!-- SECTION 3H END -->
 
 
-    <!-- Scripts MUST stay at the bottom of the body -->
+    <!-- -------------------------------------------------------- -->
+    <!-- SCRIPTS — must remain at the bottom of <body>            -->
+    <!-- player.js loads first so its globals exist before the    -->
+    <!-- YouTube API fires onYouTubeIframeAPIReady.               -->
+    <!-- -------------------------------------------------------- -->
     <script src="player.js?v=3.1.0"></script>
     <script src="https://www.youtube.com/iframe_api" async></script>
 

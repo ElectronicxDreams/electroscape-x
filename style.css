@@ -2,10 +2,32 @@
     Name: style.css | Version: 3.1.0
     Project: Electroscape
     Description: All visual styles for the Electroscape music video gallery.
-                        Added Custom Grid View sizes and unified view box.
-                 
-               
+                 Edit this file for colour, layout, or spacing changes.
+                 Page structure lives in index.html.
+                 Playback logic lives in player.js.
+
+    Changelog:
+        v2.1.0 — Orbital HUD footer styles added
+        v2.9.0 — Unified view-box control styles added
+        v3.0.0 — Michroma title font; elasticAssemble animation; HUD progress bar
+        v3.1.0 — View-box styles replaced with bare SVG icon button styles (Option B).
+                  Option D (cycle button) styles also included, always active — the
+                  button itself is toggled via HTML/JS, not CSS.
+
+    Sections:
+        2A — Page base
+        2B — Top navigation
+        2C — Page title (h1) + fly-in animation
+        2D — Featured video player
+        2E — Action bar (Prev / Shuffle / Next buttons)
+        2E-2 — Grid view controls (Option B bare icons + Option D cycle button)
+        2F — Video grid — default responsive layout
+        2F-2 — Video grid — custom density views (dense / default / max)
+        2G — Video cards
+        2H — Mobile adjustments
+        2I — Orbital HUD (persistent footer mini-player)
 */
+
 
 /* ============================================================ */
 /* SECTION 2A: PAGE BASE                                        */
@@ -15,12 +37,13 @@
 body {
     background: #000;                       /* Black page background */
     color: #fff;                            /* Default text colour: white */
-    font-family: 'Orbitron', sans-serif;    /* Futuristic font */
+    font-family: 'Orbitron', sans-serif;    /* Futuristic font used throughout */
     margin: 0;
     padding: 20px;                          /* Small gap around the page edge */
     text-align: center;                     /* Centre-align everything by default */
-    overflow-x: hidden;                     /* Hide any accidental horizontal scroll */
+    overflow-x: hidden;                     /* Prevent accidental horizontal scroll */
 }
+
 
 /* ============================================================ */
 /* SECTION 2B: TOP NAVIGATION BAR                               */
@@ -42,13 +65,14 @@ nav a {
 }
 
 nav a:hover {
-    color: #00ffcc;                         /* Accent green glow on mouse-over */
+    color: #00ffcc;                         /* Teal accent on hover */
 }
+
 
 /* ============================================================ */
 /* SECTION 2C: PAGE TITLE (H1)                                  */
-/* Animation: Sequential Left-Entry with Elastic Snap           */
-/* Based on Michroma font with 28px spacing / 2.4s duration     */
+/* Font: Michroma. Each letter is a separate <span> in the HTML */
+/* so the elasticAssemble animation can stagger them on load.   */
 /* ============================================================ */
 .fly-in-title {
     font-family: 'Michroma', sans-serif;
@@ -67,12 +91,11 @@ nav a:hover {
     letter-spacing: 22px;
     text-indent: 22px;
     opacity: 0;
-    /* Custom Bezier: Creates the 'Overshoot and Snap' effect */
     animation: elasticAssemble 2.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     transform: translateX(-100vw);
 }
 
-/* SEQUENTIAL DELAYS: Letters march in one by one */
+/* Sequential delays — letters march in one by one */
 .fly-in-title span:nth-child(1)  { animation-delay: 0.1s; }
 .fly-in-title span:nth-child(2)  { animation-delay: 0.3s; }
 .fly-in-title span:nth-child(3)  { animation-delay: 0.5s; }
@@ -86,13 +109,14 @@ nav a:hover {
 .fly-in-title span:nth-child(11) { animation-delay: 2.1s; }
 .fly-in-title span:nth-child(12) { animation-delay: 2.3s; }
 
+/* Slides in from far left with an overshoot-and-snap effect */
 @keyframes elasticAssemble {
     0% {
         opacity: 0;
         transform: translateX(-100vw);
     }
     30% {
-        opacity: 1; /* Fade in quickly as it enters the screen */
+        opacity: 1;         /* Fades in quickly as it crosses the screen */
     }
     100% {
         opacity: 1;
@@ -100,8 +124,12 @@ nav a:hover {
     }
 }
 
+
 /* ============================================================ */
 /* SECTION 2D: FEATURED VIDEO PLAYER                            */
+/* Max-width container centres and constrains the player on     */
+/* wide screens. 16:9 aspect ratio is maintained via CSS.       */
+/* #now-playing-label is also a click target (see player.js).   */
 /* ============================================================ */
 .featured-box {
     max-width: 1200px;
@@ -125,7 +153,7 @@ nav a:hover {
     letter-spacing: 5px;
     margin-bottom: 15px;
     min-height: 15px;
-    cursor: pointer;
+    cursor: pointer;                /* Clickable — toggles play/pause */
     transition: color 0.3s;
 }
 
@@ -133,8 +161,11 @@ nav a:hover {
     color: #00ffcc;
 }
 
+
 /* ============================================================ */
-/* SECTION 2E: ACTION BAR BUTTONS (Prev / Shuffle / Next)       */
+/* SECTION 2E: ACTION BAR — Prev / Override Sequence / Next     */
+/* Shared .action-bar flex row used for both the playback       */
+/* controls and the grid view switcher (Section 2E-2).          */
 /* ============================================================ */
 .action-bar {
     margin: 40px auto;
@@ -147,7 +178,7 @@ nav a:hover {
 .ctrl-btn {
     background: transparent;
     border: 1px solid rgba(0, 255, 204, 0.5);
-    color: rgba(0, 255, 204, 0.6); 
+    color: rgba(0, 255, 204, 0.6);
     padding: 12px 25px;
     font-family: 'Orbitron', sans-serif;
     font-size: 10px;
@@ -157,34 +188,35 @@ nav a:hover {
     transition: 0.4s;
     border-radius: 2px;
     outline: none;
-    white-space: nowrap; /* Prevents text from wrapping to a new line */
+    white-space: nowrap;            /* Prevents label wrapping to a new line */
 }
 
 .ctrl-btn:hover {
     border-color: #00ffcc;
-    color: #00ffcc; 
+    color: #00ffcc;
 }
 
 .ctrl-btn:focus {
     border-color: rgba(0, 255, 204, 0.25);
-    color: rgba(0, 255, 204, 0.6); 
+    color: rgba(0, 255, 204, 0.6);
 }
 
+/* Override Sequence gets slightly higher base opacity than Prev/Next */
 .shuffle-btn {
-    color: rgba(0, 255, 204, 0.85); 
+    color: rgba(0, 255, 204, 0.85);
 }
 
 .shuffle-btn:focus {
     color: rgba(0, 255, 204, 0.85);
 }
 
-/* FIX: Forces perfect symmetry so "Override Sequence" is dead-center */
+/* Fixed widths keep Override Sequence dead-centre between Prev and Next */
 #prev-btn, #next-btn {
     width: 220px;
     box-sizing: border-box;
 }
 
-/* TABLET FIX: Shrink buttons so all three sit on one line at mid-range widths */
+/* Tablet: shrink all three buttons so they fit on one line */
 @media (max-width: 1024px) and (min-width: 601px) {
     .ctrl-btn {
         font-size: 9px;
@@ -196,32 +228,39 @@ nav a:hover {
     }
 }
 
-/* Mobile wrapping adjustment so fixed widths don't break phones */
+/* Mobile: release fixed widths so buttons can wrap naturally */
 @media (max-width: 600px) {
     #prev-btn, #next-btn {
         width: 100%;
     }
 }
 
+
 /* ============================================================ */
 /* SECTION 2E-2: GRID VIEW CONTROLS                             */
+/* Styles for both UI options. Only one option's HTML is active */
+/* at a time — toggled in index.html (Section 3E).              */
+/*                                                              */
+/* Option B — Bare SVG icon buttons (ACTIVE in HTML)            */
+/* Option D — Single cycling ctrl-btn (INACTIVE in HTML)        */
 /* ============================================================ */
 
-/* Shared: tighten the action-bar margin for the view row only */
+/* Pulls the view control row closer to the playback bar above  */
 .view-controls-bar {
     margin-top: 0 !important;
     margin-bottom: 30px;
 }
 
-/* ----------------------------------------------------------  */
-/* OPTION B — Bare icon buttons                                 */
-/* ----------------------------------------------------------  */
+/* --- Option B: Bare SVG icon buttons --- */
+
+/* Flex row wrapper — no border or background of its own */
 .bare-view-wrap {
     display: flex;
     align-items: center;
     gap: 4px;
 }
 
+/* Each icon button: transparent, no border, just the SVG */
 .bare-view-btn {
     background: transparent;
     border: none;
@@ -231,39 +270,30 @@ nav a:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0.2;                   /* Inactive: ghosted */
     transition: opacity 0.25s;
     outline: none;
 }
 
 .bare-view-btn svg rect {
-    fill: #00ffcc;
-    transition: fill 0.25s;
+    fill: #00ffcc;                  /* All icons use teal fill */
 }
 
-/* Inactive state — ghosted */
-.bare-view-btn {
-    opacity: 0.2;
-}
-
-/* Active state — full teal */
 .bare-view-btn.grid-btn-active {
-    opacity: 1;
+    opacity: 1;                     /* Active: full teal */
 }
 
-/* Hover on inactive buttons */
 .bare-view-btn:hover {
-    opacity: 0.6;
+    opacity: 0.6;                   /* Hover: mid-opacity preview */
 }
 
-/* Focus ring suppression (matches rest of site) */
 .bare-view-btn:focus {
     outline: none;
 }
 
-/* ----------------------------------------------------------  */
-/* OPTION D — Single cycling button                             */
-/* Uses existing .ctrl-btn styles — only icon gap needed        */
-/* ----------------------------------------------------------  */
+/* --- Option D: Single cycling button --- */
+
+/* Extends .ctrl-btn with icon + label side by side */
 #cycle-view-btn {
     display: inline-flex;
     align-items: center;
@@ -280,8 +310,11 @@ nav a:hover {
     fill: #00ffcc;
 }
 
+
 /* ============================================================ */
-/* SECTION 2F: VIDEO GRID DEFAULT                               */
+/* SECTION 2F: VIDEO GRID — DEFAULT RESPONSIVE LAYOUT           */
+/* Base grid used when no custom view class is applied.         */
+/* Breakpoints step down column width as the viewport shrinks.  */
 /* ============================================================ */
 .grid {
     display: grid;
@@ -313,15 +346,19 @@ nav a:hover {
     }
 }
 
+
 /* ============================================================ */
-/* SECTION 2F-2: CUSTOM GRID VIEWS (ALL DEVICES)                */
-/* Works on desktop, tablet, and phone.                         */
-/* Portrait mobile: MICRO=1col, CORE=2col, MAX=2col             */
-/* Landscape mobile/tablet: MICRO=3col, CORE=3-4col, MAX=2col   */
-/* Desktop: full range as intended                              */
+/* SECTION 2F-2: VIDEO GRID — CUSTOM DENSITY VIEWS              */
+/* Applied by player.js adding .view-dense or .view-max to      */
+/* #video-grid. No class = default Core layout (Section 2F).    */
+/*                                                              */
+/* Breakdowns per viewport:                                     */
+/*   Portrait mobile  : dense=1col, max=1col                    */
+/*   Landscape/tablet : dense=auto-small, max=auto-large        */
+/*   Desktop          : dense=auto 220px, max=auto 550px        */
 /* ============================================================ */
 
-/* --- PORTRAIT MOBILE (up to 600px) --- */
+/* Portrait mobile (up to 600px) */
 @media (max-width: 600px) and (orientation: portrait) {
     .grid.view-dense {
         grid-template-columns: repeat(1, 1fr);
@@ -333,7 +370,7 @@ nav a:hover {
     }
 }
 
-/* --- LANDSCAPE MOBILE & SMALL TABLET (601px–1300px) --- */
+/* Landscape mobile and small tablet (601px–1300px) */
 @media (min-width: 601px) and (max-width: 1300px) {
     .grid.view-dense {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -345,7 +382,7 @@ nav a:hover {
     }
 }
 
-/* --- DESKTOP (1301px and above) --- */
+/* Desktop (1301px and above) */
 @media (min-width: 1301px) {
     .grid.view-dense {
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -357,8 +394,12 @@ nav a:hover {
     }
 }
 
+
 /* ============================================================ */
 /* SECTION 2G: VIDEO CARDS                                      */
+/* .video cards are injected by player.js from tracks.json.     */
+/* .is-playing is added by player.js to highlight the active    */
+/* track with a pulsing teal border.                            */
 /* ============================================================ */
 .video {
     background: #080808;
@@ -375,6 +416,7 @@ nav a:hover {
     background: #111;
 }
 
+/* Pulsing teal glow on the currently playing card */
 @keyframes activePulse {
     0%   { box-shadow: 0 0 5px rgba(0, 255, 204, 0.1); }
     50%  { box-shadow: 0 0 20px rgba(0, 255, 204, 0.35); }
@@ -386,6 +428,7 @@ nav a:hover {
     animation: activePulse 2s infinite ease-in-out;
 }
 
+/* 16:9 thumbnail, fills the top of the card */
 .thumb-container {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -394,6 +437,7 @@ nav a:hover {
     border-radius: 4px 4px 0 0;
 }
 
+/* Track title below the thumbnail */
 .video-label {
     display: block;
     width: 100%;
@@ -406,6 +450,7 @@ nav a:hover {
     box-sizing: border-box;
 }
 
+/* "> ACTIVATE <" overlay — fades in on card hover */
 .overlay-btn {
     position: absolute;
     top: 40%;
@@ -425,17 +470,19 @@ nav a:hover {
     padding: 10px 18px;
     opacity: 0;
     transition: opacity 0.3s ease;
-    pointer-events: none;
+    pointer-events: none;           /* Click passes through to the card */
 }
 
 .video:hover .overlay-btn {
     opacity: 1;
 }
 
+
 /* ============================================================ */
 /* SECTION 2H: MOBILE ADJUSTMENTS                               */
+/* General small-screen tweaks not covered by grid breakpoints. */
 /* ============================================================ */
-@media (max-width:900px) {
+@media (max-width: 900px) {
     h1 {
         letter-spacing: 20px;
         text-indent: 20px;
@@ -447,8 +494,12 @@ nav a:hover {
     }
 }
 
+
 /* ============================================================ */
 /* SECTION 2I: ORBITAL HUD — Persistent footer mini-player      */
+/* Fixed bar at the bottom of the viewport. Starts invisible    */
+/* (opacity 0, pointer-events none). player.js adds             */
+/* .hud-active on first play to reveal it.                      */
 /* ============================================================ */
 #hud-dock {
     position: fixed;
@@ -474,6 +525,7 @@ nav a:hover {
     pointer-events: all;
 }
 
+/* Thin teal progress bar — width % driven by player.js */
 #hud-progress-container {
     width: 100%;
     height: 3px;
@@ -491,17 +543,19 @@ nav a:hover {
     pointer-events: none;
 }
 
+/* Invisible expanded hit area above the progress bar for easier seeking */
 #hud-progress-container::before {
     content: '';
     position: absolute;
-    top: -23.5px; 
+    top: -23.5px;
     left: 0;
     right: 0;
     height: 50px;
     z-index: 10;
-    background: transparent; 
+    background: transparent;
 }
 
+/* Inner row: title left, controls right */
 #hud-inner {
     flex: 1;
     display: flex;
@@ -512,6 +566,7 @@ nav a:hover {
     min-width: 0;
 }
 
+/* Track title truncates with ellipsis if too long */
 #hud-track-title {
     font-size: 9px;
     letter-spacing: 3px;
@@ -532,6 +587,7 @@ nav a:hover {
     flex-shrink: 0;
 }
 
+/* Prev and Next buttons */
 .hud-btn {
     background: transparent;
     border: 1px solid #333;
@@ -551,6 +607,7 @@ nav a:hover {
     color: #fff;
 }
 
+/* Play/Pause button — always teal-bordered to stand out */
 .hud-playpause {
     border-color: #00ffcc;
     color: #00ffcc;
@@ -561,6 +618,7 @@ nav a:hover {
     background: rgba(0, 255, 204, 0.1);
 }
 
+/* Small phone: tighten padding so all HUD elements stay visible */
 @media (max-width: 500px) {
     #hud-inner {
         padding: 0 10px;
