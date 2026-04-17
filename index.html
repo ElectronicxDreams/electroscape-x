@@ -111,12 +111,42 @@
     <!-- Prev / Override Sequence (shuffle) / Next.               -->
     <!-- Fixed widths on Prev and Next keep Override Sequence      -->
     <!-- perfectly centred regardless of label length.            -->
+    <!--                                                          -->
+    <!-- BUTTON STYLE OPTIONS — only one block active at a time:  -->
+    <!--   Text buttons (INACTIVE) — original [ Previous ] style  -->
+    <!--   Pill buttons (ACTIVE)   — SVG triangle arrow pills      -->
+    <!-- To revert to text buttons: comment out the Pill block    -->
+    <!-- below and uncomment the Text block.                      -->
     <!-- -------------------------------------------------------- -->
+
+    <!-- Text buttons — INACTIVE
+         To restore: remove the comment markers around this block,
+         then comment out or remove the Pill buttons block below.
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     <div class="action-bar" style="margin-bottom: 20px;">
         <button class="ctrl-btn" id="prev-btn">[ Previous ]</button>
         <button class="ctrl-btn shuffle-btn" id="shuffle-btn">[ Override Sequence ]</button>
         <button class="ctrl-btn" id="next-btn">[ Next ]</button>
     </div>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+    <!-- Pill buttons — ACTIVE -->
+    <!-- Left pill: triangle points LEFT, flat edge faces Override Sequence (on the right) -->
+    <!-- Right pill: triangle points RIGHT, flat edge faces Override Sequence (on the left) -->
+    <div class="action-bar" style="margin-bottom: 20px;">
+        <button class="ctrl-btn" id="prev-btn" style="background:transparent; border:1px solid #00ffcc; border-radius:22px; width:64px; height:36px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0;">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="3,6 9,1 9,11" fill="#00ffcc"/>
+            </svg>
+        </button>
+        <button class="ctrl-btn shuffle-btn" id="shuffle-btn" style="border-radius:22px;">[ Override Sequence ]</button>
+        <button class="ctrl-btn" id="next-btn" style="background:transparent; border:1px solid #00ffcc; border-radius:22px; width:64px; height:36px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0;">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="9,6 3,1 3,11" fill="#00ffcc"/>
+            </svg>
+        </button>
+    </div>
+    <!-- Pill buttons END -->
 
 
     <!-- -------------------------------------------------------- -->
