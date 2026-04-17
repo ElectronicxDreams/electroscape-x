@@ -763,6 +763,8 @@ nav a:hover {
     cursor: grab;
     transition: background 0.2s;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
 }
 
 .fav-row:hover {
@@ -793,6 +795,10 @@ nav a:hover {
     justify-content: center;
     opacity: 0.25;
     cursor: grab;
+    /* Suppress Android long-press context menu */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .fav-row:hover .fav-drag-handle {
@@ -849,6 +855,18 @@ nav a:hover {
 .fav-play-btn svg {
     width: 10px;
     height: 10px;
+}
+
+.fav-move-btn {
+    font-size: 8px;
+    padding: 5px 3px;
+    color: #555;
+    min-width: 18px;
+}
+
+.fav-move-btn:hover {
+    border-color: #00ffcc;
+    color: #00ffcc;
 }
 
 .fav-play-btn:hover {

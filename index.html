@@ -1,5 +1,5 @@
 <!--
-    Name: index.html | Version: 3.3.0
+    Name: index.html | Version: 3.3.3
     Project: Electroscape
     Description: Music video gallery page with YouTube IFrame API player.
                  Track data is loaded from tracks.json — edit that file to
@@ -113,7 +113,7 @@
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3D: PLAYBACK CONTROLS                            -->
     <!-- Prev / Override Sequence (shuffle) / Next / Favourites.  -->
-    <!-- Favourites button opens the slide-out sidebar (3.3.0).   -->
+    <!-- Favourites button opens the slide-out sidebar (3.3.3).   -->
     <!-- -------------------------------------------------------- -->
 
     <!-- Pill buttons — ACTIVE -->
@@ -219,7 +219,7 @@
     <!-- SECTION 3G: FOOTER — Version display                     -->
     <!-- -------------------------------------------------------- -->
     <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-        <!-- version --><span style="color: #00ffcc;">3.3.0</span><!-- end version -->
+        <!-- version --><span style="color: #00ffcc;">3.3.3</span><!-- end version -->
     </div>
 
 
@@ -248,7 +248,7 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3I: FAVOURITES SIDEBAR (v3.3.0)                  -->
+    <!-- SECTION 3I: FAVOURITES SIDEBAR (v3.3.3)                  -->
     <!-- Slide-out panel from the right edge. Toggled by the      -->
     <!-- heart button in the action bar (#fav-toggle-btn).        -->
     <!-- player.js (Section 4P) manages all data and interaction. -->
@@ -265,6 +265,11 @@
         <div id="fav-header">
             <span id="fav-title">Favourites</span>
             <button id="fav-close-btn" aria-label="Close favourites">&#x2715;</button>
+        </div>
+
+        <!-- Action row at top: play all -->
+        <div id="fav-actions" style="display:none; justify-content:center; padding: 12px 20px; border-bottom: 1px solid #1a1a1a;">
+             <button id="fav-play-all-btn" class="ctrl-btn" style="width: 100%; border-radius: 4px; padding: 10px; font-size: 9px; letter-spacing: 4px;">[ PLAY PLAYLIST ]</button>
         </div>
 
         <!-- Empty-state message — shown when no favourites saved -->

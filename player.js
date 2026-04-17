@@ -14,6 +14,7 @@
                   and Option D (single cycling button, commented out). Both options share
                   a common applyGridSize() helper.
         v3.2.0 — New Previous/Next Buttons
+        v3.3.1 — Touch drag-to-reorder added to favourites sidebar (Section 4P)
         v3.3.0 — Favourites sidebar added (Section 4P):
                   Heart button on each card, slide-out right sidebar, drag-to-reorder,
                   play-from-sidebar, localStorage persistence under 'electroscape_favourites'.
@@ -102,12 +103,14 @@ function loadTracks() {
 /* ============================================================ */
 var queue             = [];   /* Ordered playlist */
 var currentIndex      = -1;   /* Active position in queue (-1 = nothing yet) */
+var isFavPlaylistMode = false;/* True if currently playing only the favorites */
 var player;                   /* YouTube IFrame player object — do not rename */
 var ended             = false; /* Debounce flag — prevents ENDED firing twice */
 var endCardCheck;             /* Interval ID for the end-card guard (Section 4K) */
 var hudTrackerInterval;       /* Interval ID for the HUD progress tracker (Section 4L) */
 
 function buildQueue() {
+    isFavPlaylistMode = false;
     queue = [];
     document.querySelectorAll('#video-grid .video').forEach(function(el) {
         queue.push({
@@ -118,6 +121,20 @@ function buildQueue() {
     });
 }
 
+function buildFavQueue(favs) {
+    isFavPlaylistMode = true;
+    queue = [];
+    favs.forEach(function(f) {
+        var el = document.querySelector('#video-grid .video[data-id="' + f.id + '"]');
+        if (el) {
+            queue.push({
+                id: f.id,
+                title: f.title,
+                el: el
+            });
+        }
+    });
+}
 
 /* ============================================================ */
 /* SECTION 4C: ACTIVE CARD HIGHLIGHTER & NOW-PLAYING CLICK      */
@@ -250,6 +267,9 @@ function createPlayer() {
 function attachCardClicks() {
     document.querySelectorAll('#video-grid .video').forEach(function(el) {
         el.addEventListener('click', function() {
+            if (isFavPlaylistMode) {
+                buildQueue();
+            }
             var idx = queue.findIndex(function(t) { return t.el === el; });
             if (idx !== -1) playTrack(idx);
         });
@@ -562,7 +582,21 @@ function initFavourites() {
     }
 
     /* ---- Drag-and-drop state ---- */
-    var dragSrcIndex = null;   /* Index of the row being dragged */
+    var dragSrcIndex  = null;   /* Index of the row being dragged */
+    var touchDragSrc  = null;   /* li element being touch-dragged */
+    var touchClone    = null;   /* floating visual clone during touch drag */
+    var touchOffsetY  = 0;      /* finger offset within the dragged row */
+
+    /* ---- Shift a favourite up or down in the list ---- */
+    function shiftFav(fromIndex, delta) {
+        var favs = loadFavs();
+        var toIndex = fromIndex + delta;
+        if (toIndex < 0 || toIndex >= favs.length) return;
+        var moved = favs.splice(fromIndex, 1)[0];
+        favs.splice(toIndex, 0, moved);
+        saveFavs(favs);
+        renderFavList();
+    }
 
     /* ---- Build and render the sidebar list from the favs array ---- */
     function renderFavList() {
@@ -577,11 +611,15 @@ function initFavourites() {
         if (!favs.length) {
             empty.style.display  = 'flex';
             footer.style.display = 'none';
+            var actions = document.getElementById('fav-actions');
+            if (actions) actions.style.display = 'none';
             return;
         }
 
         empty.style.display  = 'none';
         footer.style.display = 'flex';
+        var actions = document.getElementById('fav-actions');
+        if (actions) actions.style.display = 'flex';
 
         favs.forEach(function(fav, idx) {
             var li = document.createElement('li');
@@ -599,9 +637,23 @@ function initFavourites() {
             title.className = 'fav-row-title';
             title.textContent = fav.title;
 
-            /* Controls: play + remove */
+            /* Controls: Up / Down / Play / Remove */
             var controls = document.createElement('div');
             controls.className = 'fav-row-controls';
+
+            /* Up Button */
+            var upBtn = document.createElement('button');
+            upBtn.className = 'fav-row-btn fav-move-btn';
+            upBtn.setAttribute('aria-label', 'Move Up');
+            upBtn.innerHTML = '&#9650;'; /* Up arrow */
+            if (idx === 0) upBtn.style.opacity = '0.2';
+
+            /* Down Button */
+            var downBtn = document.createElement('button');
+            downBtn.className = 'fav-row-btn fav-move-btn';
+            downBtn.setAttribute('aria-label', 'Move Down');
+            downBtn.innerHTML = '&#9660;'; /* Down arrow */
+            if (idx === favs.length - 1) downBtn.style.opacity = '0.2';
 
             /* Play button */
             var playBtn = document.createElement('button');
@@ -621,6 +673,8 @@ function initFavourites() {
             /* Drag handle */
             var handle = document.createElement('div');
             handle.className = 'fav-drag-handle';
+            /* Aggressive context menu suppression for tablet drag */
+            handle.setAttribute('oncontextmenu', 'return false;');
             handle.innerHTML =
                 '<svg viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
                 '<circle cx="2" cy="2"  r="1.2" fill="#555"/>' +
@@ -631,6 +685,8 @@ function initFavourites() {
                 '<circle cx="6" cy="12" r="1.2" fill="#555"/>' +
                 '</svg>';
 
+            controls.appendChild(upBtn);
+            controls.appendChild(downBtn);
             controls.appendChild(playBtn);
             controls.appendChild(removeBtn);
 
@@ -639,6 +695,19 @@ function initFavourites() {
             li.appendChild(title);
             li.appendChild(controls);
             list.appendChild(li);
+
+            /* Aggressive context menu suppression for the whole row */
+            li.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
+
+            /* --- Up/Down logic --- */
+            upBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (idx > 0) shiftFav(idx, -1);
+            });
+            downBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (idx < favs.length - 1) shiftFav(idx, 1);
+            });
 
             /* --- Play from sidebar --- */
             playBtn.addEventListener('click', function(e) {
@@ -676,6 +745,86 @@ function initFavourites() {
                     el.classList.remove('fav-row-over');
                 });
             });
+
+            /* Suppress the Android long-press context menu on the drag handle */
+            handle.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+            /*
+             * --- Pointer Events drag-to-reorder (tablet / mobile) ---
+             * Uses the Pointer Events API instead of touch events.
+             * setPointerCapture() tells Android Chrome "I own this gesture"
+             * which is the only reliable way to prevent the long-press
+             * context menu (Download / Share / Print) from appearing.
+             */
+            handle.addEventListener('pointerdown', function(e) {
+                if (e.pointerType === 'mouse') return;   /* mouse handled by HTML5 drag above */
+                e.preventDefault();
+                handle.setPointerCapture(e.pointerId);   /* claim the gesture — suppresses context menu */
+
+                var rect     = li.getBoundingClientRect();
+                touchOffsetY = e.clientY - rect.top;
+                touchDragSrc = li;
+                dragSrcIndex = idx;
+                li.classList.add('fav-row-dragging');
+
+                touchClone = li.cloneNode(true);
+                touchClone.style.cssText =
+                    'position:fixed; left:' + rect.left + 'px; top:' + rect.top + 'px;' +
+                    'width:' + rect.width + 'px; opacity:0.85; pointer-events:none;' +
+                    'z-index:9999; background:#1a1a1a; border:1px solid #00ffcc33; border-radius:6px;';
+                document.body.appendChild(touchClone);
+            });
+
+            handle.addEventListener('pointermove', function(e) {
+                if (e.pointerType === 'mouse' || !touchClone) return;
+                e.preventDefault();
+                touchClone.style.top = (e.clientY - touchOffsetY) + 'px';
+                document.querySelectorAll('.fav-row-over').forEach(function(el) {
+                    el.classList.remove('fav-row-over');
+                });
+                touchClone.style.display = 'none';
+                var target = document.elementFromPoint(e.clientX, e.clientY);
+                touchClone.style.display = '';
+                var targetRow = target && target.closest('.fav-row');
+                if (targetRow && targetRow !== touchDragSrc) {
+                    targetRow.classList.add('fav-row-over');
+                }
+            });
+
+            handle.addEventListener('pointerup', function(e) {
+                if (e.pointerType === 'mouse') return;
+                if (touchClone) { touchClone.remove(); touchClone = null; }
+                if (!touchDragSrc) return;
+                touchDragSrc.classList.remove('fav-row-dragging');
+                document.querySelectorAll('.fav-row-over').forEach(function(el) {
+                    el.classList.remove('fav-row-over');
+                });
+                var target    = document.elementFromPoint(e.clientX, e.clientY);
+                var targetRow = target && target.closest('.fav-row');
+                if (targetRow && targetRow !== touchDragSrc) {
+                    var destIdx = parseInt(targetRow.getAttribute('data-idx'), 10);
+                    if (!isNaN(destIdx) && destIdx !== dragSrcIndex) {
+                        var current = loadFavs();
+                        var moved   = current.splice(dragSrcIndex, 1)[0];
+                        current.splice(destIdx, 0, moved);
+                        saveFavs(current);
+                        renderFavList();
+                    }
+                }
+                touchDragSrc = null;
+                dragSrcIndex = null;
+            });
+
+            handle.addEventListener('pointercancel', function(e) {
+                if (touchClone) { touchClone.remove(); touchClone = null; }
+                if (touchDragSrc) { touchDragSrc.classList.remove('fav-row-dragging'); }
+                document.querySelectorAll('.fav-row-over').forEach(function(el) {
+                    el.classList.remove('fav-row-over');
+                });
+                touchDragSrc = null;
+                dragSrcIndex = null;
+            });
+            /* --- Pointer Events drag end --- */
 
             li.addEventListener('dragover', function(e) {
                 e.preventDefault();
@@ -734,6 +883,19 @@ function initFavourites() {
 
     /* ---- Close on X button ---- */
     document.getElementById('fav-close-btn').addEventListener('click', closeSidebar);
+
+    /* ---- Play all favourites button ---- */
+    var playAllBtn = document.getElementById('fav-play-all-btn');
+    if (playAllBtn) {
+        playAllBtn.addEventListener('click', function() {
+            var favs = loadFavs();
+            if (favs.length > 0) {
+                buildFavQueue(favs);
+                playTrack(0);
+                closeSidebar();
+            }
+        });
+    }
 
     /* ---- Clear all favourites ---- */
     document.getElementById('fav-clear-btn').addEventListener('click', function() {
