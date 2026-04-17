@@ -1,5 +1,5 @@
 /*
-    Name: player.js | Version: 3.1.0
+    Name: player.js | Version: 3.2.0
     Project: Electroscape
     Description: All playback logic for the Electroscape music video gallery.
                  Loads track data from tracks.json, builds the video card grid,

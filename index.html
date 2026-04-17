@@ -1,5 +1,5 @@
 <!--
-    Name: index.html | Version: 3.1.0
+    Name: index.html | Version: 3.2.0
     Project: Electroscape
     Description: Music video gallery page with YouTube IFrame API player.
                  Track data is loaded from tracks.json — edit that file to
@@ -15,6 +15,7 @@
         v3.0.0 — Michroma title font; elastic fly-in animation; HUD seek + progress
         v3.1.0 — Grid view switcher replaced with SVG icon buttons (Option B active,
                   Option D — single cycle button — commented out and ready to enable)
+	v3.2.0 - New Previous/Next Buttons 
 
     Sections in this file:
         Stage 1 — HEAD : Page setup, font imports, stylesheet link
@@ -54,7 +55,7 @@
         Edit that file for colour, layout, or spacing changes — not here.
         Cache-busted with version query string.
     -->
-    <link rel="stylesheet" href="style.css?v=3.1.0">
+    <link rel="stylesheet" href="style.css?v=3.2.0">
 
 </head>
 <!-- ============================================================ -->
@@ -254,7 +255,7 @@
     <!-- Update the version number here when releasing changes.   -->
     <!-- -------------------------------------------------------- -->
     <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-        <!-- version --><span style="color: #00ffcc;">3.1.0</span><!-- end version -->
+        <!-- version --><span style="color: #00ffcc;">3.2.0</span><!-- end version -->
     </div>
 
 
@@ -293,7 +294,7 @@
     <!-- player.js loads first so its globals exist before the    -->
     <!-- YouTube API fires onYouTubeIframeAPIReady.               -->
     <!-- -------------------------------------------------------- -->
-    <script src="player.js?v=3.1.0"></script>
+    <script src="player.js?v=3.2.0"></script>
     <script src="https://www.youtube.com/iframe_api" async></script>
 
 </body>
