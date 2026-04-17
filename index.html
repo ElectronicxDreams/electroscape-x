@@ -80,7 +80,7 @@
         <a href='https://beacons.ai/weblinks' target='_blank'>Weblinks</a>
         <a href='https://www.youtube.com/playlist?list=PLdd12CvCHG0sdBwilp-LipaZkgzR2gJVq' target='_blank'>YouTube</a>
         <a href='https://open.spotify.com/user/3147hrg3uxl6ywo7dja4zzwhrdha/playlists' target='_blank'>Spotify</a>
-        <a href='https://www.youtube.com/playlist?list=PLdd12CvCHG0sdBwilp-LipaZkgzR2gJVq&playnext=1&index=1' target='_blank'>X</a>
+        <a id="guide-open-btn" href="javascript:void(0)" title="Quick Start Guide">X</a>
     </nav>
 
 
@@ -288,6 +288,50 @@
 
     </div>
     <!-- SECTION 3I END -->
+
+
+    <!-- -------------------------------------------------------- -->
+    <!-- SECTION 3J: GUIDE POPUP (v3.4.0)                          -->
+    <!-- Modal window displaying site instructions.                -->
+    <!-- Triggered by the 'X' button in the top navigation.        -->
+    <!-- -------------------------------------------------------- -->
+
+    <div id="guide-backdrop"></div>
+    <div id="guide-modal">
+        <div id="guide-header">
+            <span id="guide-title">Audio Sequence Protocol</span>
+            <button id="guide-close-btn" aria-label="Close guide">&#x2715;</button>
+        </div>
+        <div id="guide-content">
+            <div class="guide-section">
+                <h3>01 — FAVOURITES: SAVING TRACKS</h3>
+                <p>Click the <strong>HEART ICON (♥)</strong> on any track card to save it. The icon turns solid cyan when a track is favourited. Your list is stored locally and persists across sessions.</p>
+            </div>
+
+            <div class="guide-section">
+                <h3>02 — SIDEBAR: MANAGING LISTS</h3>
+                <p>Open the <strong>FAVOURITES</strong> sidebar via the action bar heart button. From here, you can:</p>
+                <ul>
+                    <li><strong>PLAY ALL:</strong> Start the full favourites queue.</li>
+                    <li><strong>REORDER:</strong> Use the drag handle (6 dots) or arrows (▲/▼).</li>
+                    <li><strong>REMOVE:</strong> Click 'X' on any row to delete it.</li>
+                </ul>
+            </div>
+
+            <div class="guide-section">
+                <h3>03 — QUEUE: EXITING FAV MODE</h3>
+                <p>While in "Favourite Mode", simply <strong>SELECT ANY TRACK</strong> from the main grid. This immediately exits the favourites queue and resets the player to include all tracks from the main sequence.</p>
+            </div>
+
+            <div class="guide-section">
+                <h3>04 — NAVIGATION & VIEW</h3>
+                <p>Use <strong>OVERRIDE SEQUENCE</strong> to shuffle the grid. Use the <strong>GRID ICONS</strong> (Micro, Core, Max) to switch display density. The <strong>ORBITAL HUD</strong> at the bottom provides persistent controls and seek functionality.</p>
+            </div>
+        </div>
+        <div id="guide-footer">
+            <button id="guide-ok-btn" class="ctrl-btn" style="width: 100%; border-radius: 4px;">[ ACKNOWLEDGE ]</button>
+        </div>
+    </div>
 
 
     <!-- -------------------------------------------------------- -->

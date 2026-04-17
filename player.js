@@ -938,6 +938,38 @@ function initFavourites() {
 
 
 /* ============================================================ */
+/* SECTION 4Q: GUIDE POPUP (v3.4.0)                             */
+/* Logic to open and close the Quick Start Guide popup.         */
+/* ============================================================ */
+function initGuide() {
+    var openBtn   = document.getElementById('guide-open-btn');
+    var closeBtn  = document.getElementById('guide-close-btn');
+    var okBtn     = document.getElementById('guide-ok-btn');
+    var backdrop  = document.getElementById('guide-backdrop');
+    var modal     = document.getElementById('guide-modal');
+
+    function openGuide() {
+        backdrop.classList.add('guide-visible');
+        modal.classList.add('guide-visible');
+        /* Pause player if playing — optional, but helpful */
+        if (player && typeof player.pauseVideo === 'function' && player.getPlayerState() === 1) {
+            player.pauseVideo();
+        }
+    }
+
+    function closeGuide() {
+        backdrop.classList.remove('guide-visible');
+        modal.classList.remove('guide-visible');
+    }
+
+    if (openBtn)  openBtn.addEventListener('click', openGuide);
+    if (closeBtn) closeBtn.addEventListener('click', closeGuide);
+    if (okBtn)    okBtn.addEventListener('click', closeGuide);
+    if (backdrop) backdrop.addEventListener('click', closeGuide);
+}
+
+
+/* ============================================================ */
 /* SECTION 4J: INITIALISATION                                   */
 /* Entry point. loadTracks() fetches tracks.json and builds the */
 /* grid; initGridControls() wires up the view switcher and      */
@@ -947,3 +979,4 @@ function initFavourites() {
 /* ============================================================ */
 loadTracks();
 initGridControls();
+initGuide();
