@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ELECTROSCAPE // TV</title>
+
+    <!-- Orbitron + Michroma — matching main site -->
+    <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { margin: 0; padding: 0; background: #000; color: #ccc; overflow-x: hidden; }
+
+        /* ── Navigation ── */
+        nav {
+            padding: 20px;
+            text-align: left;
+        }
+        nav a {
+            font-family: 'Orbitron', sans-serif;
+            color: #444;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            margin-right: 20px;
+        }
+        nav a:hover { color: #00ffcc; }
+
+        /* ── 8-Column Grid ── */
+        #tv-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 15px;
+            padding: 20px;
+            width: 98%;
+            margin: 0 auto;
+        }
+
+        .tv-card {
+            background: #050505;
+            border: 1px solid #1a1a1a;
+            padding: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tv-card:hover {
+            border-color: #00ffcc;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .tv-card img {
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Card titles — Orbitron to match the Electroscape UI */
+        .tv-card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px 4px 6px 4px;
+            display: block;
+            white-space: normal;
+            word-wrap: break-word;
+            line-height: 1.5;
+            min-height: 32px;
+        }
+
+        /* ── Modal overlay ── */
+        #tv-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.96);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .dossier-content {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            display: flex;
+            flex-wrap: wrap;          /* wraps on narrow screens */
+            padding: 50px;
+            position: relative;
+            gap: 40px;
+            max-width: 900px;
+            width: 90vw;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-dossier {
+            position: absolute; top: 20px; right: 25px;
+            cursor: pointer; color: #666;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            transition: 0.2s;
+        }
+        .close-dossier:hover { color: #00ffcc; }
+
+        /* Poster: fluid width so it wraps on mobile */
+        .dossier-poster {
+            width: 100%;
+            max-width: 280px;
+            border: 1px solid #222;
+            align-self: flex-start;
+        }
+
+        .dossier-text {
+            flex: 1;
+            min-width: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .dossier-title {
+            font-family: 'Michroma', sans-serif;
+            color: #ffffff;
+            font-size: 26px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .dossier-year {
+            font-family: 'Orbitron', sans-serif;
+            color: #00ffcc;
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            letter-spacing: 4px;
+        }
+
+        .dossier-desc {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #aaa;
+            font-family: -apple-system, system-ui, sans-serif;
+            margin-bottom: 35px;
+        }
+
+        .maze-link {
+            align-self: center;
+            padding: 15px 35px;
+            background: transparent;
+            border: 2px solid #00ffcc;
+            color: #00ffcc;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.3s ease;
+        }
+        .maze-link:hover {
+            background: #00ffcc;
+            color: #000;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
+        }
+
+        /* ── Responsive: collapse to fewer columns on small screens ── */
+        @media (max-width: 1200px) {
+            #tv-grid { grid-template-columns: repeat(6, 1fr); }
+        }
+        @media (max-width: 900px) {
+            #tv-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (max-width: 560px) {
+            #tv-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .dossier-content { padding: 30px 20px; }
+            .dossier-title { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">ELECTROSCAPE</a>
+        <a href="tv.html" style="color:#00ffcc;">TV</a>
+    </nav>
+
+    <div id="tv-grid"></div>
+
+    <div id="tv-modal">
+        <div class="dossier-content">
+            <span class="close-dossier">[X]</span>
+            <img class="dossier-poster" src="" alt="">
+            <div class="dossier-text">
+                <div class="dossier-title">TITLE</div>
+                <div class="dossier-year">YEAR</div>
+                <div class="dossier-desc">Description...</div>
+                <a href="#" target="_blank" class="maze-link">ACCESS DATABASE</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="tv-player.js"></script>
+
+    <!-- Escape key closes modal -->
+    <script>
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('tv-modal').style.display = 'none';
+            }
+        });
+    </script>
+
+</body>
+</html>
