@@ -690,6 +690,7 @@ function initFavourites() {
             controls.appendChild(playBtn);
             controls.appendChild(removeBtn);
 
+            /* Stacked card: drag handle → thumbnail → title → controls */
             li.appendChild(handle);
             li.appendChild(thumb);
             li.appendChild(title);

@@ -664,7 +664,7 @@ nav a:hover {
     position: fixed;
     top: 0;
     right: 0;
-    width: 360px;
+    width: 400px;
     max-width: 92vw;
     height: 100%;
     background: #0a0a0a;
@@ -753,18 +753,20 @@ nav a:hover {
     border-radius: 2px;
 }
 
-/* ---- Individual favourite row ---- */
+/* ---- Individual favourite row — stacked card layout ---- */
+/* Each track is a vertical card: thumbnail / title / controls  */
 .fav-row {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 16px 8px 12px;
-    border-bottom: 1px solid #111;
+    flex-direction: column;
+    padding: 12px 14px 10px 14px;
+    border-bottom: 1px solid #151515;
     cursor: grab;
     transition: background 0.2s;
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
+    gap: 0;
+    position: relative;
 }
 
 .fav-row:hover {
@@ -786,58 +788,63 @@ nav a:hover {
     background: #0d0d0d;
 }
 
-/* ---- Drag handle dots ---- */
+/* ---- Drag handle — small dots pinned to top-right corner of thumbnail ---- */
 .fav-drag-handle {
-    flex-shrink: 0;
-    width: 10px;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.25;
+    opacity: 0;
     cursor: grab;
-    /* Suppress Android long-press context menu */
+    background: rgba(0,0,0,0.55);
+    border-radius: 3px;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
+    transition: opacity 0.2s;
 }
 
 .fav-row:hover .fav-drag-handle {
-    opacity: 0.6;
+    opacity: 0.7;
 }
 
-/* ---- Row thumbnail ---- */
+/* ---- LINE 1: Thumbnail — full width, 16:9, doubled size ---- */
 .fav-row-thumb {
-    flex-shrink: 0;
-    width: 60px;
-    height: 34px;
+    width: 100%;
+    aspect-ratio: 16 / 9;
     background-size: cover;
     background-position: center;
-    border-radius: 2px;
+    border-radius: 3px;
     background-color: #111;
+    flex-shrink: 0;
 }
 
-/* ---- Row title ---- */
+/* ---- LINE 2: Title ---- */
 .fav-row-title {
-    flex: 1;
+    width: 100%;
     font-family: 'Orbitron', sans-serif;
-    font-size: 8px;
-    letter-spacing: 1px;
+    font-size: 9px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: #bbb;
-    line-height: 1.4;
-    min-width: 0;
+    color: #ccc;
+    line-height: 1.5;
+    padding: 10px 0 8px 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-/* ---- Row control buttons (play + remove) ---- */
+/* ---- LINE 3: Controls row — up / down / play / remove ---- */
 .fav-row-controls {
     display: flex;
     align-items: center;
     gap: 6px;
-    flex-shrink: 0;
+    width: 100%;
 }
 
 .fav-row-btn {
@@ -845,23 +852,22 @@ nav a:hover {
     border: 1px solid #2a2a2a;
     cursor: pointer;
     border-radius: 2px;
-    padding: 5px 7px;
+    padding: 7px 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: border-color 0.2s, color 0.2s;
+    flex: 1;                    /* All buttons share the row equally */
 }
 
 .fav-play-btn svg {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
 }
 
 .fav-move-btn {
-    font-size: 8px;
-    padding: 5px 3px;
+    font-size: 10px;
     color: #555;
-    min-width: 18px;
 }
 
 .fav-move-btn:hover {
@@ -949,7 +955,7 @@ nav a:hover {
 /* ---- Tablet adjustments ---- */
 @media (max-width: 1024px) {
     #fav-sidebar {
-        width: 320px;
+        width: 360px;
     }
 }
 
