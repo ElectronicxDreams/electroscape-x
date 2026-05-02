@@ -106,7 +106,7 @@ var currentIndex      = -1;   /* Active position in queue (-1 = nothing yet) */
 var isFavPlaylistMode = false;/* True if currently playing only the favorites */
 var player;                   /* YouTube IFrame player object — do not rename */
 var ended             = false; /* Debounce flag — prevents ENDED firing twice */
-var endCardCheck;             /* Interval ID for the end-card guard (Section 4K) */
+
 var hudTrackerInterval;       /* Interval ID for the HUD progress tracker (Section 4L) */
 
 function buildQueue() {
@@ -179,6 +179,9 @@ function attachNowPlayingClick() {
 function playTrack(index) {
     if (!queue.length) return;
 
+    /* Scroll to the top of the page so the player is visible */
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     /* Wrap index so it loops around the playlist */
     currentIndex = ((index % queue.length) + queue.length) % queue.length;
     var track = queue[currentIndex];
@@ -192,7 +195,6 @@ function playTrack(index) {
     }
 
     setActiveCard(currentIndex);
-    startEndCardGuard();
     updateHudTitle(track.title);
 }
 
@@ -331,27 +333,6 @@ document.getElementById('shuffle-btn').addEventListener('click', function() {
     this.blur();
 });
 
-
-/* ============================================================ */
-/* SECTION 4K: END-CARD GUARD                                   */
-/* YouTube shows its own end-card overlay at ~7 seconds before  */
-/* the video ends, which obscures the player UI. This guard     */
-/* polls every second while a track is playing and advances to  */
-/* the next track 7 seconds before the end, preventing that.   */
-/* ============================================================ */
-function startEndCardGuard() {
-    if (endCardCheck) clearInterval(endCardCheck);
-    endCardCheck = setInterval(function() {
-        if (player && player.getPlayerState() === 1) {   /* 1 = PLAYING */
-            var elapsed = player.getCurrentTime();
-            var total   = player.getDuration();
-            if (total > 0 && elapsed > (total - 7)) {
-                clearInterval(endCardCheck);
-                playTrack(currentIndex + 1);
-            }
-        }
-    }, 1000);
-}
 
 
 /* ============================================================ */
