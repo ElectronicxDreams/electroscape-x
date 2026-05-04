@@ -409,6 +409,18 @@ function attachHudControls() {
         }
     });
 
+    document.getElementById('playpause-btn').addEventListener('click', function() {
+        if (!player || typeof player.getPlayerState !== 'function') return;
+        var state = player.getPlayerState();
+        if (state === -1 || state === YT.PlayerState.UNSTARTED || state === YT.PlayerState.CUED) {
+            playTrack(currentIndex === -1 ? 0 : currentIndex);
+        } else if (state === YT.PlayerState.PLAYING) {
+            player.pauseVideo();
+        } else {
+            player.playVideo();
+        }
+    });
+
     document.getElementById('hud-next').addEventListener('click', function() {
         if (!queue.length) buildQueue();
         playTrack(currentIndex + 1);
@@ -417,8 +429,19 @@ function attachHudControls() {
 
 function updateHudPlayPauseIcon(state) {
     var btn = document.getElementById('hud-playpause');
-    if (!btn) return;
-    btn.innerHTML = (state === 1) ? '&#10074;&#10074;' : '&#9654;';
+    if (btn) btn.innerHTML = (state === 1) ? '&#10074;&#10074;' : '&#9654;';
+
+    /* Keep the command control play button in sync */
+    var cmdIcon = document.getElementById('cmd-play-icon');
+    if (cmdIcon) {
+        if (state === 1) {
+            /* Pause — two rectangles */
+            cmdIcon.innerHTML = '<rect x="2" y="1" width="4" height="14" fill="rgba(0,255,204,0.85)"/><rect x="10" y="1" width="4" height="14" fill="rgba(0,255,204,0.85)"/>';
+        } else {
+            /* Play triangle */
+            cmdIcon.innerHTML = '<polygon points="3,1 13,8 3,15" fill="rgba(0,255,204,0.85)"/>';
+        }
+    }
 }
 
 

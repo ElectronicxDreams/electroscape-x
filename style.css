@@ -163,18 +163,24 @@ nav a:hover {
 
 
 /* ============================================================ */
-/* SECTION 2E: ACTION BAR — Prev / Override Sequence / Next     */
-/* Shared .action-bar flex row used for both the playback       */
-/* controls and the grid view switcher (Section 2E-2).          */
+/* SECTION 2E: COMMAND CONTROL BOX + ACTION ROWS               */
+/* D2 layout: rounded container with three stacked rows.       */
+/* Row 1 — Prev | viewport icons | Next (all on one line)      */
+/* Row 2 — Override Sequence (full width)                      */
+/* Row 3 — Sector Zero (full width)                            */
 /* ============================================================ */
+
+/* Shared action row */
 .action-bar {
-    margin: 40px auto;
+    margin: 0 auto;
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 15px;
     flex-wrap: wrap;
 }
 
+/* Base control button */
 .ctrl-btn {
     background: transparent;
     border: 1px solid rgba(0, 255, 204, 0.5);
@@ -186,9 +192,9 @@ nav a:hover {
     letter-spacing: 6px;
     cursor: pointer;
     transition: 0.4s;
-    border-radius: 0;
+    border-radius: 6px;
     outline: none;
-    white-space: nowrap;            /* Prevents label wrapping to a new line */
+    white-space: nowrap;
 }
 
 .ctrl-btn:hover {
@@ -201,37 +207,95 @@ nav a:hover {
     color: rgba(0, 255, 204, 0.6);
 }
 
-/* Override Sequence gets slightly higher base opacity than Prev/Next */
+/* Override Sequence — higher base opacity */
 .shuffle-btn {
     color: rgba(0, 255, 204, 0.85);
 }
-
 .shuffle-btn:focus {
     color: rgba(0, 255, 204, 0.85);
 }
 
-/* Fixed widths keep Override Sequence dead-centre between Prev and Next */
-#prev-btn, #next-btn {
-    width: 220px;
+/* Prev / Next — square, strong border, fixed size */
+.cmd-arrow-btn {
+    border-radius: 6px;
+    border: 2px solid rgba(0, 255, 204, 0.6);
+    width: 56px;
+    height: 44px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cmd-arrow-btn:hover {
+    border-color: #00ffcc;
+    border-width: 2px;
+}
+
+/* Play/Pause — larger centrepiece, strong border */
+.cmd-play-btn {
+    border-radius: 6px;
+    border: 2px solid rgba(0, 255, 204, 0.7);
+    width: 80px;
+    height: 64px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cmd-play-btn:hover {
+    border-color: #00ffcc;
+    border-width: 2px;
+}
+
+/* Row 1: transport row — prev, play, next */
+.cmd-row-transport {
+    padding: 20px 20px 16px;
+    gap: 20px;
+}
+
+/* Row 2: grid icons row */
+.cmd-row-icons {
+    padding: 0 20px 16px;
+}
+
+/* Row 2 & 3: full-width button rows */
+.cmd-row-full {
+    padding: 0 20px 14px;
+    width: 100%;
     box-sizing: border-box;
 }
 
-/* Tablet: shrink all three buttons so they fit on one line */
-@media (max-width: 1024px) and (min-width: 601px) {
-    .ctrl-btn {
-        font-size: 9px;
-        letter-spacing: 3px;
-        padding: 10px 14px;
-    }
-    #prev-btn, #next-btn {
-        width: 160px;
-    }
+.cmd-row-last {
+    padding-bottom: 20px;
 }
 
-/* Mobile: release fixed widths so buttons can wrap naturally */
+/* Full-width buttons stretch to fill the container */
+.cmd-full-btn {
+    width: 100%;
+    max-width: 560px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    border-radius: 6px;
+}
+
+/* Mobile adjustments */
 @media (max-width: 600px) {
-    #prev-btn, #next-btn {
-        width: 100%;
+    .cmd-arrow-btn {
+        width: 44px;
+        height: 38px;
+    }
+    .cmd-row-transport {
+        gap: 12px;
+        padding: 16px 12px 12px;
+    }
+    .cmd-row-full {
+        padding: 0 12px 12px;
     }
 }
 
@@ -245,10 +309,9 @@ nav a:hover {
 /* Option D — Single cycling ctrl-btn (INACTIVE in HTML)        */
 /* ============================================================ */
 
-/* Pulls the view control row closer to the playback bar above  */
+/* view-controls-bar — no longer a standalone row, now lives inside cmd-row-transport */
 .view-controls-bar {
-    margin-top: 0 !important;
-    margin-bottom: 30px;
+    margin: 0;
 }
 
 /* --- Option B: Bare SVG icon buttons --- */
