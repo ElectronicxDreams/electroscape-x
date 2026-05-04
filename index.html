@@ -1,5 +1,5 @@
 <!--
-    Name: index.html | Version: 3.6.3
+    Name: index.html | Version: 3.6.4
     Project: Electroscape
     Description: Music video gallery page with YouTube IFrame API player.
                  Track data is loaded from tracks.json — edit that file to
@@ -19,9 +19,11 @@
         v3.3.0 — Favourites sidebar: heart button on each card, slide-out right panel,
                   drag-to-reorder, localStorage persistence (Section 4P in player.js,
                   Section 2J in style.css)
+        v3.6.4 — Navigation replaced with "NAVIGATION NODES" dropdown (Variant 2);
+                 toggle wire-up and styles inlined in index.html.
 
     Sections in this file:
-        Stage 1 — HEAD : Page setup, font imports, stylesheet link
+        Stage 1 — HEAD : Page setup, font imports, stylesheet link, inline dropdown styles
         Stage 3 — BODY : Visible page structure (nav, player, controls, grid, HUD)
         (Stage 2 = style.css | Stage 4 = player.js)
 
@@ -60,6 +62,88 @@
     -->
     <link rel="stylesheet" href="style.css?v=3.3.0">
 
+    <!-- Inline styles for the "NAVIGATION NODES" dropdown (Variant 2) -->
+    <style>
+        /* ---- Dropdown container ---- */
+        .nav-v2-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;   /* same spacing as the original nav */
+        }
+
+        /* ---- Toggle button: "NAVIGATION NODES" + chevron ---- */
+        .nav-v2-toggle {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            outline: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            transition: color 0.3s;
+        }
+
+        .nav-v2-toggle:hover {
+            color: rgba(0, 255, 204, 0.7);
+        }
+
+        .nav-v2-toggle:hover .nav-v2-chevron line {
+            stroke: rgba(0, 255, 204, 0.7);
+        }
+
+        .nav-v2-chevron {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-v2-chevron line {
+            stroke: rgba(255, 255, 255, 0.3);
+            transition: stroke 0.3s;
+        }
+
+        .nav-v2-toggle.open .nav-v2-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* ---- Dropdown links ---- */
+        .nav-v2-links {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s;
+            opacity: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0 30px;
+            padding: 0;
+        }
+
+        .nav-v2-links.open {
+            max-height: 60px;
+            opacity: 1;
+            padding: 16px 0 0 0;   /* this pushes the page title down */
+        }
+
+        .nav-v2-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            transition: color 0.25s;
+            white-space: nowrap;
+        }
+
+        .nav-v2-links a:hover {
+            color: #00ffcc;
+        }
+    </style>
+
 </head>
 <!-- ============================================================ -->
 <!-- STAGE 1 END                                                   -->
@@ -72,25 +156,29 @@
 <body>
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3A: TOP NAVIGATION                               -->
-    <!-- External links: Weblinks hub, YouTube playlist, Spotify, -->
-    <!-- and a YouTube autoplay direct link (labelled X).         -->
-    <!-- --------------------------------------------------------
-    <nav>
-        <a href='https://beacons.ai/weblinks' target='_blank'>Weblinks</a>
-        <a href='https://www.youtube.com/playlist?list=PLdd12CvCHG0sdBwilp-LipaZkgzR2gJVq' target='_blank'>YouTube</a>
-        <a href='https://open.spotify.com/user/3147hrg3uxl6ywo7dja4zzwhrdha/playlists' target='_blank'>Spotify</a>
-        <a id="guide-open-btn" href="javascript:void(0)" title="Quick Start Guide">X</a>
-    </nav>
- -->
-<nav>
-    
-        <a href='https://beacons.ai/weblinks' target='_blank'>WEBLINKS</a>
-        <a href='https://www.youtube.com/playlist?list=PLdd12CvCHG0sdBwilp-LipaZkgzR2gJVq' target='_blank'>YOUTUBE</a>
-        <a href='https://open.spotify.com/user/3147hrg3uxl6ywo7dja4zzwhrdha/playlists' target='_blank'>SPOTIFY</a>
-        <a href='tv.html'>TV</a>
-        <a id="guide-open-btn" href="javascript:void(0)" title="Quick Start Guide">X</a>
-    </nav>
+    <!-- SECTION 3A: TOP NAVIGATION — "NAVIGATION NODES" DROPDOWN -->
+    <!-- Replaces the old <nav> bar. The "X" link opens the       -->
+    <!-- Quick Start Guide popup (same as before).                -->
+    <!-- -------------------------------------------------------- -->
+    <div class="nav-v2-wrap">
+        <div>
+            <button class="nav-v2-toggle" id="v2-toggle" aria-expanded="false" aria-label="Toggle navigation">
+                NAVIGATION NODES
+                <svg class="nav-v2-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="1" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
+                    <line x1="9" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <div class="nav-v2-links" id="v2-links">
+                <a href='https://beacons.ai/weblinks' target='_blank'>WEBLINKS</a>
+                <a href='https://www.youtube.com/playlist?list=PLdd12CvCHG0sdBwilp-LipaZkgzR2gJVq' target='_blank'>YOUTUBE</a>
+                <a href='https://open.spotify.com/user/3147hrg3uxl6ywo7dja4zzwhrdha/playlists' target='_blank'>SPOTIFY</a>
+                <a href='tv.html'>TV</a>
+                <a id="guide-open-btn" href="javascript:void(0)" title="Quick Start Guide">X</a>
+            </div>
+        </div>
+    </div>
+
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3B: PAGE TITLE                                   -->
     <!-- Each letter is a separate <span> so the CSS animation    -->
@@ -226,7 +314,7 @@
     <!-- SECTION 3G: FOOTER — Version display                     -->
     <!-- -------------------------------------------------------- -->
     <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-        <!-- version --><span style="color: #00ffcc;">3.6.3</span><!-- end version -->
+        <!-- version --><span style="color: #00ffcc;">3.6.4</span><!-- end version -->
     </div>
 
 
@@ -346,6 +434,21 @@
     <!-- -------------------------------------------------------- -->
     <script src="player.js?v=3.3.0"></script>
     <script src="https://www.youtube.com/iframe_api" async></script>
+
+    <!-- Dropdown toggle script for "NAVIGATION NODES" -->
+    <script>
+        (function() {
+            var toggle = document.getElementById('v2-toggle');
+            var links  = document.getElementById('v2-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function() {
+                    var isOpen = links.classList.toggle('open');
+                    toggle.classList.toggle('open', isOpen);
+                    toggle.setAttribute('aria-expanded', isOpen);
+                });
+            }
+        })();
+    </script>
 
 </body>
 </html>
