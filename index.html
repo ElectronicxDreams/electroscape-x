@@ -1,5 +1,5 @@
 <!--
-    Name: index.html | Version: 4.0.0
+    Name: index.html | Version: 4.2.0
     Project: Electroscape
     Description: Music video gallery page with YouTube IFrame API player.
                  Track data is loaded from tracks.json — edit that file to
@@ -22,6 +22,8 @@
         v3.6.4 — Navigation replaced with "NAVIGATION NODES" dropdown (Variant 2)
         v4.0.0 — "COMMAND CONTROL" dropdown added for playback controls, grid view,
                   and Sector Zero; all middle controls now collapsed behind toggle.
+        v4.1.0 — Ambient orb divs added (orb-teal, orb-violet, orb-blue) at top of
+                  body; animated in style.css Section 2A-2.
 
     Sections in this file:
         Stage 1 — HEAD : Page setup, font imports, stylesheet link, inline styles
@@ -50,7 +52,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Main stylesheet -->
-    <link rel="stylesheet" href="style.css?v=4.0.0">
+    <link rel="stylesheet" href="style.css?v=4.2.0">
 
     <!-- Inline styles for dropdowns: NAVIGATION NODES + COMMAND CONTROL -->
     <style>
@@ -166,6 +168,16 @@
 <!-- STAGE 3: BODY — Visible page structure                       -->
 <!-- ============================================================ -->
 <body>
+
+    <!-- -------------------------------------------------------- -->
+    <!-- AMBIENT ORB LAYER                                        -->
+    <!-- Three fixed divs that drift slowly behind all content.  -->
+    <!-- Styled in style.css Section 2A-2. z-index: 0.           -->
+    <!-- -------------------------------------------------------- -->
+    <div class="orb orb-teal"></div>
+    <div class="orb orb-violet"></div>
+    <div class="orb orb-blue"></div>
+
 
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3A: TOP NAVIGATION — "NAVIGATION NODES" DROPDOWN -->
@@ -337,7 +349,7 @@
     <!-- FOOTER — Version display                                 -->
     <!-- -------------------------------------------------------- -->
     <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-        <span style="color: #00ffcc;">4.0.1</span>
+        <span style="color: #00ffcc;">4.2.0</span>
     </div>
 
 

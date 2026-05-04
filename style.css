@@ -1,5 +1,5 @@
 /*
-    Name: style.css | Version: 4.0.0
+    Name: style.css | Version: 4.2.0
     Project: Electroscape
     Description: All visual styles for the Electroscape music video gallery.
                  Edit this file for colour, layout, or spacing changes.
@@ -13,9 +13,12 @@
         v3.1.0 — View-box styles replaced with bare SVG icon button styles (Option B).
                   Option D (cycle button) styles also included, always active — the
                   button itself is toggled via HTML/JS, not CSS.
+        v4.1.0 — Ambient orb background: three drifting radial-gradient divs replace
+                  static body gradient. GPU-composited via transform — tablet safe.
 
     Sections:
-        2A — Page base
+        2A   — Page base
+        2A-2 — Ambient orb layer (drifting background orbs)
         2B — Top navigation
         2C — Page title (h1) + fly-in animation
         2D — Featured video player
@@ -35,18 +38,86 @@
 /* and prevents a horizontal scrollbar appearing.              */
 /* ============================================================ */
 body {
-    background-color: #07080d;              /* Deep near-black base */
-    background-image:
-        radial-gradient(ellipse 70vw 55vh at 15% 10%,  rgba(0, 200, 160, 0.13) 0%, transparent 70%),
-        radial-gradient(ellipse 60vw 50vh at 85% 80%,  rgba(80, 0, 180, 0.14) 0%, transparent 70%),
-        radial-gradient(ellipse 45vw 40vh at 50% 50%,  rgba(0, 80, 120, 0.07) 0%, transparent 65%);
-    background-attachment: fixed;           /* Orbs stay fixed while page scrolls */
+    background: #07080d;                    /* Deep near-black base — orbs sit above this */
     color: #fff;                            /* Default text colour: white */
     font-family: 'Orbitron', sans-serif;    /* Futuristic font used throughout */
     margin: 0;
     padding: 20px;                          /* Small gap around the page edge */
     text-align: center;                     /* Centre-align everything by default */
     overflow-x: hidden;                     /* Prevent accidental horizontal scroll */
+}
+
+
+/* ============================================================ */
+/* SECTION 2A-2: AMBIENT ORB LAYER                              */
+/* Three fixed <div> orbs that drift slowly behind all content. */
+/* Uses CSS transform (GPU-composited) — zero CPU cost.         */
+/* Orb divs are injected at the top of <body> in index.html.   */
+/* ============================================================ */
+.orb {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;       /* Never intercepts clicks */
+    z-index: 0;                 /* Behind all page content */
+    will-change: transform;     /* Hints browser to GPU-composite this layer */
+}
+
+/* Teal orb — top-left, drifts noticeably down-right then back */
+.orb-teal {
+    width: 70vw;
+    height: 55vh;
+    top: -10vh;
+    left: -10vw;
+    background: radial-gradient(ellipse, rgba(0, 200, 160, 0.18) 0%, transparent 70%);
+    animation: drift-teal 12s ease-in-out infinite;
+}
+
+/* Violet orb — bottom-right, drifts up-left then back */
+.orb-violet {
+    width: 60vw;
+    height: 55vh;
+    bottom: -10vh;
+    right: -10vw;
+    background: radial-gradient(ellipse, rgba(80, 0, 180, 0.20) 0%, transparent 70%);
+    animation: drift-violet 15s ease-in-out infinite;
+}
+
+/* Blue orb — centre, mid-speed wandering drift */
+.orb-blue {
+    width: 45vw;
+    height: 40vh;
+    top: 30vh;
+    left: 28vw;
+    background: radial-gradient(ellipse, rgba(0, 80, 140, 0.12) 0%, transparent 65%);
+    animation: drift-blue 18s ease-in-out infinite;
+}
+
+/* Drift keyframes — 150–220px travel, 12–18s durations = clearly visible motion */
+@keyframes drift-teal {
+    0%   { transform: translate(0,     0);      }
+    30%  { transform: translate(200px, 180px);  }
+    65%  { transform: translate(100px, 90px);   }
+    100% { transform: translate(0,     0);      }
+}
+
+@keyframes drift-violet {
+    0%   { transform: translate(0,      0);      }
+    40%  { transform: translate(-220px, -200px); }
+    70%  { transform: translate(-110px, -100px); }
+    100% { transform: translate(0,      0);      }
+}
+
+@keyframes drift-blue {
+    0%   { transform: translate(0,      0);     }
+    25%  { transform: translate(150px,  -160px);}
+    55%  { transform: translate(-130px, 140px); }
+    100% { transform: translate(0,      0);     }
+}
+
+/* Ensure all page content sits above the orb layer */
+body > *:not(.orb) {
+    position: relative;
+    z-index: 1;
 }
 
 
