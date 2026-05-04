@@ -1,5 +1,5 @@
 /*
-    Name: player.js | Version: 3.3.0
+    Name: player.js | Version: 4.0.0
     Project: Electroscape
     Description: All playback logic for the Electroscape music video gallery.
                  Loads track data from tracks.json, builds the video card grid,
@@ -15,7 +15,7 @@
                   a common applyGridSize() helper.
         v3.2.0 — New Previous/Next Buttons
         v3.3.1 — Touch drag-to-reorder added to favourites sidebar (Section 4P)
-        v3.3.0 — Favourites sidebar added (Section 4P):
+        v4 — Favourites sidebar added (Section 4P):
                   Heart button on each card, slide-out right sidebar, drag-to-reorder,
                   play-from-sidebar, localStorage persistence under 'electroscape_favourites'.
 
