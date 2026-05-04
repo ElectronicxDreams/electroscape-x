@@ -1,5 +1,5 @@
 <!--
-    Name: index.html | Version: 4.0.0
+    Name: index.html | Version: 3.6.3
     Project: Electroscape
     Description: Music video gallery page with YouTube IFrame API player.
                  Track data is loaded from tracks.json — edit that file to
@@ -19,12 +19,9 @@
         v3.3.0 — Favourites sidebar: heart button on each card, slide-out right panel,
                   drag-to-reorder, localStorage persistence (Section 4P in player.js,
                   Section 2J in style.css)
-        v3.6.4 — Navigation replaced with "NAVIGATION NODES" dropdown (Variant 2)
-        v4.0.0 — "COMMAND CONTROL" dropdown added for playback controls, grid view,
-                  and Sector Zero; all middle controls now collapsed behind toggle.
 
     Sections in this file:
-        Stage 1 — HEAD : Page setup, font imports, stylesheet link, inline styles
+        Stage 1 — HEAD : Page setup, font imports, stylesheet link
         Stage 3 — BODY : Visible page structure (nav, player, controls, grid, HUD)
         (Stage 2 = style.css | Stage 4 = player.js)
 
@@ -43,106 +40,25 @@
 <html lang="en">
 <head>
 
+    <!-- Character encoding: ensures special characters display correctly -->
     <meta charset="UTF-8">
+
+    <!-- Browser tab title -->
     <title>Electroscape</title>
 
-    <!-- Google Fonts -->
+    <!--
+        Google Fonts:
+        - Orbitron : main UI font used across the whole page
+        - Michroma : used exclusively for the ELECTROSCAPE page title (h1)
+    -->
     <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- Main stylesheet -->
+    <!--
+        All visual styles live in style.css.
+        Edit that file for colour, layout, or spacing changes — not here.
+        Cache-busted with version query string.
+    -->
     <link rel="stylesheet" href="style.css?v=3.3.0">
-
-    <!-- Inline styles for dropdowns: NAVIGATION NODES + COMMAND CONTROL -->
-    <style>
-        /* ---- Shared dropdown container ---- */
-        .dropdown-wrap {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        /* ---- Toggle button ---- */
-        .dropdown-toggle {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 0;
-            outline: none;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: #00ffcc;
-            transition: color 0.3s;
-        }
-
-        .dropdown-toggle:hover {
-            color: rgba(0, 255, 204, 0.7);
-        }
-
-        .dropdown-toggle:hover .dropdown-chevron line {
-            stroke: rgba(0, 255, 204, 0.7);
-        }
-
-        .dropdown-chevron {
-            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .dropdown-chevron line {
-            stroke: #00ffcc;                      /* always teal */
-            transition: stroke 0.3s;
-        }
-
-        .dropdown-toggle.open .dropdown-chevron {
-            transform: rotate(180deg);
-        }
-
-        /* ---- Dropdown content area (hidden by default) ---- */
-        .dropdown-content {
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s;
-            opacity: 0;
-        }
-
-        .dropdown-content.open {
-            /* a generous max-height so all controls fit */
-            max-height: 500px;
-            opacity: 1;
-            padding-top: 16px;
-        }
-
-        /* ---- NAVIGATION NODES links specific ---- */
-        .nav-links {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 0 30px;
-            padding: 0;
-        }
-
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 8px;
-            transition: color 0.25s;
-            white-space: nowrap;
-        }
-
-        .nav-links a:hover {
-            color: #00ffcc;
-        }
-
-        /* ---- COMMAND CONTROL content: just let the inner action bars flow normally ---- */
-        .cmd-inner {
-            /* no extra styling needed — all spacing comes from .action-bar */
-        }
-    </style>
 
 </head>
 <!-- ============================================================ -->
@@ -156,32 +72,40 @@
 <body>
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3A: TOP NAVIGATION — "NAVIGATION NODES" DROPDOWN -->
-    <!-- -------------------------------------------------------- -->
-    <div class="dropdown-wrap">
+    <!-- SECTION 3A: TOP NAVIGATION                               -->
+    <!-- External links: Weblinks hub, YouTube playlist, Spotify, -->
+    <!-- and a YouTube autoplay direct link (labelled X).         -->
+    <!-- --------------------------------------------------------
+    <nav>
+        <a href='https://beacons.ai/weblinks' target='_blank'>Weblinks</a>
+        <a href='https://www.youtube.com/playlist?list=PLdd12CvCHG0sdBwilp-LipaZkgzR2gJVq' target='_blank'>YouTube</a>
+        <a href='https://open.spotify.com/user/3147hrg3uxl6ywo7dja4zzwhrdha/playlists' target='_blank'>Spotify</a>
+        <a id="guide-open-btn" href="javascript:void(0)" title="Quick Start Guide">X</a>
+    </nav>
+ -->
+<div class="nav-v2-wrap">
         <div>
-            <button class="dropdown-toggle" id="nav-toggle" aria-expanded="false" aria-label="Toggle navigation">
-                NAVIGATION NODES
-                <svg class="dropdown-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <button class="nav-v2-toggle" id="v2-toggle" aria-expanded="false" aria-label="Toggle navigation">
+                MENU
+                <svg class="nav-v2-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <line x1="1" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
                     <line x1="9" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
                 </svg>
             </button>
-            <div class="dropdown-content" id="nav-content">
-                <div class="nav-links">
-                    <a href='https://beacons.ai/weblinks' target='_blank'>WEBLINKS</a>
-                    <a href='https://www.youtube.com/playlist?list=PLdd12CvCHG0sdBwilp-LipaZkgzR2gJVq' target='_blank'>YOUTUBE</a>
-                    <a href='https://open.spotify.com/user/3147hrg3uxl6ywo7dja4zzwhrdha/playlists' target='_blank'>SPOTIFY</a>
-                    <a href='tv.html'>TV</a>
-                    <a id="guide-open-btn" href="javascript:void(0)" title="Quick Start Guide">X</a>
-                </div>
+            <div class="nav-v2-links" id="v2-links">
+                <a href='https://beacons.ai/weblinks' target='_blank'>WEBLINKS</a>
+                <a href='https://www.youtube.com/playlist?list=PLdd12CvCHG0sdBwilp-LipaZkgzR2gJVq' target='_blank'>YOUTUBE</a>
+                <a href='https://open.spotify.com/user/3147hrg3uxl6ywo7dja4zzwhrdha/playlists' target='_blank'>SPOTIFY</a>
+                <a href='tv.html'>TV</a>
+                <a id="guide-open-btn" href="javascript:void(0)" title="Quick Start Guide">X</a>
             </div>
         </div>
     </div>
-
-
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3B: PAGE TITLE                                   -->
+    <!-- Each letter is a separate <span> so the CSS animation    -->
+    <!-- (elasticAssemble, defined in style.css) can stagger them -->
+    <!-- one by one on load. Font: Michroma.                      -->
     <!-- -------------------------------------------------------- -->
     <h1 class="fly-in-title">
         <span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span>
@@ -190,6 +114,10 @@
 
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3C: FEATURED VIDEO PLAYER                        -->
+    <!-- #now-playing-label displays the current track title and  -->
+    <!-- is clickable to toggle play/pause (wired in player.js).  -->
+    <!-- The YouTube IFrame API replaces #yt-player with an       -->
+    <!-- <iframe> at runtime — do not put anything inside it.     -->
     <!-- -------------------------------------------------------- -->
     <div class="featured-box">
         <div id="now-playing-label">Initiate Audio Sequence</div>
@@ -200,122 +128,129 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3D/E/F: COMMAND CONTROL DROPDOWN                 -->
-    <!-- Collapses playback controls, grid view, and Sector Zero  -->
-    <!-- into a single toggleable block.                          -->
+    <!-- SECTION 3D: PLAYBACK CONTROLS                            -->
+    <!-- Prev / Override Sequence (shuffle) / Next / Favourites.  -->
+    <!-- Favourites button opens the slide-out sidebar (3.3.3).   -->
     <!-- -------------------------------------------------------- -->
-    <div class="dropdown-wrap">
-        <div>
-            <button class="dropdown-toggle" id="cmd-toggle" aria-expanded="false" aria-label="Toggle command controls">
-                COMMAND CONTROL
-                <svg class="dropdown-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="1" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
-                    <line x1="9" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
+
+    <!-- Pill buttons — ACTIVE -->
+    <div class="action-bar" style="margin-bottom: 20px; align-items: center;">
+        <button class="ctrl-btn" id="prev-btn" style="background:transparent; border:1px solid rgba(0,255,204,0.5); border-radius:0; width:48px; height:27px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0;">
+            <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="3,6 9,1 9,11" fill="rgba(0,255,204,0.5)"/>
+            </svg>
+        </button>
+        <button class="ctrl-btn shuffle-btn" id="shuffle-btn" style="border-radius:0;">[ Override Sequence ]</button>
+        <button class="ctrl-btn" id="next-btn" style="background:transparent; border:1px solid rgba(0,255,204,0.5); border-radius:0; width:48px; height:27px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0;">
+            <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="9,6 3,1 3,11" fill="rgba(0,255,204,0.5)"/>
+            </svg>
+        </button>
+
+    </div>
+
+
+    <!-- -------------------------------------------------------- -->
+    <!-- SECTION 3E: GRID VIEW CONTROLS                           -->
+    <!-- -------------------------------------------------------- -->
+
+    <!-- OPTION B: Bare SVG icon buttons — ACTIVE -->
+    <div class="action-bar view-controls-bar">
+        <div class="bare-view-wrap">
+
+            <!-- Micro: 4×4 dense grid icon -->
+            <button class="grid-btn bare-view-btn" data-size="dense" aria-label="Micro grid">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1"    y="1"    width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5"  y="1"    width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"   y="1"    width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="14.5" y="1"    width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="1"    y="5.5"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5"  y="5.5"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"   y="5.5"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="14.5" y="5.5"  width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="1"    y="10"   width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5"  y="10"   width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"   y="10"   width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="14.5" y="10"   width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="1"    y="14.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="5.5"  y="14.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="10"   y="14.5" width="3.5" height="3.5" rx="0.4"/>
+                    <rect x="14.5" y="14.5" width="3.5" height="3.5" rx="0.4"/>
                 </svg>
             </button>
-            <div class="dropdown-content" id="cmd-content">
-                <div class="cmd-inner">
 
-                    <!-- Playback Controls -->
-                    <div class="action-bar" style="margin-bottom: 20px; align-items: center;">
-                        <button class="ctrl-btn" id="prev-btn" style="background:transparent; border:1px solid rgba(0,255,204,0.5); border-radius:0; width:48px; height:27px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0;">
-                            <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <polygon points="3,6 9,1 9,11" fill="rgba(0,255,204,0.5)"/>
-                            </svg>
-                        </button>
-                        <button class="ctrl-btn shuffle-btn" id="shuffle-btn" style="border-radius:0;">[ Override Sequence ]</button>
-                        <button class="ctrl-btn" id="next-btn" style="background:transparent; border:1px solid rgba(0,255,204,0.5); border-radius:0; width:48px; height:27px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0;">
-                            <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <polygon points="9,6 3,1 3,11" fill="rgba(0,255,204,0.5)"/>
-                            </svg>
-                        </button>
-                    </div>
+            <!-- Core: 3×3 standard grid icon -->
+            <button class="grid-btn bare-view-btn" data-size="default" aria-label="Core grid">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1"    y="1"    width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="6.75" y="1"    width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="12.5" y="1"    width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="1"    y="6.75" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="6.75" y="6.75" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="12.5" y="6.75" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="1"    y="12.5" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="6.75" y="12.5" width="4.5" height="4.5" rx="0.5"/>
+                    <rect x="12.5" y="12.5" width="4.5" height="4.5" rx="0.5"/>
+                </svg>
+            </button>
 
-                    <!-- Grid View Controls -->
-                    <div class="action-bar view-controls-bar">
-                        <div class="bare-view-wrap">
-                            <button class="grid-btn bare-view-btn" data-size="dense" aria-label="Micro grid">
-                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="1"    y="1"    width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="5.5"  y="1"    width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="10"   y="1"    width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="14.5" y="1"    width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="1"    y="5.5"  width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="5.5"  y="5.5"  width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="10"   y="5.5"  width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="14.5" y="5.5"  width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="1"    y="10"   width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="5.5"  y="10"   width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="10"   y="10"   width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="14.5" y="10"   width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="1"    y="14.5" width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="5.5"  y="14.5" width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="10"   y="14.5" width="3.5" height="3.5" rx="0.4"/>
-                                    <rect x="14.5" y="14.5" width="3.5" height="3.5" rx="0.4"/>
-                                </svg>
-                            </button>
-                            <button class="grid-btn bare-view-btn" data-size="default" aria-label="Core grid">
-                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="1"    y="1"    width="4.5" height="4.5" rx="0.5"/>
-                                    <rect x="6.75" y="1"    width="4.5" height="4.5" rx="0.5"/>
-                                    <rect x="12.5" y="1"    width="4.5" height="4.5" rx="0.5"/>
-                                    <rect x="1"    y="6.75" width="4.5" height="4.5" rx="0.5"/>
-                                    <rect x="6.75" y="6.75" width="4.5" height="4.5" rx="0.5"/>
-                                    <rect x="12.5" y="6.75" width="4.5" height="4.5" rx="0.5"/>
-                                    <rect x="1"    y="12.5" width="4.5" height="4.5" rx="0.5"/>
-                                    <rect x="6.75" y="12.5" width="4.5" height="4.5" rx="0.5"/>
-                                    <rect x="12.5" y="12.5" width="4.5" height="4.5" rx="0.5"/>
-                                </svg>
-                            </button>
-                            <button class="grid-btn bare-view-btn" data-size="max" aria-label="Max grid">
-                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="1"  y="1"  width="7" height="7" rx="0.8"/>
-                                    <rect x="10" y="1"  width="7" height="7" rx="0.8"/>
-                                    <rect x="1"  y="10" width="7" height="7" rx="0.8"/>
-                                    <rect x="10" y="10" width="7" height="7" rx="0.8"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Favourites Toggle (Sector Zero) -->
-                    <div class="action-bar" style="margin-top: 0 !important; margin-bottom: 30px;">
-                        <button class="ctrl-btn" id="fav-toggle-btn" style="background:transparent; border:1px solid rgba(0,255,204,0.5); border-radius:0; width:auto; min-width:180px; height:36px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0 25px;" aria-label="Favourites">
-                            <svg id="fav-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="#00ffcc" stroke-width="1.5" fill="none"/>
-                            </svg>
-                            <span style="margin-left: 12px; letter-spacing: 4px; font-size: 10px;">SECTOR ZERO</span>
-                        </button>
-                    </div>
-
-                </div>
-            </div>
+            <!-- Max: 2×2 large grid icon -->
+            <button class="grid-btn bare-view-btn" data-size="max" aria-label="Max grid">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1"  y="1"  width="7" height="7" rx="0.8"/>
+                    <rect x="10" y="1"  width="7" height="7" rx="0.8"/>
+                    <rect x="1"  y="10" width="7" height="7" rx="0.8"/>
+                    <rect x="10" y="10" width="7" height="7" rx="0.8"/>
+                </svg>
+            </button>
         </div>
     </div>
-    <!-- END COMMAND CONTROL -->
+    <!-- OPTION B END -->
+
+    <!-- SECTION 3F: FAVOURITES TOGGLE (Dedicated symmetric row) -->
+    <div class="action-bar" style="margin-top: 0 !important; margin-bottom: 30px;">
+        <button class="ctrl-btn" id="fav-toggle-btn" style="background:transparent; border:1px solid rgba(0,255,204,0.5); border-radius:0; width:auto; min-width:180px; height:36px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:0 25px;" aria-label="Favourites">
+            <svg id="fav-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="#00ffcc" stroke-width="1.5" fill="none"/>
+            </svg>
+            <span style="margin-left: 12px; letter-spacing: 4px; font-size: 10px;">SECTOR ZERO</span>
+        </button>
+    </div>
 
 
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3G: VIDEO GRID                                   -->
+    <!-- Empty on load. player.js fetches tracks.json and injects -->
+    <!-- one .video card per track. Do not add cards manually.    -->
     <!-- -------------------------------------------------------- -->
     <div class="grid" id="video-grid"></div>
 
 
+<!-- ============================================================ -->
+<!-- STAGE 3 MAIN CONTENT END                                     -->
+<!-- ============================================================ -->
+
+
     <!-- -------------------------------------------------------- -->
-    <!-- FOOTER — Version display                                 -->
+    <!-- SECTION 3G: FOOTER — Version display                     -->
     <!-- -------------------------------------------------------- -->
     <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-        <span style="color: #00ffcc;">4.0.0</span>
+        <!-- version --><span style="color: #00ffcc;">3.6.3</span><!-- end version -->
     </div>
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3H: ORBITAL HUD                                  -->
+    <!-- SECTION 3H: ORBITAL HUD — Persistent footer mini-player  -->
     <!-- -------------------------------------------------------- -->
     <div id="hud-dock">
+
+        <!-- Thin seekable progress bar across the very top of the HUD -->
         <div id="hud-progress-container">
             <div id="hud-progress-bar"></div>
         </div>
+
+        <!-- Inner row: track title (left) and transport controls (right) -->
         <div id="hud-inner">
             <div id="hud-track-title">Initiate Audio Sequence</div>
             <div id="hud-controls">
@@ -324,35 +259,60 @@
                 <button class="hud-btn" id="hud-next">&#9654;&#9654;</button>
             </div>
         </div>
+
     </div>
+    <!-- SECTION 3H END -->
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3I: FAVOURITES SIDEBAR                           -->
+    <!-- SECTION 3I: FAVOURITES SIDEBAR (v3.3.3)                  -->
+    <!-- Slide-out panel from the right edge. Toggled by the      -->
+    <!-- heart button in the action bar (#fav-toggle-btn).        -->
+    <!-- player.js (Section 4P) manages all data and interaction. -->
+    <!-- Clicking the backdrop (#fav-backdrop) closes the panel.  -->
     <!-- -------------------------------------------------------- -->
+
+    <!-- Semi-transparent backdrop — click to close -->
     <div id="fav-backdrop"></div>
+
+    <!-- The sidebar panel itself -->
     <div id="fav-sidebar">
+
+        <!-- Header row: title + close button -->
         <div id="fav-header">
             <span id="fav-title">Favourites</span>
             <button id="fav-close-btn" aria-label="Close favourites">&#x2715;</button>
         </div>
+
+        <!-- Action row at top: play all -->
         <div id="fav-actions" style="display:none; justify-content:center; padding: 12px 20px; border-bottom: 1px solid #1a1a1a;">
              <button id="fav-play-all-btn" class="ctrl-btn" style="width: 100%; border-radius: 4px; padding: 10px; font-size: 9px; letter-spacing: 4px;">[ PLAY PLAYLIST ]</button>
         </div>
+
+        <!-- Empty-state message — shown when no favourites saved -->
         <div id="fav-empty">
             <span>No favourites yet.</span>
             <span>Click the ♥ on any track card to add it here.</span>
         </div>
+
+        <!-- Scrollable list — populated by player.js -->
         <ul id="fav-list"></ul>
+
+        <!-- Footer: clear-all button -->
         <div id="fav-footer">
             <button id="fav-clear-btn" class="ctrl-btn">[ Clear All ]</button>
         </div>
+
     </div>
+    <!-- SECTION 3I END -->
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3J: GUIDE POPUP                                  -->
+    <!-- SECTION 3J: GUIDE POPUP (v3.4.0)                          -->
+    <!-- Modal window displaying site instructions.                -->
+    <!-- Triggered by the 'X' button in the top navigation.        -->
     <!-- -------------------------------------------------------- -->
+
     <div id="guide-backdrop"></div>
     <div id="guide-modal">
         <div id="guide-header">
@@ -364,6 +324,7 @@
                 <h3>01 — FAVOURITES: SAVING TRACKS</h3>
                 <p>Click the <strong>HEART ICON (♥)</strong> on any track card to save it. The icon turns solid cyan when a track is favourited. Your list is stored locally and persists across sessions.</p>
             </div>
+
             <div class="guide-section">
                 <h3>02 — SIDEBAR: MANAGING LISTS</h3>
                 <p>Open the <strong>FAVOURITES</strong> sidebar via the action bar heart button. From here, you can:</p>
@@ -373,10 +334,12 @@
                     <li><strong>REMOVE:</strong> Click 'X' on any row to delete it.</li>
                 </ul>
             </div>
+
             <div class="guide-section">
                 <h3>03 — QUEUE: EXITING FAV MODE</h3>
                 <p>While in "Favourite Mode", simply <strong>SELECT ANY TRACK</strong> from the main grid. This immediately exits the favourites queue and resets the player to include all tracks from the main sequence.</p>
             </div>
+
             <div class="guide-section">
                 <h3>04 — NAVIGATION & VIEW</h3>
                 <p>Use <strong>OVERRIDE SEQUENCE</strong> to shuffle the grid. Use the <strong>GRID ICONS</strong> (Micro, Core, Max) to switch display density. The <strong>ORBITAL HUD</strong> at the bottom provides persistent controls and seek functionality.</p>
@@ -389,28 +352,10 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SCRIPTS                                                 -->
+    <!-- SCRIPTS — must remain at the bottom of <body>            -->
     <!-- -------------------------------------------------------- -->
     <script src="player.js?v=3.3.0"></script>
     <script src="https://www.youtube.com/iframe_api" async></script>
-
-    <!-- Dropdown toggle logic for both buttons -->
-    <script>
-        (function() {
-            function setupDropdown(toggleId, contentId) {
-                var toggle = document.getElementById(toggleId);
-                var content = document.getElementById(contentId);
-                if (!toggle || !content) return;
-                toggle.addEventListener('click', function() {
-                    var isOpen = content.classList.toggle('open');
-                    toggle.classList.toggle('open', isOpen);
-                    toggle.setAttribute('aria-expanded', isOpen);
-                });
-            }
-            setupDropdown('nav-toggle', 'nav-content');
-            setupDropdown('cmd-toggle', 'cmd-content');
-        })();
-    </script>
 
 </body>
 </html>
