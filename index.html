@@ -204,7 +204,7 @@
     <!-- SECTION 3C: FEATURED VIDEO PLAYER                        -->
     <!-- -------------------------------------------------------- -->
     <div class="featured-box">
-        <div id="now-playing-label"></div>
+        <div id="now-playing-label">Initiate Audio Sequence</div>
         <div id="player-container">
             <div id="yt-player"></div>
         </div>
@@ -236,10 +236,19 @@
                             </svg>
                         </button>
 
-                        <button class="ctrl-btn cmd-play-btn" id="playpause-btn" aria-label="Play / Pause">
-                            <svg id="cmd-play-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <polygon points="3,1 13,8 3,15" fill="rgba(0,255,204,0.85)"/>
+                        <button class="cmd-play-btn" id="playpause-btn" aria-label="Play / Pause">
+                            <!-- Outer rotating ring -->
+                            <svg class="play-ring" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                                <circle class="play-ring-track" cx="40" cy="40" r="34"/>
+                                <circle class="play-ring-arc"   cx="40" cy="40" r="34"/>
                             </svg>
+                            <!-- Morph icon — triangle ↔ pause bars via SVG paths -->
+                            <svg class="play-icon" id="cmd-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path class="play-bar-left"  d="M7,4 L7,4 L7,20 L7,20 Z"/>
+                                <path class="play-bar-right" d="M7,4 L7,4 L7,20 L7,20 Z"/>
+                            </svg>
+                            <!-- Click ripple -->
+                            <span class="play-ripple"></span>
                         </button>
 
                         <button class="ctrl-btn cmd-arrow-btn" id="next-btn" aria-label="Next">

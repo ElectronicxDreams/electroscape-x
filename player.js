@@ -411,6 +411,10 @@ function attachHudControls() {
 
     document.getElementById('playpause-btn').addEventListener('click', function() {
         if (!player || typeof player.getPlayerState !== 'function') return;
+
+        /* Ripple on every click */
+        triggerPlayRipple();
+
         var state = player.getPlayerState();
         if (state === -1 || state === YT.PlayerState.UNSTARTED || state === YT.PlayerState.CUED) {
             playTrack(currentIndex === -1 ? 0 : currentIndex);
@@ -427,19 +431,32 @@ function attachHudControls() {
     });
 }
 
-function updateHudPlayPauseIcon(state) {
-    var btn = document.getElementById('hud-playpause');
-    if (btn) btn.innerHTML = (state === 1) ? '&#10074;&#10074;' : '&#9654;';
+/* Fire the click ripple — adds class, removes it once animation ends */
+function triggerPlayRipple() {
+    var btn = document.getElementById('playpause-btn');
+    if (!btn) return;
+    btn.classList.remove('ripple-active');
+    /* Force reflow so re-adding the class restarts the animation */
+    void btn.offsetWidth;
+    btn.classList.add('ripple-active');
+    btn.addEventListener('animationend', function handler() {
+        btn.classList.remove('ripple-active');
+        btn.removeEventListener('animationend', handler);
+    });
+}
 
-    /* Keep the command control play button in sync */
-    var cmdIcon = document.getElementById('cmd-play-icon');
-    if (cmdIcon) {
+function updateHudPlayPauseIcon(state) {
+    /* HUD text icon */
+    var hudBtn = document.getElementById('hud-playpause');
+    if (hudBtn) hudBtn.innerHTML = (state === 1) ? '&#10074;&#10074;' : '&#9654;';
+
+    /* Command play button — toggle is-playing for morph, glow, and ring via CSS */
+    var cmdBtn = document.getElementById('playpause-btn');
+    if (cmdBtn) {
         if (state === 1) {
-            /* Pause — two rectangles */
-            cmdIcon.innerHTML = '<rect x="2" y="1" width="4" height="14" fill="rgba(0,255,204,0.85)"/><rect x="10" y="1" width="4" height="14" fill="rgba(0,255,204,0.85)"/>';
+            cmdBtn.classList.add('is-playing');
         } else {
-            /* Play triangle */
-            cmdIcon.innerHTML = '<polygon points="3,1 13,8 3,15" fill="rgba(0,255,204,0.85)"/>';
+            cmdBtn.classList.remove('is-playing');
         }
     }
 }
