@@ -1,23 +1,10 @@
 /*
-    Name: player.js | Version: 4.0.0
+    Name: player.js | Version: 6.0.0
     Project: Electroscape
-    Description: All playback logic for the Electroscape music video gallery.
+    Description: All playback and UI logic for the Electroscape music video gallery.
                  Loads track data from tracks.json, builds the video card grid,
                  and controls the YouTube IFrame API player.
                  Loaded by index.html via <script> at the bottom of <body>.
-
-    Changelog:
-        v2.1.0 — Orbital HUD controls and progress tracker added
-        v2.9.0 — Grid view controls and localStorage preference saving added
-        v3.0.0 — HUD seek (click-to-seek on progress bar) added; end-card guard added
-        v3.1.0 — initGridControls refactored to support Option B (bare SVG icons, active)
-                  and Option D (single cycling button, commented out). Both options share
-                  a common applyGridSize() helper.
-        v3.2.0 — New Previous/Next Buttons
-        v3.3.1 — Touch drag-to-reorder added to favourites sidebar (Section 4P)
-        v4 — Favourites sidebar added (Section 4P):
-                  Heart button on each card, slide-out right sidebar, drag-to-reorder,
-                  play-from-sidebar, localStorage persistence under 'electroscape_favourites'.
 
     Sections:
         4A — Track loader       : Fetches tracks.json, builds the card grid
@@ -29,13 +16,14 @@
         4G — Prev button        : Steps back one track
         4H — Next button        : Steps forward one track
         4I — Shuffle button     : Randomises card order, rebuilds queue
-        4K — End-card guard     : Advances track 7 seconds before YouTube end card
         4L — HUD tracker        : Updates HUD progress bar every 500ms
         4M — HUD seek           : Click-to-seek on the HUD progress bar
         4N — HUD controls       : Wires up HUD Prev / Play-Pause / Next buttons
         4O — Grid view controls : Switches grid density; saves preference to localStorage
         4P — Favourites sidebar : Heart toggles, sidebar open/close, drag-to-reorder,
                                   play-from-list, clear-all, localStorage persistence
+        4Q — Guide popup        : Open/close the Quick Start Guide modal
+        4R — Navigation dropdown: Wires up collapsible nav and command control toggles
         4J — Initialisation     : Entry point — calls loadTracks() and initGridControls()
 */
 
@@ -59,7 +47,6 @@ function loadTracks() {
             var grid = document.getElementById('video-grid');
 
             tracks.forEach(function(track) {
-                /* Thumbnail URL built from the YouTube video ID */
                 var thumbUrl = 'https://img.youtube.com/vi/' + track.id + '/maxresdefault.jpg';
 
                 var card = document.createElement('div');
@@ -71,7 +58,6 @@ function loadTracks() {
                     '<div class="thumb-container" style="background-image: url(\'' + thumbUrl + '\');"></div>' +
                     '<div class="video-label">' + track.title + '</div>' +
                     '<div class="overlay-btn">&gt; ACTIVATE &lt;</div>' +
-                    /* Heart button — added in v3.3.0; stops propagation so card click doesn't fire */
                     '<button class="fav-heart-btn" data-id="' + track.id + '" data-title="' + track.title.replace(/"/g, '&quot;') + '" aria-label="Add to favourites">' +
                         '<svg class="fav-heart-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
                             '<path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="#00ffcc" stroke-width="1.5" fill="none" class="fav-heart-path"/>' +
@@ -83,7 +69,7 @@ function loadTracks() {
 
             buildQueue();
             attachCardClicks();
-            initFavourites();   /* Section 4P — wire up all favourites logic */
+            initFavourites();
 
             if (window.youtubeAPIReady) {
                 createPlayer();
@@ -101,13 +87,12 @@ function loadTracks() {
 /* Reads all .video cards from the DOM into the queue array.    */
 /* Called after initial load and after every shuffle.           */
 /* ============================================================ */
-var queue             = [];   /* Ordered playlist */
-var currentIndex      = -1;   /* Active position in queue (-1 = nothing yet) */
-var isFavPlaylistMode = false;/* True if currently playing only the favorites */
-var player;                   /* YouTube IFrame player object — do not rename */
-var ended             = false; /* Debounce flag — prevents ENDED firing twice */
-
-var hudTrackerInterval;       /* Interval ID for the HUD progress tracker (Section 4L) */
+var queue             = [];
+var currentIndex      = -1;
+var isFavPlaylistMode = false;
+var player;
+var ended             = false;
+var hudTrackerInterval;
 
 function buildQueue() {
     isFavPlaylistMode = false;
@@ -127,21 +112,16 @@ function buildFavQueue(favs) {
     favs.forEach(function(f) {
         var el = document.querySelector('#video-grid .video[data-id="' + f.id + '"]');
         if (el) {
-            queue.push({
-                id: f.id,
-                title: f.title,
-                el: el
-            });
+            queue.push({ id: f.id, title: f.title, el: el });
         }
     });
 }
+
 
 /* ============================================================ */
 /* SECTION 4C: ACTIVE CARD HIGHLIGHTER & NOW-PLAYING CLICK      */
 /* setActiveCard removes .is-playing from all cards and adds it */
 /* to the card at the given queue index.                        */
-/* attachNowPlayingClick wires the label above the player to    */
-/* toggle play/pause, or start playback if nothing is loaded.   */
 /* ============================================================ */
 function setActiveCard(index) {
     document.querySelectorAll('#video-grid .video').forEach(function(el) {
@@ -158,7 +138,6 @@ function attachNowPlayingClick() {
         if (!player || typeof player.getPlayerState !== 'function') return;
         var state = player.getPlayerState();
         if (state === -1 || state === YT.PlayerState.UNSTARTED || state === YT.PlayerState.CUED) {
-            /* Nothing playing yet — use playTrack so title updates correctly */
             playTrack(currentIndex === -1 ? 0 : currentIndex);
         } else if (state === YT.PlayerState.PLAYING) {
             player.pauseVideo();
@@ -172,17 +151,13 @@ function attachNowPlayingClick() {
 /* ============================================================ */
 /* SECTION 4D: PLAY TRACK                                       */
 /* Loads the track at the given queue index into the YouTube    */
-/* player. Index wraps around so the playlist loops.            */
-/* Also updates the now-playing label, active card, HUD title,  */
-/* progress bar, and restarts the end-card guard.               */
+/* player. Index wraps so the playlist loops.                   */
 /* ============================================================ */
 function playTrack(index) {
     if (!queue.length) return;
 
-    /* Scroll to the top of the page so the player is visible */
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    /* Wrap index so it loops around the playlist */
     currentIndex = ((index % queue.length) + queue.length) % queue.length;
     var track = queue[currentIndex];
 
@@ -202,9 +177,7 @@ function playTrack(index) {
 /* ============================================================ */
 /* SECTION 4E: YOUTUBE IFRAME API READY                         */
 /* onYouTubeIframeAPIReady is called automatically by the       */
-/* YouTube script once it loads. If tracks are already in the   */
-/* queue, the player is created immediately; otherwise           */
-/* loadTracks() (Section 4A) will call createPlayer() itself.  */
+/* YouTube script once it loads.                                */
 /* ============================================================ */
 window.youtubeAPIReady = false;
 
@@ -220,17 +193,16 @@ function createPlayer() {
         width: '100%',
         height: '100%',
         playerVars: {
-            autoplay:        0,
-            controls:        1,
-            rel:             0,
-            modestbranding:  1,
-            fs:              1,
-            enablejsapi:     1
+            autoplay:       0,
+            controls:       1,
+            rel:            0,
+            modestbranding: 1,
+            fs:             1,
+            enablejsapi:    1
         },
         events: {
             onReady: function() {
                 if (queue.length) {
-                    /* Cue (but don't play) the first track on load */
                     player.cueVideoById(queue[0].id);
                     currentIndex = 0;
                     setActiveCard(0);
@@ -242,16 +214,11 @@ function createPlayer() {
                 attachHudControls();
             },
             onStateChange: function(event) {
-                /* Auto-advance when a track ends */
                 if (event.data === YT.PlayerState.ENDED && !ended) {
                     ended = true;
                     playTrack(currentIndex + 1);
                 }
-
-                /* Keep the HUD play/pause icon in sync */
                 updateHudPlayPauseIcon(event.data);
-
-                /* Reveal the HUD on first play or cue */
                 if (event.data === YT.PlayerState.PLAYING || event.data === YT.PlayerState.CUED) {
                     document.getElementById('hud-dock').classList.add('hud-active');
                 }
@@ -264,7 +231,6 @@ function createPlayer() {
 /* ============================================================ */
 /* SECTION 4F: CARD CLICK EVENT                                 */
 /* Attaches a click listener to every .video card in the grid.  */
-/* Finds the card's position in the queue and calls playTrack.  */
 /* ============================================================ */
 function attachCardClicks() {
     document.querySelectorAll('#video-grid .video').forEach(function(el) {
@@ -300,10 +266,9 @@ document.getElementById('next-btn').addEventListener('click', function() {
 
 
 /* ============================================================ */
-/* SECTION 4I: SHUFFLE BUTTON (Override Sequence)               */
+/* SECTION 4I: SHUFFLE BUTTON                                   */
 /* Fisher-Yates shuffle on the card DOM nodes, then rebuilds    */
-/* the queue. If a track was playing it keeps its currentIndex  */
-/* correct in the new order; otherwise resets to position 0.    */
+/* the queue.                                                   */
 /* ============================================================ */
 document.getElementById('shuffle-btn').addEventListener('click', function() {
     var grid  = document.getElementById('video-grid');
@@ -334,18 +299,16 @@ document.getElementById('shuffle-btn').addEventListener('click', function() {
 });
 
 
-
 /* ============================================================ */
 /* SECTION 4L: HUD PROGRESS TRACKER                             */
-/* Polls the player every 500ms while a track is playing and    */
-/* updates the HUD progress bar width as a percentage.          */
+/* Polls the player every 500ms and updates the progress bar.   */
 /* ============================================================ */
 function startHudTracker() {
     if (hudTrackerInterval) clearInterval(hudTrackerInterval);
 
     hudTrackerInterval = setInterval(function() {
         if (!player || typeof player.getPlayerState !== 'function') return;
-        if (player.getPlayerState() === 1) {   /* 1 = PLAYING */
+        if (player.getPlayerState() === 1) {
             var current = player.getCurrentTime();
             var total   = player.getDuration();
             if (total > 0) {
@@ -363,9 +326,7 @@ function updateHudTitle(title) {
 
 /* ============================================================ */
 /* SECTION 4M: HUD SEEK                                         */
-/* Clicking anywhere on the HUD progress bar container seeks    */
-/* to that position. Gives immediate visual feedback by         */
-/* updating the bar width before the player confirms the seek.  */
+/* Click anywhere on the HUD progress bar to seek.              */
 /* ============================================================ */
 function setupHudSeeking() {
     var barContainer = document.getElementById('hud-progress-container');
@@ -376,7 +337,7 @@ function setupHudSeeking() {
 
         var rect = barContainer.getBoundingClientRect();
         var pos  = (e.clientX - rect.left) / rect.width;
-        pos = Math.max(0, Math.min(1, pos));   /* Clamp to 0–1 */
+        pos = Math.max(0, Math.min(1, pos));
 
         if (visualBar) {
             visualBar.style.width = (pos * 100) + '%';
@@ -412,7 +373,6 @@ function attachHudControls() {
     document.getElementById('playpause-btn').addEventListener('click', function() {
         if (!player || typeof player.getPlayerState !== 'function') return;
 
-        /* Ripple on every click */
         triggerPlayRipple();
 
         var state = player.getPlayerState();
@@ -431,12 +391,10 @@ function attachHudControls() {
     });
 }
 
-/* Fire the click ripple — adds class, removes it once animation ends */
 function triggerPlayRipple() {
     var btn = document.getElementById('playpause-btn');
     if (!btn) return;
     btn.classList.remove('ripple-active');
-    /* Force reflow so re-adding the class restarts the animation */
     void btn.offsetWidth;
     btn.classList.add('ripple-active');
     btn.addEventListener('animationend', function handler() {
@@ -446,11 +404,9 @@ function triggerPlayRipple() {
 }
 
 function updateHudPlayPauseIcon(state) {
-    /* HUD text icon */
     var hudBtn = document.getElementById('hud-playpause');
     if (hudBtn) hudBtn.innerHTML = (state === 1) ? '&#10074;&#10074;' : '&#9654;';
 
-    /* Command play button — toggle is-playing for morph, glow, and ring via CSS */
     var cmdBtn = document.getElementById('playpause-btn');
     if (cmdBtn) {
         if (state === 1) {
@@ -463,14 +419,14 @@ function updateHudPlayPauseIcon(state) {
 
 
 /* ============================================================ */
-/* SECTION 4O: GRID VIEW CONTROLS & LOCAL STORAGE               */
-/* Switches the video grid between three density modes.         */
+/* SECTION 4O: GRID VIEW CONTROLS                               */
+/* Switches the video grid between three density modes and      */
+/* saves the preference to localStorage.                        */
 /* ============================================================ */
 function initGridControls() {
     var grid      = document.getElementById('video-grid');
     var savedSize = localStorage.getItem('electroscape_grid_size') || 'default';
 
-    /* Shared helper — applies the correct grid class and saves the choice */
     function applyGridSize(size) {
         grid.classList.remove('view-dense', 'view-max');
         if (size !== 'default') {
@@ -480,9 +436,6 @@ function initGridControls() {
         return size;
     }
 
-    /* -------------------------------------------------------- */
-    /* OPTION B: Bare SVG icon buttons — ACTIVE                 */
-    /* -------------------------------------------------------- */
     var buttons = document.querySelectorAll('.grid-btn');
 
     function updateBareActive(size) {
@@ -501,71 +454,38 @@ function initGridControls() {
             updateBareActive(size);
         });
     });
-    /* OPTION B END */
-
-    /*
-    --------------------------------------------------------
-    OPTION D: Single cycling button — INACTIVE
-    --------------------------------------------------------
-    [commented-out option D code preserved as-is]
-    */
 }
 
 
 /* ============================================================ */
 /* SECTION 4P: FAVOURITES SIDEBAR                               */
 /*                                                              */
-/* Overview:                                                    */
-/*   - Each card gets a .fav-heart-btn injected in Section 4A.  */
-/*   - Favourites stored as an array of {id, title} objects in  */
-/*     localStorage under 'electroscape_favourites'.            */
-/*   - The sidebar (#fav-sidebar) slides in from the right.     */
-/*   - Rows in the list are draggable for reordering.           */
-/*   - Clicking a row's play button finds the matching card in  */
-/*     the queue by data-id and calls playTrack().              */
-/*                                                              */
-/* Key DOM IDs (defined in index.html Section 3I):              */
-/*   #fav-sidebar    — the panel itself                         */
-/*   #fav-backdrop   — click-to-close overlay behind the panel  */
-/*   #fav-list       — <ul> populated by renderFavList()        */
-/*   #fav-empty      — empty-state message div                  */
-/*   #fav-header     — title bar with close button              */
-/*   #fav-close-btn  — X button inside the header              */
-/*   #fav-clear-btn  — clear-all button in the footer           */
-/*   #fav-toggle-btn — heart pill in the action bar             */
-/*   #fav-toggle-icon — SVG inside the toggle button            */
+/* Heart button on each card saves tracks to localStorage.      */
+/* Sidebar (#fav-sidebar) slides in from the right.             */
+/* Rows are draggable for reordering (mouse + touch/pointer).   */
+/* Play button in sidebar finds the matching card and calls     */
+/* playTrack(). Clear-all wipes localStorage and resets hearts. */
 /* ============================================================ */
 function initFavourites() {
 
-    /* ---- Storage key ---- */
     var STORAGE_KEY = 'electroscape_favourites';
 
-    /* ---- Load saved favourites from localStorage ---- */
     function loadFavs() {
         try {
             var raw = localStorage.getItem(STORAGE_KEY);
             return raw ? JSON.parse(raw) : [];
-        } catch(e) {
-            return [];
-        }
+        } catch(e) { return []; }
     }
 
-    /* ---- Save current favourites array to localStorage ---- */
     function saveFavs(favs) {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(favs));
-        } catch(e) { /* storage full — silently skip */ }
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(favs)); }
+        catch(e) { /* storage full — silently skip */ }
     }
 
-    /* ---- Check if a video ID is currently favourited ---- */
     function isFav(id, favs) {
         return favs.some(function(f) { return f.id === id; });
     }
 
-    /* ---- SVG paths for heart: outline vs filled ---- */
-    var HEART_PATH = 'M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z';
-
-    /* ---- Update the visual state of a heart button on a card ---- */
     function updateHeartBtn(btn, active) {
         var path = btn.querySelector('.fav-heart-path');
         if (!path) return;
@@ -580,7 +500,6 @@ function initFavourites() {
         }
     }
 
-    /* ---- Update the toggle button icon (outline/filled) ---- */
     function updateToggleIcon(open) {
         var icon = document.getElementById('fav-toggle-icon');
         if (!icon) return;
@@ -595,20 +514,18 @@ function initFavourites() {
         }
     }
 
-    /* ---- Sync all card heart buttons against current favs array ---- */
     function syncAllHearts(favs) {
         document.querySelectorAll('.fav-heart-btn').forEach(function(btn) {
             updateHeartBtn(btn, isFav(btn.getAttribute('data-id'), favs));
         });
     }
 
-    /* ---- Drag-and-drop state ---- */
-    var dragSrcIndex  = null;   /* Index of the row being dragged */
-    var touchDragSrc  = null;   /* li element being touch-dragged */
-    var touchClone    = null;   /* floating visual clone during touch drag */
-    var touchOffsetY  = 0;      /* finger offset within the dragged row */
+    /* Drag-and-drop state */
+    var dragSrcIndex = null;
+    var touchDragSrc = null;
+    var touchClone   = null;
+    var touchOffsetY = 0;
 
-    /* ---- Shift a favourite up or down in the list ---- */
     function shiftFav(fromIndex, delta) {
         var favs = loadFavs();
         var toIndex = fromIndex + delta;
@@ -619,14 +536,12 @@ function initFavourites() {
         renderFavList();
     }
 
-    /* ---- Build and render the sidebar list from the favs array ---- */
     function renderFavList() {
-        var favs    = loadFavs();
-        var list    = document.getElementById('fav-list');
-        var empty   = document.getElementById('fav-empty');
-        var footer  = document.getElementById('fav-footer');
+        var favs   = loadFavs();
+        var list   = document.getElementById('fav-list');
+        var empty  = document.getElementById('fav-empty');
+        var footer = document.getElementById('fav-footer');
 
-        /* Clear existing rows */
         list.innerHTML = '';
 
         if (!favs.length) {
@@ -647,36 +562,31 @@ function initFavourites() {
             li.className = 'fav-row';
             li.setAttribute('draggable', 'true');
             li.setAttribute('data-idx', idx);
+            li.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
 
-            /* Thumbnail */
             var thumb = document.createElement('div');
             thumb.className = 'fav-row-thumb';
             thumb.style.backgroundImage = 'url(https://img.youtube.com/vi/' + fav.id + '/mqdefault.jpg)';
 
-            /* Title */
             var title = document.createElement('span');
             title.className = 'fav-row-title';
             title.textContent = fav.title;
 
-            /* Controls: Up / Down / Play / Remove */
             var controls = document.createElement('div');
             controls.className = 'fav-row-controls';
 
-            /* Up Button */
             var upBtn = document.createElement('button');
             upBtn.className = 'fav-row-btn fav-move-btn';
             upBtn.setAttribute('aria-label', 'Move Up');
-            upBtn.innerHTML = '&#9650;'; /* Up arrow */
+            upBtn.innerHTML = '&#9650;';
             if (idx === 0) upBtn.style.opacity = '0.2';
 
-            /* Down Button */
             var downBtn = document.createElement('button');
             downBtn.className = 'fav-row-btn fav-move-btn';
             downBtn.setAttribute('aria-label', 'Move Down');
-            downBtn.innerHTML = '&#9660;'; /* Down arrow */
+            downBtn.innerHTML = '&#9660;';
             if (idx === favs.length - 1) downBtn.style.opacity = '0.2';
 
-            /* Play button */
             var playBtn = document.createElement('button');
             playBtn.className = 'fav-row-btn fav-play-btn';
             playBtn.setAttribute('aria-label', 'Play ' + fav.title);
@@ -685,16 +595,13 @@ function initFavourites() {
                 '<polygon points="2,1 10,6 2,11" fill="#00ffcc"/>' +
                 '</svg>';
 
-            /* Remove button */
             var removeBtn = document.createElement('button');
             removeBtn.className = 'fav-row-btn fav-remove-btn';
             removeBtn.setAttribute('aria-label', 'Remove ' + fav.title);
             removeBtn.innerHTML = '&#x2715;';
 
-            /* Drag handle */
             var handle = document.createElement('div');
             handle.className = 'fav-drag-handle';
-            /* Aggressive context menu suppression for tablet drag */
             handle.setAttribute('oncontextmenu', 'return false;');
             handle.innerHTML =
                 '<svg viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
@@ -711,17 +618,13 @@ function initFavourites() {
             controls.appendChild(playBtn);
             controls.appendChild(removeBtn);
 
-            /* Stacked card: drag handle → thumbnail → title → controls */
             li.appendChild(handle);
             li.appendChild(thumb);
             li.appendChild(title);
             li.appendChild(controls);
             list.appendChild(li);
 
-            /* Aggressive context menu suppression for the whole row */
-            li.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
-
-            /* --- Up/Down logic --- */
+            /* Up/Down */
             upBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 if (idx > 0) shiftFav(idx, -1);
@@ -731,17 +634,14 @@ function initFavourites() {
                 if (idx < favs.length - 1) shiftFav(idx, 1);
             });
 
-            /* --- Play from sidebar --- */
+            /* Play from sidebar */
             playBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                /* Find the queue index for this video ID */
                 var qIdx = queue.findIndex(function(t) { return t.id === fav.id; });
-                if (qIdx !== -1) {
-                    playTrack(qIdx);
-                }
+                if (qIdx !== -1) playTrack(qIdx);
             });
 
-            /* --- Remove from favourites --- */
+            /* Remove */
             removeBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 var current = loadFavs();
@@ -751,37 +651,50 @@ function initFavourites() {
                 renderFavList();
             });
 
-            /* --- Drag-to-reorder: dragstart --- */
+            /* HTML5 drag-to-reorder (mouse) */
             li.addEventListener('dragstart', function(e) {
                 dragSrcIndex = idx;
                 li.classList.add('fav-row-dragging');
                 e.dataTransfer.effectAllowed = 'move';
-                /* Required for Firefox */
                 e.dataTransfer.setData('text/plain', idx);
             });
 
             li.addEventListener('dragend', function() {
                 li.classList.remove('fav-row-dragging');
-                /* Remove any lingering drop-target highlights */
                 document.querySelectorAll('.fav-row-over').forEach(function(el) {
                     el.classList.remove('fav-row-over');
                 });
             });
 
-            /* Suppress the Android long-press context menu on the drag handle */
+            li.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                li.classList.add('fav-row-over');
+            });
+
+            li.addEventListener('dragleave', function() {
+                li.classList.remove('fav-row-over');
+            });
+
+            li.addEventListener('drop', function(e) {
+                e.preventDefault();
+                li.classList.remove('fav-row-over');
+                if (dragSrcIndex === null || dragSrcIndex === idx) return;
+                var current = loadFavs();
+                var moved   = current.splice(dragSrcIndex, 1)[0];
+                current.splice(idx, 0, moved);
+                saveFavs(current);
+                renderFavList();
+                dragSrcIndex = null;
+            });
+
+            /* Pointer Events drag-to-reorder (tablet/touch) */
             handle.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
-            /*
-             * --- Pointer Events drag-to-reorder (tablet / mobile) ---
-             * Uses the Pointer Events API instead of touch events.
-             * setPointerCapture() tells Android Chrome "I own this gesture"
-             * which is the only reliable way to prevent the long-press
-             * context menu (Download / Share / Print) from appearing.
-             */
             handle.addEventListener('pointerdown', function(e) {
-                if (e.pointerType === 'mouse') return;   /* mouse handled by HTML5 drag above */
+                if (e.pointerType === 'mouse') return;
                 e.preventDefault();
-                handle.setPointerCapture(e.pointerId);   /* claim the gesture — suppresses context menu */
+                handle.setPointerCapture(e.pointerId);
 
                 var rect     = li.getBoundingClientRect();
                 touchOffsetY = e.clientY - rect.top;
@@ -837,49 +750,23 @@ function initFavourites() {
                 dragSrcIndex = null;
             });
 
-            handle.addEventListener('pointercancel', function(e) {
+            handle.addEventListener('pointercancel', function() {
                 if (touchClone) { touchClone.remove(); touchClone = null; }
-                if (touchDragSrc) { touchDragSrc.classList.remove('fav-row-dragging'); }
+                if (touchDragSrc) touchDragSrc.classList.remove('fav-row-dragging');
                 document.querySelectorAll('.fav-row-over').forEach(function(el) {
                     el.classList.remove('fav-row-over');
                 });
                 touchDragSrc = null;
                 dragSrcIndex = null;
             });
-            /* --- Pointer Events drag end --- */
-
-            li.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                li.classList.add('fav-row-over');
-            });
-
-            li.addEventListener('dragleave', function() {
-                li.classList.remove('fav-row-over');
-            });
-
-            li.addEventListener('drop', function(e) {
-                e.preventDefault();
-                li.classList.remove('fav-row-over');
-                if (dragSrcIndex === null || dragSrcIndex === idx) return;
-
-                /* Reorder the array and persist */
-                var current = loadFavs();
-                var moved   = current.splice(dragSrcIndex, 1)[0];
-                current.splice(idx, 0, moved);
-                saveFavs(current);
-                renderFavList();   /* Re-render with new order */
-                dragSrcIndex = null;
-            });
         });
     }
 
-    /* ---- Open / close the sidebar ---- */
     function openSidebar() {
         document.getElementById('fav-sidebar').classList.add('fav-sidebar-open');
         document.getElementById('fav-backdrop').classList.add('fav-backdrop-visible');
         updateToggleIcon(true);
-        renderFavList();   /* Always refresh on open */
+        renderFavList();
     }
 
     function closeSidebar() {
@@ -888,9 +775,7 @@ function initFavourites() {
         updateToggleIcon(false);
     }
 
-    /* ---- Wire up the toggle button in the action bar ---- */
-    var toggleBtn = document.getElementById('fav-toggle-btn');
-    toggleBtn.addEventListener('click', function() {
+    document.getElementById('fav-toggle-btn').addEventListener('click', function() {
         var sidebar = document.getElementById('fav-sidebar');
         if (sidebar.classList.contains('fav-sidebar-open')) {
             closeSidebar();
@@ -900,13 +785,9 @@ function initFavourites() {
         this.blur();
     });
 
-    /* ---- Close on backdrop click ---- */
     document.getElementById('fav-backdrop').addEventListener('click', closeSidebar);
-
-    /* ---- Close on X button ---- */
     document.getElementById('fav-close-btn').addEventListener('click', closeSidebar);
 
-    /* ---- Play all favourites button ---- */
     var playAllBtn = document.getElementById('fav-play-all-btn');
     if (playAllBtn) {
         playAllBtn.addEventListener('click', function() {
@@ -919,16 +800,13 @@ function initFavourites() {
         });
     }
 
-    /* ---- Clear all favourites ---- */
     document.getElementById('fav-clear-btn').addEventListener('click', function() {
         saveFavs([]);
         syncAllHearts([]);
         renderFavList();
     });
 
-    /* ---- Wire up each card's heart button ---- */
     document.querySelectorAll('.fav-heart-btn').forEach(function(btn) {
-        /* Stop propagation — heart click must not trigger card play */
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
             var id    = btn.getAttribute('data-id');
@@ -936,17 +814,14 @@ function initFavourites() {
             var favs  = loadFavs();
 
             if (isFav(id, favs)) {
-                /* Already favourited — remove */
                 favs = favs.filter(function(f) { return f.id !== id; });
             } else {
-                /* Not yet favourited — add */
                 favs.push({ id: id, title: title });
             }
 
             saveFavs(favs);
             updateHeartBtn(btn, isFav(id, favs));
 
-            /* If sidebar is open, refresh the list live */
             var sidebar = document.getElementById('fav-sidebar');
             if (sidebar.classList.contains('fav-sidebar-open')) {
                 renderFavList();
@@ -954,26 +829,24 @@ function initFavourites() {
         });
     });
 
-    /* ---- Restore heart states from localStorage on load ---- */
     syncAllHearts(loadFavs());
 }
 
 
 /* ============================================================ */
-/* SECTION 4Q: GUIDE POPUP (v3.4.0)                             */
+/* SECTION 4Q: GUIDE POPUP                                      */
 /* Logic to open and close the Quick Start Guide popup.         */
 /* ============================================================ */
 function initGuide() {
-    var openBtn   = document.getElementById('guide-open-btn');
-    var closeBtn  = document.getElementById('guide-close-btn');
-    var okBtn     = document.getElementById('guide-ok-btn');
-    var backdrop  = document.getElementById('guide-backdrop');
-    var modal     = document.getElementById('guide-modal');
+    var openBtn  = document.getElementById('guide-open-btn');
+    var closeBtn = document.getElementById('guide-close-btn');
+    var okBtn    = document.getElementById('guide-ok-btn');
+    var backdrop = document.getElementById('guide-backdrop');
+    var modal    = document.getElementById('guide-modal');
 
     function openGuide() {
         backdrop.classList.add('guide-visible');
         modal.classList.add('guide-visible');
-        /* Pause player if playing — optional, but helpful */
         if (player && typeof player.pauseVideo === 'function' && player.getPlayerState() === 1) {
             player.pauseVideo();
         }
@@ -992,13 +865,32 @@ function initGuide() {
 
 
 /* ============================================================ */
+/* SECTION 4R: NAVIGATION DROPDOWNS                             */
+/* Wires up the collapsible NAVIGATION NODES and COMMAND        */
+/* CONTROL toggles. Moved here from inline script in index.html */
+/* so all JS lives in one place.                                */
+/* ============================================================ */
+function initDropdowns() {
+    function setupDropdown(toggleId, contentId) {
+        var toggle  = document.getElementById(toggleId);
+        var content = document.getElementById(contentId);
+        if (!toggle || !content) return;
+        toggle.addEventListener('click', function() {
+            var isOpen = content.classList.toggle('open');
+            toggle.classList.toggle('open', isOpen);
+            toggle.setAttribute('aria-expanded', isOpen);
+        });
+    }
+    setupDropdown('nav-toggle', 'nav-content');
+    setupDropdown('cmd-toggle', 'cmd-content');
+}
+
+
+/* ============================================================ */
 /* SECTION 4J: INITIALISATION                                   */
-/* Entry point. loadTracks() fetches tracks.json and builds the */
-/* grid; initGridControls() wires up the view switcher and      */
-/* restores the saved grid preference from localStorage.        */
-/* initFavourites() is called inside loadTracks() once the      */
-/* card DOM is ready (heart buttons must exist first).          */
+/* Entry point. Called once the DOM is ready.                   */
 /* ============================================================ */
 loadTracks();
 initGridControls();
 initGuide();
+initDropdowns();
