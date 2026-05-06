@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ELECTROSCAPE // MUSIC</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body { margin: 0; padding: 0; background: #000; color: #fff; overflow-x: hidden; }
+
+        /* ── Navigation ── */
+        nav {
+            padding: 20px;
+            text-align: left;
+        }
+        nav a {
+            font-family: 'Orbitron', sans-serif;
+            color: #444;
+            text-decoration: none;
+            font-size: 11px;          /* ← NAV FONT SIZE */
+            font-weight: bold;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            margin-right: 20px;
+        }
+        nav a:hover { color: #00ffcc; }
+
+        /* ── Page heading — "STREAMING // DIRECTORY" ── */
+        .page-header {
+            padding: 10px 20px 30px 20px;
+            font-family: 'Michroma', sans-serif;
+            font-size: 13px;          /* ← PAGE HEADER FONT SIZE */
+            color: #fff;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        /* ── Platform section wrapper ── */
+        .platform-section {
+            padding: 0 20px 50px 20px;
+            width: 98%;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        /* ── Platform section heading e.g. "● Spotify" ── */
+        .platform-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;          /* ← PLATFORM HEADING FONT SIZE (YouTube / Spotify / etc) */
+            font-weight: bold;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #fff;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .platform-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #1a1a1a;
+        }
+
+        /* Coloured dot beside each platform heading */
+        .platform-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .dot-youtube { background: #ff0000; }
+        .dot-spotify { background: #1db954; }
+        .dot-tidal   { background: #00ffff; }
+        .dot-deezer  { background: #a238ff; }
+
+        /* ── Card grid — 4 columns by default ──
+           To change column count edit the repeat() numbers below.
+           The @media blocks lower down handle smaller screens. */
+        .music-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);   /* ← COLUMNS (desktop) */
+            gap: 15px;
+        }
+
+        /* ── Individual card ── */
+        .music-card {
+            background: #080808;
+            border: 1px solid #1a1a1a;
+            padding: 24px 20px 20px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Default hover (fallback) */
+        .music-card:hover {
+            border-color: #00ffcc;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Platform-coloured hover borders */
+        .music-card.spotify:hover { border-color: #1db954; box-shadow: 0 0 15px rgba(29,185,84,0.15); }
+        .music-card.tidal:hover   { border-color: #00ffff; box-shadow: 0 0 15px rgba(0,255,255,0.15); }
+        .music-card.deezer:hover  { border-color: #a238ff; box-shadow: 0 0 15px rgba(162,56,255,0.15); }
+        .music-card.youtube:hover { border-color: #ff0000; box-shadow: 0 0 15px rgba(255,0,0,0.15); }
+
+        /* Small platform badge at top of card e.g. "SPOTIFY" */
+        .card-platform {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px;           /* ← PLATFORM BADGE FONT SIZE inside card */
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        .card-platform.spotify { color: #1db954; }
+        .card-platform.tidal   { color: #00ffff; }
+        .card-platform.deezer  { color: #a238ff; }
+        .card-platform.youtube { color: #ff0000; }
+
+        /* Main card title e.g. "Electroscape X" */
+        .card-title {
+            font-family: 'Michroma', sans-serif;
+            font-size: 18px;          /* ← CARD TITLE FONT SIZE */
+            color: #ffffff;
+            text-transform: uppercase;
+            line-height: 1.3;
+        }
+
+        /* Small subtitle line e.g. "Playlist · 569 tracks" */
+        .card-meta {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px;           /* ← CARD META FONT SIZE */
+            color: #ffffff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: auto;
+        }
+
+        /* Arrow in bottom-right corner of card */
+        .card-arrow {
+            position: absolute;
+            bottom: 18px;
+            right: 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            color: #333;
+            transition: 0.3s;
+        }
+        .music-card:hover .card-arrow         { color: #00ffcc; }
+        .music-card.spotify:hover .card-arrow { color: #1db954; }
+        .music-card.tidal:hover .card-arrow   { color: #00ffff; }
+        .music-card.deezer:hover .card-arrow  { color: #a238ff; }
+        .music-card.youtube:hover .card-arrow { color: #ff0000; }
+
+        /* ── Responsive breakpoints ── */
+        @media (max-width: 1000px) {
+            .music-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 700px) {
+            .music-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 420px) {
+            .music-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">ELECTROSCAPE</a>
+        <a href="tv.html">TV</a>
+        <a href="music.html" style="color:#00ffcc;">MUSIC</a>
+    </nav>
+
+    <div class="page-header">STREAMING // DIRECTORY</div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         YOUTUBE SECTION
+         To add more cards: copy an <a class="music-card youtube">
+         block and update the href and card-title.
+    ══════════════════════════════════════════════════════════ -->
+    <div class="platform-section">
+        <div class="platform-label">
+            <span class="platform-dot dot-youtube"></span>
+            YouTube
+        </div>
+        <div class="music-grid">
+
+            <a class="music-card youtube" href="https://www.youtube.com/@ElectroscapeX" target="_blank">
+                <span class="card-platform youtube">YouTube</span>
+                <span class="card-title">ElectroscapeX</span>
+                <span class="card-meta">Channel</span>
+                <span class="card-arrow">→</span>
+            </a>
+
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         SPOTIFY SECTION
+         To add a new playlist card: copy one of the <a> blocks
+         below, paste it inside .music-grid, update href and text.
+         To change a name: edit the text inside <span class="card-title">.
+    ══════════════════════════════════════════════════════════ -->
+    <div class="platform-section">
+        <div class="platform-label">
+            <span class="platform-dot dot-spotify"></span>
+            Spotify
+        </div>
+        <div class="music-grid">
+
+            <a class="music-card spotify" href="https://open.spotify.com/user/3147hrg3uxl6ywo7dja4zzwhrdha/playlists" target="_blank">
+                <span class="card-platform spotify">Spotify</span>
+                <span class="card-title">Electroscape</span>     <!-- Profile 1 name — edit here -->
+                <span class="card-meta">Profile Page</span>
+                <span class="card-arrow">→</span>
+            </a>
+
+ 	  
+            <a class="music-card spotify" href="https://open.spotify.com/playlist/2mz99e3dQJsrtTCCrS3pCf" target="_blank">
+                <span class="card-platform spotify">Spotify</span>
+                <span class="card-title">Electroscape X</span>    <!-- Playlist 1 name — edit here -->
+                <span class="card-meta">Playlist</span>
+                <span class="card-arrow">→</span>
+            </a>
+
+            <a class="music-card spotify" href="https://open.spotify.com/playlist/5FPPQ0dQV7LFdOJGx83mWl" target="_blank">
+                <span class="card-platform spotify">Spotify</span>
+                <span class="card-title">Trance Classics</span>   <!-- Playlist 2 name — edit here -->
+                <span class="card-meta">Playlist</span>
+                <span class="card-arrow">→</span>
+            </a>
+
+ 	    <a class="music-card spotify" href="https://open.spotify.com/playlist/5BOGr40V6nzLhNfMKbRkON" target="_blank">
+ 	     <span class="card-platform spotify">Spotify</span>
+	     <span class="card-title">Soundscape 5k </span>     <!-- Playlist 3 name — edit here -->
+  	     <span class="card-meta">Playlist</span>
+ 	     <span class="card-arrow">→</span>
+	     </a>
+
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         TIDAL SECTION
+         To add a new playlist: copy an <a> block, paste inside
+         .music-grid, update href, card-title, and card-meta.
+    ══════════════════════════════════════════════════════════ -->
+    <div class="platform-section">
+        <div class="platform-label">
+            <span class="platform-dot dot-tidal"></span>
+            Tidal
+        </div>
+        <div class="music-grid">
+
+            <a class="music-card tidal" href="https://tidal.com/playlist/f2d1abca-f526-4ff9-81c3-72c30ca71545" target="_blank">
+                <span class="card-platform tidal">Tidal</span>
+                <span class="card-title">Electroscape X</span>    <!-- Playlist 1 name — edit here -->
+                <span class="card-meta">Playlist</span>
+                <span class="card-arrow">→</span>
+            </a>
+
+            <a class="music-card tidal" href="https://tidal.com/playlist/bc4655e4-80fd-418a-989a-7b3449fbaa98" target="_blank">
+                <span class="card-platform tidal">Tidal</span>
+                <span class="card-title">Trance Classics</span>   <!-- Playlist 2 name — edit here -->
+                <span class="card-meta">Playlist</span>
+                <span class="card-arrow">→</span>
+            </a>
+
+            <!-- TO ADD A NEW TIDAL PLAYLIST: copy the block below, remove the comment tags,
+                 replace the href with your playlist URL, and update the title/meta text.
+
+            <a class="music-card tidal" href="https://tidal.com/playlist/YOUR-PLAYLIST-ID" target="_blank">
+                <span class="card-platform tidal">Tidal</span>
+                <span class="card-title">Playlist Name</span>
+                <span class="card-meta">Playlist · X tracks</span>
+                <span class="card-arrow">→</span>
+            </a>
+            -->
+
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         DEEZER SECTION
+         To add a new playlist: copy an <a> block, paste inside
+         .music-grid, update href, card-title, and card-meta.
+    ══════════════════════════════════════════════════════════ -->
+    <div class="platform-section">
+        <div class="platform-label">
+            <span class="platform-dot dot-deezer"></span>
+            Deezer
+        </div>
+        <div class="music-grid">
+
+         
+            -->
+
+        </div>
+    </div>
+
+</body>
+</html>

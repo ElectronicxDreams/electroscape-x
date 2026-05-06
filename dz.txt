@@ -1,0 +1,44 @@
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         DEEZER SECTION
+         To add a new playlist: copy an <a> block, paste inside
+         .music-grid, update href, card-title, and card-meta.
+    ══════════════════════════════════════════════════════════ -->
+    <div class="platform-section">
+        <div class="platform-label">
+            <span class="platform-dot dot-deezer"></span>
+            Deezer
+        </div>
+        <div class="music-grid">
+
+            <a class="music-card deezer" href="https://link.deezer.com/s/33bHb6Wk6pRiI4qa6yLzr" target="_blank">
+                <span class="card-platform deezer">Deezer</span>
+                <span class="card-title">Electroscape</span>      <!-- Playlist 1 name — edit here -->
+                <span class="card-meta">Playlist</span>
+                <span class="card-arrow">→</span>
+            </a>
+
+            <a class="music-card deezer" href="https://link.deezer.com/s/33bHcNMMIW1H4ekD6yAjc" target="_blank">
+                <span class="card-platform deezer">Deezer</span>
+                <span class="card-title">Trance Classics</span>   <!-- Playlist 2 name — edit here -->
+                <span class="card-meta">Playlist</span>
+                <span class="card-arrow">→</span>
+            </a>
+
+            <!-- TO ADD A NEW DEEZER PLAYLIST: copy the block below, remove the comment tags,
+                 replace the href with your Deezer link, and update the title/meta text.
+
+            <a class="music-card deezer" href="https://link.deezer.com/s/YOUR-LINK" target="_blank">
+                <span class="card-platform deezer">Deezer</span>
+                <span class="card-title">Playlist Name</span>
+                <span class="card-meta">Playlist</span>
+                <span class="card-arrow">→</span>
+            </a>
+            -->
+
+        </div>
+    </div>
+
+</body>
+</html>
