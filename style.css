@@ -1,68 +1,68 @@
 /*
-    Name: style.css | Version: 6.0.0
+    Name: style.css | Version: 4.2.0
     Project: Electroscape
     Description: All visual styles for the Electroscape music video gallery.
                  Edit this file for colour, layout, or spacing changes.
                  Page structure lives in index.html.
                  Playback logic lives in player.js.
 
-    Sections:
-        2A     — Page base
-        2A-2   — Ambient orb layer  ← LIVE BACKGROUND (swap note below)
-        2B     — Top navigation
-        2C     — Page title (h1) + fly-in animation
-        2D     — Featured video player
-        2E     — Command control box + action rows
-        2E-2   — Grid view controls (bare SVG icon buttons)
-        2F     — Video grid — default responsive layout
-        2F-2   — Video grid — custom density views (dense / default / max)
-        2G     — Video cards
-        2H     — Mobile adjustments
-        2I     — Orbital HUD (persistent footer mini-player)
-        2J     — Favourites sidebar
-        2K     — Guide popup
+    Changelog:
+        v2.1.0 — Orbital HUD footer styles added
+        v2.9.0 — Unified view-box control styles added
+        v3.0.0 — Michroma title font; elasticAssemble animation; HUD progress bar
+        v3.1.0 — View-box styles replaced with bare SVG icon button styles (Option B).
+                  Option D (cycle button) styles also included, always active — the
+                  button itself is toggled via HTML/JS, not CSS.
+        v4.1.0 — Ambient orb background: three drifting radial-gradient divs replace
+                  static body gradient. GPU-composited via transform — tablet safe.
 
-    ── BACKGROUND SWAP GUIDE ──────────────────────────────────────────────
-    The live animated orb background lives in Section 2A-2 below.
-    To revert to a plain static backdrop, replace Section 2A-2 entirely
-    with the content from style-static-bg.css (kept in your project folder).
-    The orb <div> elements in index.html (marked AMBIENT ORB LAYER) can
-    then be removed — they do nothing without the CSS animation.
-    ───────────────────────────────────────────────────────────────────────
+    Sections:
+        2A   — Page base
+        2A-2 — Ambient orb layer (drifting background orbs)
+        2B — Top navigation
+        2C — Page title (h1) + fly-in animation
+        2D — Featured video player
+        2E — Action bar (Prev / Shuffle / Next buttons)
+        2E-2 — Grid view controls (Option B bare icons + Option D cycle button)
+        2F — Video grid — default responsive layout
+        2F-2 — Video grid — custom density views (dense / default / max)
+        2G — Video cards
+        2H — Mobile adjustments
+        2I — Orbital HUD (persistent footer mini-player)
 */
 
 
 /* ============================================================ */
 /* SECTION 2A: PAGE BASE                                        */
+/* Sets the overall page background, text colour, font,        */
+/* and prevents a horizontal scrollbar appearing.              */
 /* ============================================================ */
 body {
-    background: #07080d;
-    color: #fff;
-    font-family: 'Orbitron', sans-serif;
+    background: #07080d;                    /* Deep near-black base — orbs sit above this */
+    color: #fff;                            /* Default text colour: white */
+    font-family: 'Orbitron', sans-serif;    /* Futuristic font used throughout */
     margin: 0;
-    padding: 20px;
-    text-align: center;
-    overflow-x: hidden;
+    padding: 20px;                          /* Small gap around the page edge */
+    text-align: center;                     /* Centre-align everything by default */
+    overflow-x: hidden;                     /* Prevent accidental horizontal scroll */
 }
 
 
 /* ============================================================ */
 /* SECTION 2A-2: AMBIENT ORB LAYER                              */
 /* Three fixed <div> orbs that drift slowly behind all content. */
-/* Uses CSS transform (GPU-composited).                         */
+/* Uses CSS transform (GPU-composited) — zero CPU cost.         */
 /* Orb divs are injected at the top of <body> in index.html.   */
-/* ── To revert to static backdrop: see BACKGROUND SWAP GUIDE   */
-/*    in the file header above.                                 */
 /* ============================================================ */
 .orb {
     position: fixed;
     border-radius: 50%;
-    pointer-events: none;
-    z-index: -1;
-    will-change: transform;
+    pointer-events: none;       /* Never intercepts clicks */
+    z-index: 0;                 /* Behind all page content */
+    will-change: transform;     /* Hints browser to GPU-composite this layer */
 }
 
-/* Teal orb — top-left */
+/* Teal orb — top-left, drifts noticeably down-right then back */
 .orb-teal {
     width: 70vw;
     height: 55vh;
@@ -72,7 +72,7 @@ body {
     animation: drift-teal 12s ease-in-out infinite;
 }
 
-/* Violet orb — bottom-right */
+/* Violet orb — bottom-right, drifts up-left then back */
 .orb-violet {
     width: 60vw;
     height: 55vh;
@@ -82,7 +82,7 @@ body {
     animation: drift-violet 15s ease-in-out infinite;
 }
 
-/* Blue orb — centre */
+/* Blue orb — centre, mid-speed wandering drift */
 .orb-blue {
     width: 45vw;
     height: 40vh;
@@ -92,6 +92,7 @@ body {
     animation: drift-blue 18s ease-in-out infinite;
 }
 
+/* Drift keyframes — 150–220px travel, 12–18s durations = clearly visible motion */
 @keyframes drift-teal {
     0%   { transform: translate(0,     0);      }
     30%  { transform: translate(200px, 180px);  }
@@ -107,30 +108,18 @@ body {
 }
 
 @keyframes drift-blue {
-    0%   { transform: translate(0,      0);      }
-    25%  { transform: translate(150px,  -160px); }
-    55%  { transform: translate(-130px, 140px);  }
-    100% { transform: translate(0,      0);      }
+    0%   { transform: translate(0,      0);     }
+    25%  { transform: translate(150px,  -160px);}
+    55%  { transform: translate(-130px, 140px); }
+    100% { transform: translate(0,      0);     }
 }
 
-/* All page content sits above the orb layer */
+/* Ensure all page content sits above the orb layer */
 body > *:not(.orb) {
     position: relative;
     z-index: 1;
 }
 
-/* Solid mask — covers orbs behind nav and title, sits below page content */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 165px;        /* ← adjust this value to sit just below the title */
-    background: #07080d;  /* matches body background */
-    z-index: 0;           /* above orbs (z-index -1) but below content (z-index 1) */
-    pointer-events: none;
-}
 
 /* ============================================================ */
 /* SECTION 2B: TOP NAVIGATION BAR                               */
@@ -152,14 +141,14 @@ nav a {
 }
 
 nav a:hover {
-    color: #00ffcc;
+    color: #00ffcc;                         /* Teal accent on hover */
 }
 
 
 /* ============================================================ */
 /* SECTION 2C: PAGE TITLE (H1)                                  */
-/* Font: Michroma. Each letter is a separate <span> so the      */
-/* elasticAssemble animation can stagger them on load.          */
+/* Font: Michroma. Each letter is a separate <span> in the HTML */
+/* so the elasticAssemble animation can stagger them on load.   */
 /* ============================================================ */
 .fly-in-title {
     font-family: 'Michroma', sans-serif;
@@ -196,16 +185,26 @@ nav a:hover {
 .fly-in-title span:nth-child(11) { animation-delay: 2.1s; }
 .fly-in-title span:nth-child(12) { animation-delay: 2.3s; }
 
+/* Slides in from far left with an overshoot-and-snap effect */
 @keyframes elasticAssemble {
-    0%   { opacity: 0; transform: translateX(-100vw); }
-    30%  { opacity: 1; }
-    100% { opacity: 1; transform: translateX(0); }
+    0% {
+        opacity: 0;
+        transform: translateX(-100vw);
+    }
+    30% {
+        opacity: 1;         /* Fades in quickly as it crosses the screen */
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 
 /* ============================================================ */
 /* SECTION 2D: FEATURED VIDEO PLAYER                            */
-/* Max-width container centres the player on wide screens.      */
+/* Max-width container centres and constrains the player on     */
+/* wide screens. 16:9 aspect ratio is maintained via CSS.       */
 /* #now-playing-label is also a click target (see player.js).   */
 /* ============================================================ */
 .featured-box {
@@ -230,7 +229,7 @@ nav a:hover {
     letter-spacing: 5px;
     margin-bottom: 15px;
     min-height: 15px;
-    cursor: pointer;
+    cursor: pointer;                /* Clickable — toggles play/pause */
     transition: color 0.3s;
 }
 
@@ -240,14 +239,14 @@ nav a:hover {
 
 
 /* ============================================================ */
-/* SECTION 2E: COMMAND CONTROL BOX + ACTION ROWS                */
-/* Rounded container with stacked rows:                         */
-/*   Row 1 — Prev | Play/Pause | Next                           */
-/*   Row 2 — Grid density icons                                 */
-/*   Row 3 — Override Sequence (shuffle)                        */
-/*   Row 4 — Sector Zero (favourites)                           */
+/* SECTION 2E: COMMAND CONTROL BOX + ACTION ROWS               */
+/* D2 layout: rounded container with three stacked rows.       */
+/* Row 1 — Prev | viewport icons | Next (all on one line)      */
+/* Row 2 — Override Sequence (full width)                      */
+/* Row 3 — Sector Zero (full width)                            */
 /* ============================================================ */
 
+/* Shared action row */
 .action-bar {
     margin: 0 auto;
     display: flex;
@@ -292,7 +291,7 @@ nav a:hover {
     color: rgba(0, 255, 204, 0.85);
 }
 
-/* Prev / Next — square fixed-size buttons */
+/* Prev / Next — square, strong border, fixed size */
 .cmd-arrow-btn {
     border-radius: 6px;
     border: 2px solid rgba(0, 255, 204, 0.6);
@@ -324,6 +323,7 @@ nav a:hover {
     justify-content: center;
     flex-shrink: 0;
     padding: 0;
+    /* idle glow */
     filter: drop-shadow(0 0 4px rgba(0,255,204,0.2));
     transition: filter 0.2s ease-out, transform 0.15s ease-out;
 }
@@ -337,22 +337,25 @@ nav a:hover {
     transform: scale(0.97);
 }
 
+/* Playing state — brighter glow */
+.cmd-play-btn.is-playing {
+    filter: drop-shadow(0 0 8px rgba(0,255,204,0.45));
+}
+
 /* Breathing glow while playing */
 @keyframes playGlow {
     0%, 100% { filter: drop-shadow(0 0 6px rgba(0,255,204,0.35)); }
     50%       { filter: drop-shadow(0 0 14px rgba(0,255,204,0.7)); }
 }
-
 .cmd-play-btn.is-playing {
     animation: playGlow 2.4s ease-in-out infinite;
 }
-
 .cmd-play-btn.is-playing:hover {
     animation: none;
     filter: drop-shadow(0 0 16px rgba(0,255,204,0.8));
 }
 
-/* Outer rotating ring */
+/* ── Outer ring ── */
 .play-ring {
     position: absolute;
     inset: 0;
@@ -373,6 +376,7 @@ nav a:hover {
     stroke: rgba(0,255,204,0.5);
     stroke-width: 1.5;
     stroke-linecap: round;
+    /* circumference of r=34 ≈ 213.6 */
     stroke-dasharray: 60 153.6;
     stroke-dashoffset: 0;
     transform-origin: 40px 40px;
@@ -380,6 +384,7 @@ nav a:hover {
     transition: opacity 0.3s ease-out;
 }
 
+/* Rotate the arc while playing */
 @keyframes ringRotate {
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }
@@ -390,7 +395,7 @@ nav a:hover {
     animation: ringRotate 3s linear infinite;
 }
 
-/* Morph icon — triangle ↔ pause bars */
+/* ── Morph icon ── */
 .play-icon {
     position: relative;
     width: 26px;
@@ -399,18 +404,22 @@ nav a:hover {
     flex-shrink: 0;
 }
 
+/* Left bar / left edge of triangle */
 .play-bar-left {
     fill: rgba(0,255,204,0.85);
+    /* play: left edge of triangle — thin wedge */
     d: path("M7,4 L17,12 L7,20 Z");
     transition: d 0.18s ease-out, fill 0.18s ease-out;
 }
 
+/* Right bar — hidden in play state, appears in pause */
 .play-bar-right {
     fill: rgba(0,255,204,0.85);
     d: path("M7,4 L7,4 L7,20 L7,20 Z");
     transition: d 0.18s ease-out, fill 0.18s ease-out;
 }
 
+/* Pause state — morph to two bars */
 .cmd-play-btn.is-playing .play-bar-left {
     d: path("M5,4 L9,4 L9,20 L5,20 Z");
 }
@@ -418,7 +427,7 @@ nav a:hover {
     d: path("M13,4 L17,4 L17,20 L13,20 Z");
 }
 
-/* Click ripple */
+/* ── Click ripple ── */
 .play-ripple {
     position: absolute;
     inset: 0;
@@ -435,16 +444,18 @@ nav a:hover {
     animation: rippleOut 0.35s ease-out forwards;
 }
 
-/* Row layouts */
+/* Row 1: transport row — prev, play, next */
 .cmd-row-transport {
     padding: 20px 20px 16px;
     gap: 20px;
 }
 
+/* Row 2: grid icons row */
 .cmd-row-icons {
     padding: 0 20px 16px;
 }
 
+/* Row 2 & 3: full-width button rows */
 .cmd-row-full {
     padding: 0 20px 14px;
     width: 100%;
@@ -466,6 +477,7 @@ nav a:hover {
     border-radius: 6px;
 }
 
+/* Mobile adjustments */
 @media (max-width: 600px) {
     .cmd-arrow-btn {
         width: 44px;
@@ -483,18 +495,28 @@ nav a:hover {
 
 /* ============================================================ */
 /* SECTION 2E-2: GRID VIEW CONTROLS                             */
-/* Bare SVG icon buttons — three density modes.                 */
+/* Styles for both UI options. Only one option's HTML is active */
+/* at a time — toggled in index.html (Section 3E).              */
+/*                                                              */
+/* Option B — Bare SVG icon buttons (ACTIVE in HTML)            */
+/* Option D — Single cycling ctrl-btn (INACTIVE in HTML)        */
 /* ============================================================ */
+
+/* view-controls-bar — no longer a standalone row, now lives inside cmd-row-transport */
 .view-controls-bar {
     margin: 0;
 }
 
+/* --- Option B: Bare SVG icon buttons --- */
+
+/* Flex row wrapper — no border or background of its own */
 .bare-view-wrap {
     display: flex;
     align-items: center;
     gap: 4px;
 }
 
+/* Each icon button: transparent, no border, just the SVG */
 .bare-view-btn {
     background: transparent;
     border: none;
@@ -504,30 +526,51 @@ nav a:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.2;
+    opacity: 0.2;                   /* Inactive: ghosted */
     transition: opacity 0.25s;
     outline: none;
 }
 
 .bare-view-btn svg rect {
-    fill: #00ffcc;
+    fill: #00ffcc;                  /* All icons use teal fill */
 }
 
 .bare-view-btn.grid-btn-active {
-    opacity: 1;
+    opacity: 1;                     /* Active: full teal */
 }
 
 .bare-view-btn:hover {
-    opacity: 0.6;
+    opacity: 0.6;                   /* Hover: mid-opacity preview */
 }
 
 .bare-view-btn:focus {
     outline: none;
 }
 
+/* --- Option D: Single cycling button --- */
+
+/* Extends .ctrl-btn with icon + label side by side */
+#cycle-view-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 4px;
+}
+
+#cycle-view-icon svg rect {
+    fill: rgba(0, 255, 204, 0.7);
+    transition: fill 0.25s;
+}
+
+#cycle-view-btn:hover #cycle-view-icon svg rect {
+    fill: #00ffcc;
+}
+
 
 /* ============================================================ */
 /* SECTION 2F: VIDEO GRID — DEFAULT RESPONSIVE LAYOUT           */
+/* Base grid used when no custom view class is applied.         */
+/* Breakpoints step down column width as the viewport shrinks.  */
 /* ============================================================ */
 .grid {
     display: grid;
@@ -563,10 +606,15 @@ nav a:hover {
 /* ============================================================ */
 /* SECTION 2F-2: VIDEO GRID — CUSTOM DENSITY VIEWS              */
 /* Applied by player.js adding .view-dense or .view-max to      */
-/* #video-grid. No class = default layout (Section 2F).         */
+/* #video-grid. No class = default Core layout (Section 2F).    */
+/*                                                              */
+/* Breakdowns per viewport:                                     */
+/*   Portrait mobile  : dense=1col, max=1col                    */
+/*   Landscape/tablet : dense=auto-small, max=auto-large        */
+/*   Desktop          : dense=auto 220px, max=auto 550px        */
 /* ============================================================ */
 
-/* Portrait mobile */
+/* Portrait mobile (up to 600px) */
 @media (max-width: 600px) and (orientation: portrait) {
     .grid.view-dense {
         grid-template-columns: repeat(1, 1fr);
@@ -578,7 +626,7 @@ nav a:hover {
     }
 }
 
-/* Landscape mobile and small tablet */
+/* Landscape mobile and small tablet (601px–1300px) */
 @media (min-width: 601px) and (max-width: 1300px) {
     .grid.view-dense {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -590,7 +638,7 @@ nav a:hover {
     }
 }
 
-/* Desktop */
+/* Desktop (1301px and above) */
 @media (min-width: 1301px) {
     .grid.view-dense {
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -606,8 +654,8 @@ nav a:hover {
 /* ============================================================ */
 /* SECTION 2G: VIDEO CARDS                                      */
 /* .video cards are injected by player.js from tracks.json.     */
-/* .is-playing highlights the active track with a pulsing       */
-/* teal border.                                                 */
+/* .is-playing is added by player.js to highlight the active    */
+/* track with a pulsing teal border.                            */
 /* ============================================================ */
 .video {
     background: #080808;
@@ -624,6 +672,7 @@ nav a:hover {
     background: #111;
 }
 
+/* Pulsing teal glow on the currently playing card */
 @keyframes activePulse {
     0%   { box-shadow: 0 0 5px rgba(0, 255, 204, 0.1); }
     50%  { box-shadow: 0 0 20px rgba(0, 255, 204, 0.35); }
@@ -635,7 +684,7 @@ nav a:hover {
     animation: activePulse 2s infinite ease-in-out;
 }
 
-/* 16:9 thumbnail */
+/* 16:9 thumbnail, fills the top of the card */
 .thumb-container {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -644,7 +693,7 @@ nav a:hover {
     border-radius: 4px 4px 0 0;
 }
 
-/* Track title below thumbnail */
+/* Track title below the thumbnail */
 .video-label {
     display: block;
     width: 100%;
@@ -677,7 +726,7 @@ nav a:hover {
     padding: 10px 18px;
     opacity: 0;
     transition: opacity 0.3s ease;
-    pointer-events: none;
+    pointer-events: none;           /* Click passes through to the card */
 }
 
 .video:hover .overlay-btn {
@@ -687,6 +736,7 @@ nav a:hover {
 
 /* ============================================================ */
 /* SECTION 2H: MOBILE ADJUSTMENTS                               */
+/* General small-screen tweaks not covered by grid breakpoints. */
 /* ============================================================ */
 @media (max-width: 900px) {
     h1 {
@@ -703,7 +753,8 @@ nav a:hover {
 
 /* ============================================================ */
 /* SECTION 2I: ORBITAL HUD — Persistent footer mini-player      */
-/* Fixed bar at the bottom. Starts invisible; player.js adds    */
+/* Fixed bar at the bottom of the viewport. Starts invisible    */
+/* (opacity 0, pointer-events none). player.js adds             */
 /* .hud-active on first play to reveal it.                      */
 /* ============================================================ */
 #hud-dock {
@@ -748,7 +799,7 @@ nav a:hover {
     pointer-events: none;
 }
 
-/* Expanded hit area above the bar for easier seeking */
+/* Invisible expanded hit area above the progress bar for easier seeking */
 #hud-progress-container::before {
     content: '';
     position: absolute;
@@ -760,6 +811,7 @@ nav a:hover {
     background: transparent;
 }
 
+/* Inner row: title left, controls right */
 #hud-inner {
     flex: 1;
     display: flex;
@@ -770,7 +822,7 @@ nav a:hover {
     min-width: 0;
 }
 
-/* Track title — truncates with ellipsis */
+/* Track title truncates with ellipsis if too long */
 #hud-track-title {
     font-size: 9px;
     letter-spacing: 3px;
@@ -791,6 +843,7 @@ nav a:hover {
     flex-shrink: 0;
 }
 
+/* Prev and Next buttons */
 .hud-btn {
     background: transparent;
     border: 1px solid #333;
@@ -810,7 +863,7 @@ nav a:hover {
     color: #fff;
 }
 
-/* Play/Pause — always teal-bordered */
+/* Play/Pause button — always teal-bordered to stand out */
 .hud-playpause {
     border-color: #00ffcc;
     color: #00ffcc;
@@ -821,6 +874,7 @@ nav a:hover {
     background: rgba(0, 255, 204, 0.1);
 }
 
+/* Small phone: tighten padding so all HUD elements stay visible */
 @media (max-width: 500px) {
     #hud-inner {
         padding: 0 10px;
@@ -838,13 +892,14 @@ nav a:hover {
 
 
 /* ============================================================ */
-/* SECTION 2J: FAVOURITES SIDEBAR                               */
-/* Slide-out panel from the right. Backdrop behind it.          */
-/* Card heart buttons, sidebar rows, drag-to-reorder UX.        */
+/* SECTION 2J: FAVOURITES SIDEBAR (v3.3.0)                      */
+/* All styles for the slide-out favourites panel, backdrop,     */
+/* card heart buttons, sidebar rows, and drag-to-reorder UX.    */
+/* Injected markup lives in index.html Section 3I.              */
 /* Interaction logic lives in player.js Section 4P.             */
 /* ============================================================ */
 
-/* Backdrop */
+/* ---- Backdrop — semi-transparent overlay behind the panel ---- */
 #fav-backdrop {
     display: none;
     position: fixed;
@@ -860,7 +915,7 @@ nav a:hover {
     opacity: 1;
 }
 
-/* Sidebar panel */
+/* ---- Sidebar panel ---- */
 #fav-sidebar {
     position: fixed;
     top: 0;
@@ -873,16 +928,16 @@ nav a:hover {
     z-index: 1200;
     display: flex;
     flex-direction: column;
-    transform: translateX(100%);
+    transform: translateX(100%);          /* Hidden off-screen to the right */
     transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
 }
 
 #fav-sidebar.fav-sidebar-open {
-    transform: translateX(0);
+    transform: translateX(0);            /* Slide in */
 }
 
-/* Sidebar header */
+/* ---- Sidebar header ---- */
 #fav-header {
     display: flex;
     align-items: center;
@@ -916,7 +971,7 @@ nav a:hover {
     color: #00ffcc;
 }
 
-/* Empty state */
+/* ---- Empty state message ---- */
 #fav-empty {
     display: flex;
     flex-direction: column;
@@ -934,7 +989,7 @@ nav a:hover {
     line-height: 1.8;
 }
 
-/* Scrollable list */
+/* ---- Scrollable favourites list ---- */
 #fav-list {
     list-style: none;
     margin: 0;
@@ -945,10 +1000,17 @@ nav a:hover {
     scrollbar-color: #222 transparent;
 }
 
-#fav-list::-webkit-scrollbar { width: 4px; }
-#fav-list::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+#fav-list::-webkit-scrollbar {
+    width: 4px;
+}
 
-/* Individual favourite row */
+#fav-list::-webkit-scrollbar-thumb {
+    background: #222;
+    border-radius: 2px;
+}
+
+/* ---- Individual favourite row — stacked card layout ---- */
+/* Each track is a vertical card: thumbnail / title / controls  */
 .fav-row {
     display: flex;
     flex-direction: column;
@@ -963,15 +1025,26 @@ nav a:hover {
     position: relative;
 }
 
-.fav-row:hover { background: #111; }
-.fav-row:active { cursor: grabbing; }
-.fav-row-dragging { opacity: 0.4; }
+.fav-row:hover {
+    background: #111;
+}
+
+.fav-row:active {
+    cursor: grabbing;
+}
+
+/* Drag source: ghost while dragging */
+.fav-row-dragging {
+    opacity: 0.4;
+}
+
+/* Drop target: teal top-border highlight */
 .fav-row-over {
     border-top: 2px solid rgba(0, 255, 204, 0.5);
     background: #0d0d0d;
 }
 
-/* Drag handle — top-right corner of row */
+/* ---- Drag handle — small dots pinned to top-right corner of thumbnail ---- */
 .fav-drag-handle {
     position: absolute;
     top: 8px;
@@ -991,9 +1064,11 @@ nav a:hover {
     transition: opacity 0.2s;
 }
 
-.fav-row:hover .fav-drag-handle { opacity: 0.7; }
+.fav-row:hover .fav-drag-handle {
+    opacity: 0.7;
+}
 
-/* Thumbnail — full width, 16:9 */
+/* ---- LINE 1: Thumbnail — full width, 16:9, doubled size ---- */
 .fav-row-thumb {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -1004,7 +1079,7 @@ nav a:hover {
     flex-shrink: 0;
 }
 
-/* Title */
+/* ---- LINE 2: Title ---- */
 .fav-row-title {
     width: 100%;
     font-family: 'Orbitron', sans-serif;
@@ -1020,7 +1095,7 @@ nav a:hover {
     overflow: hidden;
 }
 
-/* Controls row */
+/* ---- LINE 3: Controls row — up / down / play / remove ---- */
 .fav-row-controls {
     display: flex;
     align-items: center;
@@ -1038,20 +1113,42 @@ nav a:hover {
     align-items: center;
     justify-content: center;
     transition: border-color 0.2s, color 0.2s;
-    flex: 1;
+    flex: 1;                    /* All buttons share the row equally */
 }
 
-.fav-play-btn svg { width: 12px; height: 12px; }
+.fav-play-btn svg {
+    width: 12px;
+    height: 12px;
+}
 
-.fav-move-btn { font-size: 10px; color: #555; }
-.fav-move-btn:hover { border-color: #00ffcc; color: #00ffcc; }
-.fav-play-btn:hover { border-color: #00ffcc; }
-.fav-remove-btn { color: #444; font-size: 11px; line-height: 1; }
-.fav-remove-btn:hover { border-color: #ff4466; color: #ff4466; }
+.fav-move-btn {
+    font-size: 10px;
+    color: #555;
+}
 
-/* Sidebar footer */
+.fav-move-btn:hover {
+    border-color: #00ffcc;
+    color: #00ffcc;
+}
+
+.fav-play-btn:hover {
+    border-color: #00ffcc;
+}
+
+.fav-remove-btn {
+    color: #444;
+    font-size: 11px;
+    line-height: 1;
+}
+
+.fav-remove-btn:hover {
+    border-color: #ff4466;
+    color: #ff4466;
+}
+
+/* ---- Sidebar footer (Clear All button) ---- */
 #fav-footer {
-    display: none;
+    display: none;                       /* Hidden when list is empty */
     justify-content: center;
     padding: 14px 20px;
     border-top: 1px solid #1a1a1a;
@@ -1067,9 +1164,12 @@ nav a:hover {
     border-radius: 22px;
 }
 
-#fav-clear-btn:hover { color: #ff4466; border-color: #ff4466; }
+#fav-clear-btn:hover {
+    color: #ff4466;
+    border-color: #ff4466;
+}
 
-/* Heart button on each video card */
+/* ---- Heart button on each video card ---- */
 .fav-heart-btn {
     position: absolute;
     top: 8px;
@@ -1086,11 +1186,12 @@ nav a:hover {
     justify-content: center;
     cursor: pointer;
     z-index: 10;
-    opacity: 0;
+    opacity: 0;                          /* Hidden until card is hovered */
     transition: opacity 0.25s, border-color 0.25s, background 0.25s;
     padding: 0;
 }
 
+/* Show heart on card hover, or when already favourited */
 .video:hover .fav-heart-btn,
 .fav-heart-btn.fav-heart-active {
     opacity: 1;
@@ -1101,20 +1202,31 @@ nav a:hover {
     border-color: #00ffcc;
 }
 
-.fav-heart-svg { width: 14px; height: 14px; display: block; }
+.fav-heart-svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+}
 
+/* ---- Tablet adjustments ---- */
 @media (max-width: 1024px) {
-    #fav-sidebar { width: 360px; }
+    #fav-sidebar {
+        width: 360px;
+    }
 }
 
+/* ---- Small phone: full-width panel ---- */
 @media (max-width: 500px) {
-    #fav-sidebar { width: 100vw; max-width: 100vw; border-left: none; }
+    #fav-sidebar {
+        width: 100vw;
+        max-width: 100vw;
+        border-left: none;
+    }
 }
-
-
 /* ============================================================ */
-/* SECTION 2K: GUIDE POPUP                                      */
+/* SECTION 2K: GUIDE POPUP (v3.4.0)                             */
 /* ============================================================ */
+
 #guide-backdrop {
     display: none;
     position: fixed;
@@ -1124,7 +1236,9 @@ nav a:hover {
     z-index: 1299;
 }
 
-#guide-backdrop.guide-visible { display: block; }
+#guide-backdrop.guide-visible {
+    display: block;
+}
 
 #guide-modal {
     display: flex;
@@ -1178,7 +1292,9 @@ nav a:hover {
     transition: color 0.2s;
 }
 
-#guide-close-btn:hover { color: #00ffcc; }
+#guide-close-btn:hover {
+    color: #00ffcc;
+}
 
 #guide-content {
     overflow-y: auto;
@@ -1187,8 +1303,14 @@ nav a:hover {
     scrollbar-color: #222 transparent;
 }
 
-#guide-content::-webkit-scrollbar { width: 4px; }
-#guide-content::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+#guide-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+#guide-content::-webkit-scrollbar-thumb {
+    background: #222;
+    border-radius: 2px;
+}
 
 .guide-section {
     margin-bottom: 35px;
@@ -1211,7 +1333,10 @@ nav a:hover {
     letter-spacing: 0.5px;
 }
 
-.guide-section strong { color: #ddd; font-weight: normal; }
+.guide-section strong {
+    color: #ddd;
+    font-weight: normal;
+}
 
 .guide-section ul {
     margin: 10px 0 0 0;
@@ -1238,105 +1363,4 @@ nav a:hover {
 #guide-footer {
     padding: 0 30px 30px 30px;
     flex-shrink: 0;
-}
-
-
-/* ============================================================ */
-/* SECTION 2L: DROPDOWN PANELS                                  */
-/* Collapsible NAVIGATION NODES and COMMAND CONTROL toggles.    */
-/* Previously inline in index.html — consolidated here v6.0.0   */
-/* ============================================================ */
-
-.dropdown-wrap {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
-}
-
-.dropdown-toggle {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    outline: none;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: #00ffcc;
-    transition: color 0.3s;
-}
-
-.dropdown-toggle:hover {
-    color: rgba(0, 255, 204, 0.7);
-}
-
-.dropdown-toggle:hover .dropdown-chevron line {
-    stroke: rgba(0, 255, 204, 0.7);
-}
-
-.dropdown-chevron {
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dropdown-chevron line {
-    stroke: #00ffcc;
-    transition: stroke 0.3s;
-}
-
-.dropdown-toggle.open .dropdown-chevron {
-    transform: rotate(180deg);
-}
-
-/* Dropdown content area — hidden by default */
-.dropdown-content {
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s;
-    opacity: 0;
-}
-
-.dropdown-content.open {
-    max-height: 500px;
-    opacity: 1;
-    padding-top: 16px;
-}
-
-/* Navigation links row */
-.nav-links {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0 30px;
-    padding: 0;
-}
-
-.nav-links a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 8px;
-    transition: color 0.25s;
-    white-space: nowrap;
-}
-
-.nav-links a:hover {
-    color: #00ffcc;
-}
-
-/* Command control inner container */
-.cmd-inner {
-    border: 1px solid rgba(0, 255, 204, 0.15);
-    border-radius: 10px;
-    background: rgba(0, 255, 204, 0.02);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 680px;
-    margin: 0 auto;
 }

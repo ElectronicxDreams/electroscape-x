@@ -1,27 +1,45 @@
 <!--
-    Name: index.html | Version: 6.0.0
+    Name: index.html | Version: 4.2.0
     Project: Electroscape
-    Description: Music video gallery with YouTube IFrame API player.
-                 Track data loaded from tracks.json — edit that file to
+    Description: Music video gallery page with YouTube IFrame API player.
+                 Track data is loaded from tracks.json — edit that file to
                  add, remove, or reorder tracks. No changes needed here.
-                 Styles live in style.css. All logic lives in player.js.
+                 Styles live in style.css. Playback logic lives in player.js.
+                 Clicking a card loads it into the featured player at the top.
+                 Prev / Next buttons step through the playlist in order.
+                 Override Sequence randomises the card grid and resets the queue.
 
-    Sections:
-        Stage 1 — HEAD : Page setup, font imports, stylesheet link
-        Stage 3 — BODY : Visible page structure
-            3A — Navigation dropdown
-            3B — Page title
-            3C — Featured video player
-            3D — Command control dropdown (transport, grid, shuffle, favourites)
-            3G — Video grid
-            3H — Orbital HUD footer
-            3I — Favourites sidebar
-            3J — Guide popup
+    Changelog:
+        v2.1.0 — Orbital HUD footer added (persistent mini-player bar)
+        v2.9.0 — Unified view controls and centred action bar
+        v3.0.0 — Michroma title font; elastic fly-in animation; HUD seek + progress
+        v3.1.0 — Grid view switcher replaced with SVG icon buttons (Option B active,
+                  Option D — single cycle button — commented out and ready to enable)
+        v3.2.0 — New Previous/Next Buttons
+        v3.3.0 — Favourites sidebar: heart button on each card, slide-out right panel,
+                  drag-to-reorder, localStorage persistence (Section 4P in player.js,
+                  Section 2J in style.css)
+        v3.6.4 — Navigation replaced with "NAVIGATION NODES" dropdown (Variant 2)
+        v4.0.0 — "COMMAND CONTROL" dropdown added for playback controls, grid view,
+                  and Sector Zero; all middle controls now collapsed behind toggle.
+        v4.1.0 — Ambient orb divs added (orb-teal, orb-violet, orb-blue) at top of
+                  body; animated in style.css Section 2A-2.
+
+    Sections in this file:
+        Stage 1 — HEAD : Page setup, font imports, stylesheet link, inline styles
+        Stage 3 — BODY : Visible page structure (nav, player, controls, grid, HUD)
+        (Stage 2 = style.css | Stage 4 = player.js)
+
+    File structure — all files must sit in the same folder:
+        index.html   ← this file  (page structure — rarely needs editing)
+        style.css    ← all visual styles (edit for colour/layout changes)
+        player.js    ← all playback logic (edit for behaviour changes)
+        tracks.json  ← track list only (THIS is the file you edit day-to-day)
 -->
 
 
 <!-- ============================================================ -->
-<!-- STAGE 1: HEAD                                                 -->
+<!-- STAGE 1: HEAD — Page setup, fonts, stylesheet                -->
 <!-- ============================================================ -->
 <!DOCTYPE html>
 <html lang="en">
@@ -30,8 +48,115 @@
     <meta charset="UTF-8">
     <title>Electroscape</title>
 
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="style.css?v=4.2.0">
+
+    <!-- Inline styles for dropdowns: NAVIGATION NODES + COMMAND CONTROL -->
+    <style>
+        /* ---- Shared dropdown container ---- */
+        .dropdown-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        /* ---- Toggle button ---- */
+        .dropdown-toggle {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            outline: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #00ffcc;
+            transition: color 0.3s;
+        }
+
+        .dropdown-toggle:hover {
+            color: rgba(0, 255, 204, 0.7);
+        }
+
+        .dropdown-toggle:hover .dropdown-chevron line {
+            stroke: rgba(0, 255, 204, 0.7);
+        }
+
+        .dropdown-chevron {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dropdown-chevron line {
+            stroke: #00ffcc;                      /* always teal */
+            transition: stroke 0.3s;
+        }
+
+        .dropdown-toggle.open .dropdown-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* ---- Dropdown content area (hidden by default) ---- */
+        .dropdown-content {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s;
+            opacity: 0;
+        }
+
+        .dropdown-content.open {
+            /* a generous max-height so all controls fit */
+            max-height: 500px;
+            opacity: 1;
+            padding-top: 16px;
+        }
+
+        /* ---- NAVIGATION NODES links specific ---- */
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0 30px;
+            padding: 0;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            transition: color 0.25s;
+            white-space: nowrap;
+        }
+
+        .nav-links a:hover {
+            color: #00ffcc;
+        }
+
+        /* ---- COMMAND CONTROL content: just let the inner action bars flow normally ---- */
+        .cmd-inner {
+            border: 1px solid rgba(0, 255, 204, 0.15);
+            border-radius: 10px;
+            background: rgba(0, 255, 204, 0.02);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+	.cmd-toggle-lg {
+    	font-size: 12px;           /* larger than the default  */
+	}
+    </style>
 
 </head>
 <!-- ============================================================ -->
@@ -40,16 +165,14 @@
 
 
 <!-- ============================================================ -->
-<!-- STAGE 3: BODY                                                 -->
+<!-- STAGE 3: BODY — Visible page structure                       -->
 <!-- ============================================================ -->
 <body>
 
     <!-- -------------------------------------------------------- -->
-    <!-- AMBIENT ORB LAYER                                         -->
-    <!-- Three fixed divs that drift slowly behind all content.   -->
-    <!-- Styled in style.css Section 2A-2.                        -->
-    <!-- To remove the live background: delete these three lines  -->
-    <!-- and replace style.css Section 2A-2 with style-static-bg  -->
+    <!-- AMBIENT ORB LAYER                                        -->
+    <!-- Three fixed divs that drift slowly behind all content.  -->
+    <!-- Styled in style.css Section 2A-2. z-index: 0.           -->
     <!-- -------------------------------------------------------- -->
     <div class="orb orb-teal"></div>
     <div class="orb orb-violet"></div>
@@ -57,7 +180,7 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3A: NAVIGATION NODES DROPDOWN                    -->
+    <!-- SECTION 3A: TOP NAVIGATION — "NAVIGATION NODES" DROPDOWN -->
     <!-- -------------------------------------------------------- -->
     <div class="dropdown-wrap">
         <div>
@@ -70,10 +193,10 @@
             </button>
             <div class="dropdown-content" id="nav-content">
                 <div class="nav-links">
-                    <a href="https://beacons.ai/weblinks" target="_blank">WEBLINKS</a>
-                    <a href="music.html">MUSIC</a>
-                    <a href="tv.html">TV</a>
-                    <a id="guide-open-btn" href="javascript:void(0)" title="Quick Start Guide">?</a>
+                    <a href='https://beacons.ai/weblinks' target='_blank'>WEBLINKS</a>
+                    <a href='music.html'>MUSIC</a>
+                    <a href='tv.html'>TV</a>
+                    <a id="guide-open-btn" href="javascript:void(0)" title="Quick Start Guide">X</a>
                 </div>
             </div>
         </div>
@@ -81,7 +204,7 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3B: PAGE TITLE                                    -->
+    <!-- SECTION 3B: PAGE TITLE                                   -->
     <!-- -------------------------------------------------------- -->
     <h1 class="fly-in-title">
         <span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span>
@@ -89,7 +212,7 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3C: FEATURED VIDEO PLAYER                         -->
+    <!-- SECTION 3C: FEATURED VIDEO PLAYER                        -->
     <!-- -------------------------------------------------------- -->
     <div class="featured-box">
         <div id="now-playing-label"></div>
@@ -100,15 +223,13 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3D: COMMAND CONTROL DROPDOWN                      -->
-    <!-- Row 1 — Prev | Play/Pause | Next                          -->
-    <!-- Row 2 — Grid density icons                                -->
-    <!-- Row 3 — Override Sequence (shuffle)                       -->
-    <!-- Row 4 — Sector Zero (favourites)                          -->
+    <!-- SECTION 3D/E/F: COMMAND CONTROL DROPDOWN                 -->
+    <!-- Collapses playback controls, grid view, and Sector Zero  -->
+    <!-- into a single toggleable block.                          -->
     <!-- -------------------------------------------------------- -->
     <div class="dropdown-wrap">
         <div>
-            <button class="dropdown-toggle" id="cmd-toggle" aria-expanded="false" aria-label="Toggle command controls">
+            <button class="dropdown-toggle cmd-toggle-lg" id="cmd-toggle" aria-expanded="false" aria-label="Toggle command controls">
                 COMMAND CONTROL
                 <svg class="dropdown-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <line x1="1" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
@@ -118,7 +239,7 @@
             <div class="dropdown-content" id="cmd-content">
                 <div class="cmd-inner">
 
-                    <!-- Row 1: transport -->
+                    <!-- Row 1: Prev | Play/Pause | Next -->
                     <div class="action-bar cmd-row-transport">
                         <button class="ctrl-btn cmd-arrow-btn" id="prev-btn" aria-label="Previous">
                             <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -127,14 +248,17 @@
                         </button>
 
                         <button class="cmd-play-btn" id="playpause-btn" aria-label="Play / Pause">
+                            <!-- Outer rotating ring -->
                             <svg class="play-ring" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
                                 <circle class="play-ring-track" cx="40" cy="40" r="34"/>
                                 <circle class="play-ring-arc"   cx="40" cy="40" r="34"/>
                             </svg>
-                            <svg class="play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Morph icon — triangle ↔ pause bars via SVG paths -->
+                            <svg class="play-icon" id="cmd-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path class="play-bar-left"  d="M7,4 L7,4 L7,20 L7,20 Z"/>
                                 <path class="play-bar-right" d="M7,4 L7,4 L7,20 L7,20 Z"/>
                             </svg>
+                            <!-- Click ripple -->
                             <span class="play-ripple"></span>
                         </button>
 
@@ -145,7 +269,7 @@
                         </button>
                     </div>
 
-                    <!-- Row 2: grid density icons -->
+                    <!-- Row 2: Grid view icons -->
                     <div class="action-bar cmd-row-icons">
                         <div class="bare-view-wrap">
                             <button class="grid-btn bare-view-btn" data-size="dense" aria-label="Micro grid">
@@ -192,12 +316,12 @@
                         </div>
                     </div>
 
-                    <!-- Row 3: Override Sequence (shuffle) -->
+                    <!-- Row 3: Override Sequence — full width -->
                     <div class="action-bar cmd-row-full">
                         <button class="ctrl-btn shuffle-btn cmd-full-btn" id="shuffle-btn">[ Override Sequence ]</button>
                     </div>
 
-                    <!-- Row 4: Sector Zero (favourites sidebar toggle) -->
+                    <!-- Row 3: Sector Zero — full width, unfilled heart -->
                     <div class="action-bar cmd-row-full cmd-row-last">
                         <button class="ctrl-btn cmd-full-btn" id="fav-toggle-btn" aria-label="Favourites">
                             <svg id="fav-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -215,23 +339,21 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3G: VIDEO GRID                                    -->
-    <!-- Cards are injected here by player.js from tracks.json.   -->
+    <!-- SECTION 3G: VIDEO GRID                                   -->
     <!-- -------------------------------------------------------- -->
     <div class="grid" id="video-grid"></div>
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- FOOTER — Version display                                  -->
+    <!-- FOOTER — Version display                                 -->
     <!-- -------------------------------------------------------- -->
     <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-        <span style="color: #00ffcc;">6.0.0</span>
+        <span style="color: #00ffcc;">5.0.0</span>
     </div>
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3H: ORBITAL HUD                                   -->
-    <!-- Persistent mini-player footer. Revealed on first play.   -->
+    <!-- SECTION 3H: ORBITAL HUD                                  -->
     <!-- -------------------------------------------------------- -->
     <div id="hud-dock">
         <div id="hud-progress-container">
@@ -249,7 +371,7 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3I: FAVOURITES SIDEBAR                            -->
+    <!-- SECTION 3I: FAVOURITES SIDEBAR                           -->
     <!-- -------------------------------------------------------- -->
     <div id="fav-backdrop"></div>
     <div id="fav-sidebar">
@@ -258,7 +380,7 @@
             <button id="fav-close-btn" aria-label="Close favourites">&#x2715;</button>
         </div>
         <div id="fav-actions" style="display:none; justify-content:center; padding: 12px 20px; border-bottom: 1px solid #1a1a1a;">
-            <button id="fav-play-all-btn" class="ctrl-btn" style="width: 100%; border-radius: 4px; padding: 10px; font-size: 9px; letter-spacing: 4px;">[ PLAY PLAYLIST ]</button>
+             <button id="fav-play-all-btn" class="ctrl-btn" style="width: 100%; border-radius: 4px; padding: 10px; font-size: 9px; letter-spacing: 4px;">[ PLAY PLAYLIST ]</button>
         </div>
         <div id="fav-empty">
             <span>No favourites yet.</span>
@@ -272,7 +394,7 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3J: GUIDE POPUP                                   -->
+    <!-- SECTION 3J: GUIDE POPUP                                  -->
     <!-- -------------------------------------------------------- -->
     <div id="guide-backdrop"></div>
     <div id="guide-modal">
@@ -287,20 +409,20 @@
             </div>
             <div class="guide-section">
                 <h3>02 — SIDEBAR: MANAGING LISTS</h3>
-                <p>Open the <strong>FAVOURITES</strong> sidebar via the action bar heart button. From here you can:</p>
+                <p>Open the <strong>FAVOURITES</strong> sidebar via the action bar heart button. From here, you can:</p>
                 <ul>
                     <li><strong>PLAY ALL:</strong> Start the full favourites queue.</li>
                     <li><strong>REORDER:</strong> Use the drag handle (6 dots) or arrows (▲/▼).</li>
-                    <li><strong>REMOVE:</strong> Click ✕ on any row to delete it.</li>
+                    <li><strong>REMOVE:</strong> Click 'X' on any row to delete it.</li>
                 </ul>
             </div>
             <div class="guide-section">
                 <h3>03 — QUEUE: EXITING FAV MODE</h3>
-                <p>While in Favourite Mode, <strong>SELECT ANY TRACK</strong> from the main grid to exit the favourites queue and restore all tracks.</p>
+                <p>While in "Favourite Mode", simply <strong>SELECT ANY TRACK</strong> from the main grid. This immediately exits the favourites queue and resets the player to include all tracks from the main sequence.</p>
             </div>
             <div class="guide-section">
                 <h3>04 — NAVIGATION & VIEW</h3>
-                <p>Use <strong>OVERRIDE SEQUENCE</strong> to shuffle the grid. Use the <strong>GRID ICONS</strong> (Micro, Core, Max) to switch display density. The <strong>ORBITAL HUD</strong> at the bottom provides persistent controls and seek.</p>
+                <p>Use <strong>OVERRIDE SEQUENCE</strong> to shuffle the grid. Use the <strong>GRID ICONS</strong> (Micro, Core, Max) to switch display density. The <strong>ORBITAL HUD</strong> at the bottom provides persistent controls and seek functionality.</p>
             </div>
         </div>
         <div id="guide-footer">
@@ -310,12 +432,28 @@
 
 
     <!-- -------------------------------------------------------- -->
-    <!-- SCRIPTS                                                   -->
-    <!-- player.js must load before the YouTube API so all        -->
-    <!-- event handlers exist when onYouTubeIframeAPIReady fires.  -->
+    <!-- SCRIPTS                                                 -->
     <!-- -------------------------------------------------------- -->
-    <script src="player.js"></script>
+    <script src="player.js?v=3.3.0"></script>
     <script src="https://www.youtube.com/iframe_api" async></script>
+
+    <!-- Dropdown toggle logic for both buttons -->
+    <script>
+        (function() {
+            function setupDropdown(toggleId, contentId) {
+                var toggle = document.getElementById(toggleId);
+                var content = document.getElementById(contentId);
+                if (!toggle || !content) return;
+                toggle.addEventListener('click', function() {
+                    var isOpen = content.classList.toggle('open');
+                    toggle.classList.toggle('open', isOpen);
+                    toggle.setAttribute('aria-expanded', isOpen);
+                });
+            }
+            setupDropdown('nav-toggle', 'nav-content');
+            setupDropdown('cmd-toggle', 'cmd-content');
+        })();
+    </script>
 
 </body>
 </html>
