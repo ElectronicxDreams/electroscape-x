@@ -71,7 +71,7 @@ nav a {
 }
 
 nav a:hover {
-    color: #00ffcc;
+    color: #00FFE6;
 }
 
 /* ============================================================ */
@@ -81,7 +81,7 @@ nav a:hover {
     font-family: 'Michroma', sans-serif;
     font-size: 13px;
     font-weight: 400;
-    color: #00ffcc;
+    color: #00FFE6;
     text-transform: uppercase;
     margin-bottom: 40px;
     display: flex;
@@ -147,7 +147,7 @@ nav a:hover {
 }
 
 #now-playing-label:hover {
-    color: #00ffcc;
+    color: #00FFE6;
 }
 
 /* ============================================================ */
@@ -164,8 +164,8 @@ nav a:hover {
 
 .ctrl-btn {
     background: transparent;
-    border: 1px solid rgba(0, 255, 204, 0.5);
-    color: rgba(0, 255, 204, 0.6);
+    border: 1px solid rgba(0, 255, 230, 0.5);
+    color: rgba(0, 255, 230, 0.6);
     padding: 12px 25px;
     font-family: 'Orbitron', sans-serif;
     font-size: 10px;
@@ -179,25 +179,25 @@ nav a:hover {
 }
 
 .ctrl-btn:hover {
-    border-color: #00ffcc;
-    color: #00ffcc;
+    border-color: #00FFE6;
+    color: #00FFE6;
 }
 
 .ctrl-btn:focus {
-    border-color: rgba(0, 255, 204, 0.25);
-    color: rgba(0, 255, 204, 0.6);
+    border-color: rgba(0, 255, 230, 0.25);
+    color: rgba(0, 255, 230, 0.6);
 }
 
 .shuffle-btn {
-    color: rgba(0, 255, 204, 0.85);
+    color: rgba(0, 255, 230, 0.85);
 }
 .shuffle-btn:focus {
-    color: rgba(0, 255, 204, 0.85);
+    color: rgba(0, 255, 230, 0.85);
 }
 
 .cmd-arrow-btn {
     border-radius: 6px;
-    border: 2px solid rgba(0, 255, 204, 0.6);
+    border: 2px solid rgba(0, 255, 230, 0.6);
     width: 56px;
     height: 44px;
     padding: 0;
@@ -208,7 +208,7 @@ nav a:hover {
 }
 
 .cmd-arrow-btn:hover {
-    border-color: #00ffcc;
+    border-color: #00FFE6;
     border-width: 2px;
 }
 
@@ -225,13 +225,13 @@ nav a:hover {
     justify-content: center;
     flex-shrink: 0;
     padding: 0;
-    filter: drop-shadow(0 0 4px rgba(0,255,204,0.2));
+    filter: drop-shadow(0 0 4px rgba(0,255,230,0.2));
     transition: filter 0.2s ease-out, transform 0.15s ease-out;
 }
 
 .cmd-play-btn:hover {
     transform: scale(1.05);
-    filter: drop-shadow(0 0 10px rgba(0,255,204,0.55));
+    filter: drop-shadow(0 0 10px rgba(0,255,230,0.55));
 }
 
 .cmd-play-btn:active {
@@ -239,8 +239,8 @@ nav a:hover {
 }
 
 @keyframes playGlow {
-    0%, 100% { filter: drop-shadow(0 0 6px rgba(0,255,204,0.35)); }
-    50%       { filter: drop-shadow(0 0 14px rgba(0,255,204,0.7)); }
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(0,255,230,0.35)); }
+    50%       { filter: drop-shadow(0 0 14px rgba(0,255,230,0.7)); }
 }
 
 .cmd-play-btn.is-playing {
@@ -249,7 +249,7 @@ nav a:hover {
 
 .cmd-play-btn.is-playing:hover {
     animation: none;
-    filter: drop-shadow(0 0 16px rgba(0,255,204,0.8));
+    filter: drop-shadow(0 0 16px rgba(0,255,230,0.8));
 }
 
 .play-ring {
@@ -263,13 +263,13 @@ nav a:hover {
 
 .play-ring-track {
     fill: none;
-    stroke: rgba(0,255,204,0.08);
+    stroke: rgba(0,255,230,0.08);
     stroke-width: 1.5;
 }
 
 .play-ring-arc {
     fill: none;
-    stroke: rgba(0,255,204,0.5);
+    stroke: rgba(0,255,230,0.5);
     stroke-width: 1.5;
     stroke-linecap: round;
     stroke-dasharray: 60 153.6;
@@ -298,13 +298,13 @@ nav a:hover {
 }
 
 .play-bar-left {
-    fill: rgba(0,255,204,0.85);
+    fill: rgba(0,255,230,0.85);
     d: path("M7,4 L17,12 L7,20 Z");
     transition: d 0.18s ease-out, fill 0.18s ease-out;
 }
 
 .play-bar-right {
-    fill: rgba(0,255,204,0.85);
+    fill: rgba(0,255,230,0.85);
     d: path("M7,4 L7,4 L7,20 L7,20 Z");
     transition: d 0.18s ease-out, fill 0.18s ease-out;
 }
@@ -324,8 +324,8 @@ nav a:hover {
 }
 
 @keyframes rippleOut {
-    0%   { box-shadow: 0 0 0 0px rgba(0,255,204,0.45); opacity: 1; }
-    100% { box-shadow: 0 0 0 18px rgba(0,255,204,0);   opacity: 0; }
+    0%   { box-shadow: 0 0 0 0px rgba(0,255,230,0.45); opacity: 1; }
+    100% { box-shadow: 0 0 0 18px rgba(0,255,230,0);   opacity: 0; }
 }
 
 .cmd-play-btn.ripple-active .play-ripple {
@@ -392,7 +392,7 @@ nav a:hover {
     outline: none;
 }
 
-.bare-view-btn svg rect { fill: #00ffcc; }
+.bare-view-btn svg rect { fill: #00FFE6; }
 .bare-view-btn.grid-btn-active { opacity: 1; }
 .bare-view-btn:hover { opacity: 0.6; }
 .bare-view-btn:focus { outline: none; }
@@ -467,13 +467,13 @@ nav a:hover {
 }
 
 @keyframes activePulse {
-    0%   { box-shadow: 0 0 5px rgba(0, 255, 204, 0.1); }
-    50%  { box-shadow: 0 0 20px rgba(0, 255, 204, 0.35); }
-    100% { box-shadow: 0 0 5px rgba(0, 255, 204, 0.1); }
+    0%   { box-shadow: 0 0 5px rgba(0, 255, 230, 0.1); }
+    50%  { box-shadow: 0 0 20px rgba(0, 255, 230, 0.35); }
+    100% { box-shadow: 0 0 5px rgba(0, 255, 230, 0.1); }
 }
 
 .video.is-playing {
-    border-color: #00ffcc !important;
+    border-color: #00FFE6 !important;
     animation: activePulse 2s infinite ease-in-out;
 }
 
@@ -505,13 +505,13 @@ nav a:hover {
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    color: #00ffcc;
+    color: #00FFE6;
     font-size: 10px;
     font-weight: 500;
     letter-spacing: 3px;
     text-transform: uppercase;
     white-space: nowrap;
-    border: 1px solid rgba(0, 255, 204, 0.25);
+    border: 1px solid rgba(0, 255, 230, 0.25);
     border-radius: 2px;
     padding: 10px 18px;
     opacity: 0;
@@ -568,7 +568,7 @@ nav a:hover {
 #hud-progress-bar {
     height: 100%;
     width: 0%;
-    background: #00ffcc;
+    background: #00FFE6;
     transition: width 0.15s linear;
     pointer-events: none;
 }
@@ -628,15 +628,15 @@ nav a:hover {
     letter-spacing: 1px;
 }
 
-.hud-btn:hover { border-color: #00ffcc; color: #fff; }
+.hud-btn:hover { border-color: #00FFE6; color: #fff; }
 
 .hud-playpause {
-    border-color: #00ffcc;
-    color: #00ffcc;
+    border-color: #00FFE6;
+    color: #00FFE6;
     padding: 6px 14px;
 }
 
-.hud-playpause:hover { background: rgba(0, 255, 204, 0.1); }
+.hud-playpause:hover { background: rgba(0, 255, 230, 0.1); }
 
 @media (max-width: 500px) {
     #hud-inner { padding: 0 10px; gap: 8px; }
@@ -692,7 +692,7 @@ nav a:hover {
     font-size: 10px;
     letter-spacing: 6px;
     text-transform: uppercase;
-    color: #00ffcc;
+    color: #00FFE6;
 }
 
 #fav-close-btn {
@@ -707,7 +707,7 @@ nav a:hover {
     border-radius: 2px;
 }
 
-#fav-close-btn:hover { color: #00ffcc; }
+#fav-close-btn:hover { color: #00FFE6; }
 
 #fav-empty {
     display: flex;
@@ -757,7 +757,7 @@ nav a:hover {
 .fav-row:active { cursor: grabbing; }
 .fav-row-dragging { opacity: 0.4; }
 .fav-row-over {
-    border-top: 2px solid rgba(0, 255, 204, 0.5);
+    border-top: 2px solid rgba(0, 255, 230, 0.5);
     background: #0d0d0d;
 }
 
@@ -829,8 +829,8 @@ nav a:hover {
 
 .fav-play-btn svg { width: 12px; height: 12px; }
 .fav-move-btn { font-size: 10px; color: #555; }
-.fav-move-btn:hover { border-color: #00ffcc; color: #00ffcc; }
-.fav-play-btn:hover { border-color: #00ffcc; }
+.fav-move-btn:hover { border-color: #00FFE6; color: #00FFE6; }
+.fav-play-btn:hover { border-color: #00FFE6; }
 .fav-remove-btn { color: #444; font-size: 11px; line-height: 1; }
 .fav-remove-btn:hover { border-color: #ff4466; color: #ff4466; }
 
@@ -860,7 +860,7 @@ nav a:hover {
     background: rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 255, 204, 0.2);
+    border: 1px solid rgba(0, 255, 230, 0.2);
     border-radius: 50%;
     width: 30px;
     height: 30px;
@@ -879,7 +879,7 @@ nav a:hover {
 
 .fav-heart-btn:hover {
     background: rgba(0, 0, 0, 0.7);
-    border-color: #00ffcc;
+    border-color: #00FFE6;
 }
 
 .fav-heart-svg { width: 14px; height: 14px; display: block; }
@@ -918,7 +918,7 @@ nav a:hover {
     opacity: 0;
     pointer-events: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 0 1px #00ffcc33;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 0 1px #00FFE633;
 }
 
 #guide-modal.guide-visible {
@@ -940,7 +940,7 @@ nav a:hover {
     font-size: 11px;
     letter-spacing: 5px;
     text-transform: uppercase;
-    color: #00ffcc;
+    color: #00FFE6;
 }
 
 #guide-close-btn {
@@ -953,7 +953,7 @@ nav a:hover {
     transition: color 0.2s;
 }
 
-#guide-close-btn:hover { color: #00ffcc; }
+#guide-close-btn:hover { color: #00FFE6; }
 
 #guide-content {
     overflow-y: auto;
@@ -970,7 +970,7 @@ nav a:hover {
 .guide-section h3 {
     font-size: 10px;
     letter-spacing: 3px;
-    color: #00ffcc;
+    color: #00FFE6;
     margin-bottom: 12px;
     text-transform: uppercase;
 }
@@ -1022,15 +1022,15 @@ nav a:hover {
     font-size: 10px;
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: #00ffcc;
+    color: #00FFE6;
     transition: color 0.3s;
 }
 
-.dropdown-toggle:hover { color: rgba(0, 255, 204, 0.7); }
-.dropdown-toggle:hover .dropdown-chevron line { stroke: rgba(0, 255, 204, 0.7); }
+.dropdown-toggle:hover { color: rgba(0, 255, 230, 0.7); }
+.dropdown-toggle:hover .dropdown-chevron line { stroke: rgba(0, 255, 230, 0.7); }
 
 .dropdown-chevron { transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
-.dropdown-chevron line { stroke: #00ffcc; transition: stroke 0.3s; }
+.dropdown-chevron line { stroke: #00FFE6; transition: stroke 0.3s; }
 .dropdown-toggle.open .dropdown-chevron { transform: rotate(180deg); }
 
 .dropdown-content {
@@ -1064,12 +1064,12 @@ nav a:hover {
     white-space: nowrap;
 }
 
-.nav-links a:hover { color: #00ffcc; }
+.nav-links a:hover { color: #00FFE6; }
 
 .cmd-inner {
-    border: 1px solid rgba(0, 255, 204, 0.15);
+    border: 1px solid rgba(0, 255, 230, 0.15);
     border-radius: 10px;
-    background: rgba(0, 255, 204, 0.02);
+    background: rgba(0, 255, 230, 0.02);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1162,7 +1162,7 @@ nav a:hover {
     overflow: hidden;
 }
 
-.music-card:hover { border-color: #00ffcc; box-shadow: 0 0 15px rgba(0,255,204,0.15); transform: translateY(-2px); }
+.music-card:hover { border-color: #00FFE6; box-shadow: 0 0 15px rgba(0,255,230,0.15); transform: translateY(-2px); }
 .music-card.spotify:hover { border-color: #1db954; box-shadow: 0 0 15px rgba(29,185,84,0.15); }
 .music-card.tidal:hover   { border-color: #00ffff; box-shadow: 0 0 15px rgba(0,255,255,0.15); }
 .music-card.deezer:hover  { border-color: #a238ff; box-shadow: 0 0 15px rgba(162,56,255,0.15); }
@@ -1209,7 +1209,7 @@ nav a:hover {
     transition: 0.3s;
 }
 
-.music-card:hover .card-arrow         { color: #00ffcc; }
+.music-card:hover .card-arrow         { color: #00FFE6; }
 .music-card.spotify:hover .card-arrow { color: #1db954; }
 .music-card.tidal:hover .card-arrow   { color: #00ffff; }
 .music-card.deezer:hover .card-arrow  { color: #a238ff; }
@@ -1285,7 +1285,7 @@ nav a:hover {
                         <div class="action-bar cmd-row-transport">
                             <button class="ctrl-btn cmd-arrow-btn" id="prev-btn" aria-label="Previous">
                                 <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <polygon points="3,6 9,1 9,11" fill="rgba(0,255,204,0.75)"/>
+                                    <polygon points="3,6 9,1 9,11" fill="rgba(0,255,230,0.75)"/>
                                 </svg>
                             </button>
                             <button class="cmd-play-btn" id="playpause-btn" aria-label="Play / Pause">
@@ -1301,7 +1301,7 @@ nav a:hover {
                             </button>
                             <button class="ctrl-btn cmd-arrow-btn" id="next-btn" aria-label="Next">
                                 <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <polygon points="9,6 3,1 3,11" fill="rgba(0,255,204,0.75)"/>
+                                    <polygon points="9,6 3,1 3,11" fill="rgba(0,255,230,0.75)"/>
                                 </svg>
                             </button>
                         </div>
@@ -1359,7 +1359,7 @@ nav a:hover {
                         <div class="action-bar cmd-row-full cmd-row-last">
                             <button class="ctrl-btn cmd-full-btn" id="fav-toggle-btn" aria-label="Favourites">
                                 <svg id="fav-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="#00ffcc" stroke-width="1.5" fill="none"/>
+                                    <path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="#00FFE6" stroke-width="1.5" fill="none"/>
                                 </svg>
                                 <span style="margin-left: 12px; letter-spacing: 4px; font-size: 10px;">SECTOR ZERO</span>
                             </button>
@@ -1375,7 +1375,7 @@ nav a:hover {
 
         <!-- FOOTER -->
         <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-            <span style="color: #00ffcc;">7.0.0</span>
+            <span style="color: #00FFE6;">7.0.0</span>
         </div>
 
     </div><!-- end #player-section -->
@@ -1596,7 +1596,7 @@ function loadTracks() {
                     '<div class="overlay-btn">&gt; ACTIVATE &lt;</div>' +
                     '<button class="fav-heart-btn" data-id="' + track.id + '" data-title="' + track.title.replace(/"/g, '&quot;') + '" aria-label="Add to favourites">' +
                         '<svg class="fav-heart-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-                            '<path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="#00ffcc" stroke-width="1.5" fill="none" class="fav-heart-path"/>' +
+                            '<path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="#00FFE6" stroke-width="1.5" fill="none" class="fav-heart-path"/>' +
                         '</svg>' +
                     '</button>';
 
@@ -2004,12 +2004,12 @@ function initFavourites() {
         var path = btn.querySelector('.fav-heart-path');
         if (!path) return;
         if (active) {
-            path.setAttribute('fill', '#00ffcc');
-            path.setAttribute('stroke', '#00ffcc');
+            path.setAttribute('fill', '#00FFE6');
+            path.setAttribute('stroke', '#00FFE6');
             btn.classList.add('fav-heart-active');
         } else {
             path.setAttribute('fill', 'none');
-            path.setAttribute('stroke', '#00ffcc');
+            path.setAttribute('stroke', '#00FFE6');
             btn.classList.remove('fav-heart-active');
         }
     }
@@ -2020,11 +2020,11 @@ function initFavourites() {
         var path = icon.querySelector('path');
         if (!path) return;
         if (open) {
-            path.setAttribute('fill', '#00ffcc');
-            path.setAttribute('stroke', '#00ffcc');
+            path.setAttribute('fill', '#00FFE6');
+            path.setAttribute('stroke', '#00FFE6');
         } else {
             path.setAttribute('fill', 'none');
-            path.setAttribute('stroke', '#00ffcc');
+            path.setAttribute('stroke', '#00FFE6');
         }
     }
 
@@ -2105,7 +2105,7 @@ function initFavourites() {
             playBtn.setAttribute('aria-label', 'Play ' + fav.title);
             playBtn.innerHTML =
                 '<svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-                '<polygon points="2,1 10,6 2,11" fill="#00ffcc"/>' +
+                '<polygon points="2,1 10,6 2,11" fill="#00FFE6"/>' +
                 '</svg>';
 
             var removeBtn = document.createElement('button');
@@ -2214,7 +2214,7 @@ function initFavourites() {
                 touchClone.style.cssText =
                     'position:fixed; left:' + rect.left + 'px; top:' + rect.top + 'px;' +
                     'width:' + rect.width + 'px; opacity:0.85; pointer-events:none;' +
-                    'z-index:9999; background:#1a1a1a; border:1px solid #00ffcc33; border-radius:6px;';
+                    'z-index:9999; background:#1a1a1a; border:1px solid #00FFE633; border-radius:6px;';
                 document.body.appendChild(touchClone);
             });
 
@@ -2409,7 +2409,7 @@ function initSectionToggle() {
     function showMusic() {
         playerSection.classList.add('hidden');
         musicSection.classList.add('active');
-        musicLink.style.color = '#00ffcc';
+        musicLink.style.color = '#00FFE6';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
