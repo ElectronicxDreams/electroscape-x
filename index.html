@@ -1,5 +1,5 @@
 <!--
-    Name: index.html | Version: 7.0.0
+    Name: index.html | Version: 7.0.1
     Project: Electroscape
     Description: Single-file build. Combines:
                  - style.css (inlined in <style>)
@@ -1138,7 +1138,7 @@ nav a:hover {
 }
 
 .dot-youtube { background: #ff0000; }
-.dot-spotify { background: #1db954; }
+.dot-spotify { background: #FD4095; }
 .dot-tidal   { background: #00ffff; }
 .dot-deezer  { background: #a238ff; }
 
@@ -1163,7 +1163,7 @@ nav a:hover {
 }
 
 .music-card:hover { border-color: #00FFE6; box-shadow: 0 0 15px rgba(0,255,230,0.15); transform: translateY(-2px); }
-.music-card.spotify:hover { border-color: #1db954; box-shadow: 0 0 15px rgba(29,185,84,0.15); }
+.music-card.spotify:hover { border-color: #FD4095; box-shadow: 0 0 15px rgba(253,64,149,0.15); }
 .music-card.tidal:hover   { border-color: #00ffff; box-shadow: 0 0 15px rgba(0,255,255,0.15); }
 .music-card.deezer:hover  { border-color: #a238ff; box-shadow: 0 0 15px rgba(162,56,255,0.15); }
 .music-card.youtube:hover { border-color: #ff0000; box-shadow: 0 0 15px rgba(255,0,0,0.15); }
@@ -1176,7 +1176,7 @@ nav a:hover {
     text-transform: uppercase;
 }
 
-.card-platform.spotify { color: #1db954; }
+.card-platform.spotify { color: #FD4095; }
 .card-platform.tidal   { color: #00ffff; }
 .card-platform.deezer  { color: #a238ff; }
 .card-platform.youtube { color: #ff0000; }
@@ -1210,7 +1210,7 @@ nav a:hover {
 }
 
 .music-card:hover .card-arrow         { color: #00FFE6; }
-.music-card.spotify:hover .card-arrow { color: #1db954; }
+.music-card.spotify:hover .card-arrow { color: #FD4095; }
 .music-card.tidal:hover .card-arrow   { color: #00ffff; }
 .music-card.deezer:hover .card-arrow  { color: #a238ff; }
 .music-card.youtube:hover .card-arrow { color: #ff0000; }
@@ -1375,7 +1375,7 @@ nav a:hover {
 
         <!-- FOOTER -->
         <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-            <span style="color: #00FFE6;">7.0.0</span>
+            <span style="color: #00FFE6;">7.0.1</span>
         </div>
 
     </div><!-- end #player-section -->
@@ -1387,22 +1387,6 @@ nav a:hover {
     <div id="music-section">
 
         <div class="music-page-header">STREAMING // DIRECTORY</div>
-
-        <!-- YOUTUBE -->
-        <div class="platform-section">
-            <div class="platform-label">
-                <span class="platform-dot dot-youtube"></span>
-                YouTube
-            </div>
-            <div class="music-grid">
-                <a class="music-card youtube" href="https://www.youtube.com/@ElectroscapeX" target="_blank">
-                    <span class="card-platform youtube">YouTube</span>
-                    <span class="card-title">Electroscape</span>
-                    <span class="card-meta">Channel</span>
-                    <span class="card-arrow">→</span>
-                </a>
-            </div>
-        </div>
 
         <!-- SPOTIFY -->
         <div class="platform-section">
@@ -1433,6 +1417,22 @@ nav a:hover {
                     <span class="card-platform spotify">Spotify</span>
                     <span class="card-title">Soundscape 5k</span>
                     <span class="card-meta">Playlist</span>
+                    <span class="card-arrow">→</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- YOUTUBE -->
+        <div class="platform-section">
+            <div class="platform-label">
+                <span class="platform-dot dot-youtube"></span>
+                YouTube
+            </div>
+            <div class="music-grid">
+                <a class="music-card youtube" href="https://www.youtube.com/@ElectroscapeX" target="_blank">
+                    <span class="card-platform youtube">YouTube</span>
+                    <span class="card-title">Electroscape</span>
+                    <span class="card-meta">Channel</span>
                     <span class="card-arrow">→</span>
                 </a>
             </div>
