@@ -23,37 +23,6 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-
-<script>
-  (function () {
-    var ua = navigator.userAgent;
-
-    // 1. UA "Mobile" token — Android phones include it, Android tablets don't
-    var hasMobileToken = /Mobile/i.test(ua);
-
-    // 2. iPhone (never a tablet)
-    var isIphone = /iPhone/i.test(ua);
-
-    // 3. Explicit tablet signals — if ANY of these match, it's NOT a phone
-    var isTablet = /iPad/i.test(ua)
-      || /tablet/i.test(ua)
-      || /playbook/i.test(ua)
-      || /silk/i.test(ua)
-      || (/Android/i.test(ua) && !/Mobile/i.test(ua));  // Android tablet pattern
-
-    // 4. CSS pixel width guard — phones are almost never wider than 500px
-    var isNarrow = window.innerWidth < 500;
-
-    // Only redirect if it looks like a phone AND the screen is narrow
-    var isPhone = (hasMobileToken || isIphone) && !isTablet && isNarrow;
-
-    if (isPhone) location.replace('mobile.html');
-  })();
-</script>
-
-
-
 
 
 
