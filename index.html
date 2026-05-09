@@ -24,13 +24,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <script>
-  (function() {
+  (function () {
     var ua = navigator.userAgent;
-    var isPhone = /Mobi|Android|iPhone/i.test(ua) && !/tablet|ipad|playbook|silk|(android(?!.*mobi))/i.test(ua);
+    // True phones: UA contains "Mobile" (Android phones, iPhones)
+    // Android tablets omit "Mobile" from their UA string
+    var isPhone = /Mobile/i.test(ua) || /iPhone/i.test(ua);
     if (isPhone && window.innerWidth < 1024) location.replace('mobile.html');
   })();
 </script>
+
+
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Electroscape</title>
