@@ -1,12 +1,10 @@
 <!--
-    Name: index.html | Version: 7.0.1
-    Project: Electroscape
-    Description: Single-file build. Combines:
-                 - style.css (inlined in <style>)
-                 - player.js (inlined in <script>)
+    Name: website.html | Version: 1.3.0    Project: Electroscape
+    Description: Website 1 - Sticky Cinematic Core. Single-file build. Combines:
+                 - style.css (inlined in the style block)
+                 - player.js (inlined in the script block)
                  - music.html (toggled section, no page reload)
                  Track data still loaded from tracks.json.
-                 TV section lives in tv.html.
 
     Sections:
         Stage 1 — HEAD  : Page setup, font imports, all styles
@@ -27,7 +25,9 @@
 <html lang="en">
 <head>
 
+<script>if(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) && window.innerWidth < 1024) location.replace('mobile.html');</script>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Electroscape</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
@@ -135,33 +135,6 @@ nav a:hover {
     overflow: hidden;
 }
 
-#now-playing-label {
-    font-size: 10px;
-    color: #ffffff;
-    text-transform: uppercase;
-    letter-spacing: 5px;
-    margin-bottom: 15px;
-    min-height: 15px;
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-#now-playing-label:hover {
-    color: #00FFE6;
-}
-
-/* ============================================================ */
-/* SECTION 2E: COMMAND CONTROL BOX + ACTION ROWS                */
-/* ============================================================ */
-.action-bar {
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
 .ctrl-btn {
     background: transparent;
     border: 1px solid rgba(0, 255, 230, 0.5);
@@ -244,49 +217,7 @@ nav a:hover {
 }
 
 .cmd-play-btn.is-playing {
-    animation: playGlow 2.4s ease-in-out infinite;
-}
-
-.cmd-play-btn.is-playing:hover {
-    animation: none;
-    filter: drop-shadow(0 0 16px rgba(0,255,230,0.8));
-}
-
-.play-ring {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: visible;
-}
-
-.play-ring-track {
-    fill: none;
-    stroke: rgba(0,255,230,0.08);
-    stroke-width: 1.5;
-}
-
-.play-ring-arc {
-    fill: none;
-    stroke: rgba(0,255,230,0.5);
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-dasharray: 60 153.6;
-    stroke-dashoffset: 0;
-    transform-origin: 40px 40px;
-    opacity: 0;
-    transition: opacity 0.3s ease-out;
-}
-
-@keyframes ringRotate {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-}
-
-.cmd-play-btn.is-playing .play-ring-arc {
-    opacity: 1;
-    animation: ringRotate 3s linear infinite;
+    filter: drop-shadow(0 0 8px rgba(0,255,230,0.38));
 }
 
 .play-icon {
@@ -332,39 +263,8 @@ nav a:hover {
     animation: rippleOut 0.35s ease-out forwards;
 }
 
-.cmd-row-transport {
-    padding: 20px 20px 16px;
-    gap: 20px;
-}
-
-.cmd-row-icons {
-    padding: 0 20px 16px;
-}
-
-.cmd-row-full {
-    padding: 0 20px 14px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.cmd-row-last {
-    padding-bottom: 20px;
-}
-
-.cmd-full-btn {
-    width: 100%;
-    max-width: 560px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 20px;
-    border-radius: 6px;
-}
-
 @media (max-width: 600px) {
     .cmd-arrow-btn { width: 44px; height: 38px; }
-    .cmd-row-transport { gap: 12px; padding: 16px 12px 12px; }
-    .cmd-row-full { padding: 0 12px 12px; }
 }
 
 /* ============================================================ */
@@ -576,10 +476,10 @@ nav a:hover {
 #hud-progress-container::before {
     content: '';
     position: absolute;
-    top: -23.5px;
+    top: -22px;
     left: 0;
     right: 0;
-    height: 50px;
+    height: 48px;
     z-index: 10;
     background: transparent;
 }
@@ -588,23 +488,10 @@ nav a:hover {
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding: 0 20px;
     gap: 16px;
     min-width: 0;
-}
-
-#hud-track-title {
-    font-size: 9px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #aaa;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-    min-width: 0;
-    text-align: left;
 }
 
 #hud-controls {
@@ -640,7 +527,6 @@ nav a:hover {
 
 @media (max-width: 500px) {
     #hud-inner { padding: 0 10px; gap: 8px; }
-    #hud-track-title { font-size: 7px; letter-spacing: 1.5px; }
     .hud-btn { padding: 5px 8px; font-size: 8px; }
 }
 
@@ -888,162 +774,12 @@ nav a:hover {
 @media (max-width: 500px)  { #fav-sidebar { width: 100vw; max-width: 100vw; border-left: none; } }
 
 /* ============================================================ */
-/* SECTION 2K: GUIDE POPUP                                      */
-/* ============================================================ */
-#guide-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(10px);
-    z-index: 1299;
-}
-
-#guide-backdrop.guide-visible { display: block; }
-
-#guide-modal {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
-    width: 500px;
-    max-width: 90vw;
-    max-height: 85vh;
-    background: rgba(10, 10, 10, 0.95);
-    border: 1px solid #1e1e1e;
-    border-radius: 6px;
-    z-index: 1300;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), 0 0 1px #00FFE633;
-}
-
-#guide-modal.guide-visible {
-    opacity: 1;
-    pointer-events: all;
-    transform: translate(-50%, -50%) scale(1);
-}
-
-#guide-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 25px;
-    border-bottom: 1px solid #1a1a1a;
-    flex-shrink: 0;
-}
-
-#guide-title {
-    font-size: 11px;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    color: #00FFE6;
-}
-
-#guide-close-btn {
-    background: transparent;
-    border: none;
-    color: #666;
-    font-size: 16px;
-    cursor: pointer;
-    line-height: 1;
-    transition: color 0.2s;
-}
-
-#guide-close-btn:hover { color: #00FFE6; }
-
-#guide-content {
-    overflow-y: auto;
-    padding: 30px;
-    scrollbar-width: thin;
-    scrollbar-color: #222 transparent;
-}
-
-#guide-content::-webkit-scrollbar { width: 4px; }
-#guide-content::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
-
-.guide-section { margin-bottom: 35px; text-align: left; }
-
-.guide-section h3 {
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: #00FFE6;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-}
-
-.guide-section p {
-    font-size: 11px;
-    line-height: 1.8;
-    color: #888;
-    margin: 0;
-    letter-spacing: 0.5px;
-}
-
-.guide-section strong { color: #ddd; font-weight: normal; }
-
-.guide-section ul { margin: 10px 0 0 0; padding: 0; list-style: none; }
-
-.guide-section li {
-    font-size: 11px;
-    color: #888;
-    margin-bottom: 8px;
-    padding-left: 15px;
-    position: relative;
-    letter-spacing: 0.5px;
-}
-
-.guide-section li::before { content: '—'; position: absolute; left: 0; color: #333; }
-
-#guide-footer { padding: 0 30px 30px 30px; flex-shrink: 0; }
-
-/* ============================================================ */
-/* SECTION 2L: DROPDOWN PANELS                                  */
+/* SECTION 2K: SHARED WRAPPERS                                  */
 /* ============================================================ */
 .dropdown-wrap {
     display: flex;
     justify-content: center;
     margin-bottom: 30px;
-}
-
-.dropdown-toggle {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    outline: none;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: #00FFE6;
-    transition: color 0.3s;
-}
-
-.dropdown-toggle:hover { color: rgba(0, 255, 230, 0.7); }
-.dropdown-toggle:hover .dropdown-chevron line { stroke: rgba(0, 255, 230, 0.7); }
-
-.dropdown-chevron { transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
-.dropdown-chevron line { stroke: #00FFE6; transition: stroke 0.3s; }
-.dropdown-toggle.open .dropdown-chevron { transform: rotate(180deg); }
-
-.dropdown-content {
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s;
-    opacity: 0;
-}
-
-.dropdown-content.open {
-    max-height: 500px;
-    opacity: 1;
-    padding-top: 16px;
 }
 
 .nav-links {
@@ -1065,18 +801,6 @@ nav a:hover {
 }
 
 .nav-links a:hover { color: #00FFE6; }
-
-.cmd-inner {
-    border: 1px solid rgba(0, 255, 230, 0.15);
-    border-radius: 10px;
-    background: rgba(0, 255, 230, 0.02);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: 680px;
-    margin: 0 auto;
-}
 
 /* ============================================================ */
 /* SECTION 2M: MUSIC PAGE (inline section)                      */
@@ -1218,32 +942,1929 @@ nav a:hover {
 @media (max-width: 1000px) { .music-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 700px)  { .music-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 420px)  { .music-grid { grid-template-columns: 1fr; } }
-    </style>
+
+/* ============================================================ */
+/* WEBSITE 1: STICKY CINEMATIC CORE OVERRIDES                  */
+/* ============================================================ */
+html {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    min-height: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background:
+        radial-gradient(circle at 50% -15%, rgba(0, 255, 230, 0.12), transparent 34%),
+        radial-gradient(circle at 18% 22%, rgba(50, 80, 140, 0.22), transparent 30%),
+        linear-gradient(180deg, #03050a 0%, #07080d 42%, #030409 100%);
+}
+
+body::before,
+body::after {
+    content: '';
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    pointer-events: none;
+}
+
+body::before {
+    top: 0;
+    height: 130px;
+    background: linear-gradient(180deg, rgba(3, 5, 10, 0.95), rgba(3, 5, 10, 0));
+}
+
+body::after {
+    bottom: 0;
+    height: 145px;
+    background: linear-gradient(0deg, rgba(3, 4, 9, 0.96), rgba(3, 4, 9, 0));
+}
+
+body > .dropdown-wrap:first-of-type {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 10px 22px 0;
+    max-height: 62px;
+    overflow: hidden;
+    z-index: 20;
+    transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease, max-height 0.35s ease, padding 0.35s ease;
+}
+
+.fly-in-title {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 4px 20px 8px;
+    max-height: 48px;
+    color: #00FFE6;
+    text-shadow: 0 0 28px rgba(0, 255, 230, 0.22);
+    z-index: 10;
+    transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease, max-height 0.35s ease, padding 0.35s ease;
+}
+
+.fly-in-title span {
+    letter-spacing: 18px;
+    text-indent: 18px;
+}
+
+.top-reveal-zone {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 96px;
+    z-index: 1450;
+    pointer-events: none;
+}
+
+.top-reveal-cue {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 34px;
+    height: 28px;
+    transform: translateX(-50%) translateY(-12px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 255, 230, 0.18);
+    border-radius: 0 0 7px 7px;
+    background: rgba(5, 8, 13, 0.56);
+    color: #00FFE6;
+    opacity: 0;
+    pointer-events: none;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.top-reveal-cue svg {
+    width: 14px;
+    height: 9px;
+    stroke: currentColor;
+}
+
+body.top-chrome-hidden > .dropdown-wrap:first-of-type,
+body.top-chrome-hidden .fly-in-title {
+    opacity: 0;
+    filter: blur(1px);
+    transform: translateY(-26px);
+    pointer-events: none;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+body.top-chrome-hidden .top-reveal-zone {
+    pointer-events: auto;
+}
+
+body.top-chrome-hidden .top-reveal-cue {
+    opacity: 0.78;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+body.top-chrome-hidden .top-reveal-cue:hover {
+    opacity: 1;
+    border-color: rgba(0, 255, 230, 0.52);
+    background: rgba(0, 255, 230, 0.065);
+}
+
+body.top-chrome-hidden #player-section {
+    grid-template-rows: minmax(220px, 41vh) 46px minmax(0, 1fr);
+}
+
+#player-section {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: minmax(220px, 40vh) 46px minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 clamp(14px, 2.6vw, 42px) 92px;
+    overflow: hidden;
+    transition: grid-template-rows 0.45s ease, grid-template-columns 0.45s ease, gap 0.45s ease;
+}
+
+#player-section.hidden {
+    display: none;
+}
+
+.featured-box {
+    width: min(1120px, 92vw);
+    height: 100%;
+    min-height: 0;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    isolation: isolate;
+    transition: width 0.45s ease;
+}
+
+.featured-box::before {
+    content: '';
+    position: absolute;
+    inset: 22px -50px -22px;
+    z-index: -1;
+    background:
+        radial-gradient(circle at 50% 48%, rgba(0, 255, 230, 0.16), transparent 58%),
+        linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.035), transparent);
+    filter: blur(20px);
+    opacity: 0.8;
+}
+
+#player-container {
+    flex: 1;
+    min-height: 0;
+    border: 1px solid rgba(162, 215, 220, 0.12);
+    border-radius: 8px;
+    background: #000;
+    box-shadow:
+        0 28px 90px rgba(0, 0, 0, 0.64),
+        0 0 70px rgba(0, 255, 230, 0.09),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+#player-section > .dropdown-wrap {
+    margin: 0;
+    min-height: 42px;
+    z-index: 15;
+    transition: opacity 0.35s ease, filter 0.35s ease;
+}
+
+.command-shell {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    gap: 8px;
+}
+
+.nav-links a:hover {
+    color: #00FFE6;
+}
+
+.nav-links {
+    gap: 0 24px;
+}
+
+.nav-links a {
+    color: #00FFE6;
+    letter-spacing: 5px;
+}
+
+.ctrl-btn {
+    border-color: rgba(168, 214, 216, 0.18);
+    color: rgba(230, 246, 246, 0.64);
+    border-radius: 5px;
+}
+
+.ctrl-btn:hover {
+    border-color: rgba(0, 255, 230, 0.72);
+    color: rgba(0, 255, 230, 0.95);
+    box-shadow: 0 0 20px rgba(0, 255, 230, 0.08);
+}
+
+.bare-view-btn svg rect {
+    fill: rgba(0, 255, 230, 0.72);
+}
+
+.grid {
+    --website1-thumb-height: clamp(128px, 8.6vw, 184px);
+    --website1-label-height: 52px;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-content: start;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: clamp(12px, 1.1vw, 20px);
+    width: min(1640px, 100%);
+    max-width: 1640px;
+    margin: 0 auto;
+    padding: 12px clamp(3px, 1vw, 16px) 104px;
+    box-sizing: border-box;
+    scrollbar-width: none;
+    mask-image: linear-gradient(to bottom, transparent 0, #000 28px, #000 calc(100% - 62px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 28px, #000 calc(100% - 62px), transparent 100%);
+    transition: opacity 0.35s ease, filter 0.35s ease;
+}
+
+.grid::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+#player-section > div[style*="margin-top: 40px"] {
+    display: none;
+}
+
+.video {
+    background: linear-gradient(180deg, rgba(18, 24, 31, 0.84), rgba(6, 8, 13, 0.92));
+    border: 1px solid rgba(204, 244, 246, 0.07);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    height: calc(var(--website1-thumb-height) + var(--website1-label-height) + 2px);
+    min-height: 0;
+    overflow: hidden;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+    transform: translateZ(0);
+    transition: transform 0.36s ease, border-color 0.36s ease, box-shadow 0.36s ease, background 0.36s ease;
+}
+
+.video:hover {
+    transform: translateY(-4px) scale(1.012);
+    background: linear-gradient(180deg, rgba(24, 33, 42, 0.92), rgba(8, 11, 17, 0.96));
+    border-color: rgba(0, 255, 230, 0.34);
+    box-shadow: 0 24px 52px rgba(0, 0, 0, 0.38), 0 0 26px rgba(0, 255, 230, 0.08);
+}
+
+.video.is-playing {
+    border-color: rgba(0, 255, 230, 0.82) !important;
+}
+
+.thumb-container {
+    border-radius: 8px 8px 0 0;
+    flex: 0 0 auto;
+    height: var(--website1-thumb-height);
+    min-height: 0;
+    aspect-ratio: auto;
+}
+
+.video-label {
+    color: #00FFE6;
+    font-size: 10px;
+    line-height: 1.45;
+    flex: 0 0 auto;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.overlay-btn {
+    border-color: rgba(0, 255, 230, 0.24);
+    border-radius: 4px;
+    background: rgba(2, 7, 12, 0.46);
+}
+
+#hud-dock {
+    left: 50%;
+    bottom: 14px;
+    width: min(820px, calc(100% - 28px));
+    height: 76px;
+    transform: translateX(-50%);
+    border: 1px solid rgba(180, 225, 230, 0.1);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.58) 0 22px, rgba(5, 7, 12, 0.82) 22px 100%);
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.5), 0 0 34px rgba(0, 255, 230, 0.08);
+    overflow: hidden;
+    touch-action: none;
+}
+
+#hud-progress-container {
+    height: 2px;
+    margin-top: 22px;
+    background: rgba(255, 255, 255, 0.055);
+    position: relative;
+    z-index: 3;
+    touch-action: none;
+}
+
+#hud-progress-bar {
+    background: #00FFE6;
+}
+
+.hud-btn {
+    border-color: rgba(180, 225, 230, 0.12);
+    color: rgba(235, 248, 248, 0.58);
+    border-radius: 4px;
+}
+
+.hud-playpause {
+    border-color: rgba(0, 255, 230, 0.58);
+    color: rgba(0, 255, 230, 0.9);
+}
+
+#music-section {
+    position: fixed;
+    inset: 0;
+    z-index: 1700;
+    padding: clamp(64px, 8vh, 88px) clamp(14px, 4vw, 48px) 102px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(11px);
+    -webkit-backdrop-filter: blur(11px);
+}
+
+#music-section.active {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.music-modal-box {
+    width: min(1180px, 100%);
+    max-height: calc(100vh - 156px);
+    overflow-y: auto;
+    padding: 38px clamp(16px, 3vw, 34px) 34px;
+    box-sizing: border-box;
+    border: 2px solid rgba(0, 255, 230, 0.72);
+    border-radius: 6px;
+    background: rgba(5, 7, 12, 0.96);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.055), 0 28px 90px rgba(0, 0, 0, 0.78), 0 0 38px rgba(0, 255, 230, 0.13);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 255, 230, 0.35) transparent;
+    position: relative;
+}
+
+.music-modal-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.music-modal-box::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 230, 0.35);
+    border-radius: 999px;
+}
+
+.music-close-btn {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    width: 42px;
+    height: 34px;
+    margin: -30px auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0, 255, 230, 0.7);
+    border-radius: 4px;
+    background: #05070c;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 0 18px rgba(0, 255, 230, 0.22);
+}
+
+.music-close-btn:hover,
+.music-close-btn:focus-visible {
+    color: #00FFE6;
+    outline: none;
+}
+
+.cinema-mode-btn {
+    width: 38px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(180, 225, 230, 0.16);
+    border-radius: 6px;
+    background: rgba(5, 8, 13, 0.46);
+    color: rgba(230, 246, 246, 0.62);
+    cursor: pointer;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cinema-mode-btn svg {
+    width: 19px;
+    height: 19px;
+    stroke: currentColor;
+}
+
+.layout-mode-btn {
+    width: 38px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(180, 225, 230, 0.16);
+    border-radius: 6px;
+    background: rgba(5, 8, 13, 0.46);
+    color: rgba(230, 246, 246, 0.62);
+    cursor: pointer;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.layout-mode-btn svg {
+    width: 19px;
+    height: 19px;
+    stroke: currentColor;
+}
+
+.layout-mode-btn:hover,
+.layout-mode-btn.is-active {
+    color: #00FFE6;
+    border-color: rgba(0, 255, 230, 0.5);
+    background: rgba(0, 255, 230, 0.055);
+    box-shadow: 0 0 18px rgba(0, 255, 230, 0.1);
+}
+
+@media (min-width: 1200px) and (orientation: landscape) {
+    body.side-layout #player-section {
+        grid-template-columns: minmax(520px, min(42vw, 1220px)) minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) 46px;
+        grid-template-areas:
+            "player grid"
+            "command grid";
+        gap: 14px clamp(18px, 1.4vw, 28px);
+        padding-top: 0;
+    }
+
+    body.side-layout .featured-box {
+        grid-area: player;
+        width: 100%;
+        max-width: none;
+        align-self: stretch;
+        justify-self: stretch;
+    }
+
+    body.side-layout #player-section > .dropdown-wrap {
+        grid-area: command;
+        align-self: start;
+        justify-self: center;
+        width: 100%;
+    }
+
+    body.side-layout .grid {
+        grid-area: grid;
+        width: 100%;
+        max-width: none;
+        height: 100%;
+        padding-top: 8px;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    body.side-layout .command-shell {
+        width: 100%;
+    }
+}
+
+@media (min-aspect-ratio: 21/10) and (min-width: 1800px) {
+    #player-section {
+        grid-template-rows: minmax(230px, 38vh) 44px minmax(0, 1fr);
+    }
+
+    body.top-chrome-hidden #player-section {
+        grid-template-rows: minmax(230px, 39vh) 44px minmax(0, 1fr);
+    }
+
+    .featured-box {
+        width: min(1180px, 76vw);
+    }
+
+    .grid {
+        --website1-thumb-height: clamp(112px, 6.2vw, 172px);
+        width: min(2200px, 100%);
+        max-width: 2200px;
+        grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+        padding-top: 8px;
+    }
+
+    body.side-layout #player-section {
+        grid-template-columns: minmax(640px, min(44vw, 1380px)) minmax(0, 1fr);
+    }
+
+    body.side-layout .featured-box {
+        width: 100%;
+    }
+}
+
+.cinema-mode-btn:hover,
+.cinema-mode-btn.is-active {
+    color: #00FFE6;
+    border-color: rgba(0, 255, 230, 0.5);
+    background: rgba(0, 255, 230, 0.055);
+    box-shadow: 0 0 18px rgba(0, 255, 230, 0.1);
+}
+
+body.cinema-mode > .dropdown-wrap:first-of-type,
+body.cinema-mode .fly-in-title {
+    opacity: 0.09;
+    filter: blur(0.6px);
+}
+
+body.cinema-mode #player-section {
+    grid-template-rows: minmax(330px, 72vh) 74px minmax(0, 1fr);
+}
+
+body.cinema-mode .featured-box {
+    width: min(1400px, 94vw);
+}
+
+body.cinema-mode #player-section > .dropdown-wrap {
+    opacity: 1;
+    filter: none;
+    pointer-events: auto;
+    align-self: center;
+    transform: none;
+}
+
+body.cinema-mode .grid {
+    opacity: 0.025;
+    filter: blur(3px);
+    pointer-events: none;
+}
+
+body.cinema-mode #hud-dock:not(.hud-active) {
+    opacity: 0;
+}
+
+body.cinema-mode .command-shell {
+    opacity: 0.74;
+    width: 100%;
+}
+
+body.cinema-mode .cinema-mode-btn {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(0, 255, 230, 0.58);
+    border-color: rgba(0, 255, 230, 0.22);
+    background: rgba(5, 8, 13, 0.36);
+    box-shadow: 0 0 16px rgba(0, 255, 230, 0.055);
+}
+
+.music-card {
+    border-radius: 8px;
+    border-color: rgba(204, 244, 246, 0.07);
+    background: rgba(12, 16, 23, 0.82);
+}
+
+@media (max-width: 820px) {
+    body > .dropdown-wrap:first-of-type {
+        padding-top: 12px;
+    }
+
+    .fly-in-title {
+        font-size: 11px;
+        padding-bottom: 10px;
+    }
+
+    .fly-in-title span {
+        letter-spacing: 8px;
+        text-indent: 8px;
+    }
+
+    #player-section {
+        grid-template-rows: minmax(176px, 31vh) 42px minmax(0, 1fr);
+        padding-left: 12px;
+        padding-right: 12px;
+        gap: 10px;
+    }
+
+    body.cinema-mode #player-section {
+        grid-template-rows: minmax(220px, 54vh) 74px minmax(0, 1fr);
+    }
+
+    .cinema-mode-btn,
+    .layout-mode-btn {
+        width: 34px;
+        height: 31px;
+    }
+
+    .featured-box {
+        width: 100%;
+    }
+
+    .grid {
+        --website1-thumb-height: max(104px, 25vw);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding-top: 14px;
+    }
+
+    .grid.view-dense,
+    .grid.view-max {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .video-label {
+        font-size: 9px;
+        letter-spacing: 1px;
+        padding: 11px 8px;
+    }
+
+}
+
+@media (max-width: 520px) {
+    .nav-links {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .fly-in-title {
+        font-size: 9px;
+    }
+
+    .fly-in-title span {
+        letter-spacing: 4px;
+        text-indent: 4px;
+    }
+
+    #player-section {
+        grid-template-rows: minmax(154px, 27vh) 42px minmax(0, 1fr);
+        padding-bottom: 88px;
+    }
+
+    body.cinema-mode #player-section {
+        grid-template-rows: minmax(190px, 44vh) 74px minmax(0, 1fr);
+    }
+
+    .cmd-play-btn {
+        width: 62px;
+        height: 62px;
+    }
+
+    .grid,
+    .grid.view-dense,
+    .grid.view-max {
+        --website1-thumb-height: max(180px, 56vw);
+        grid-template-columns: 1fr;
+    }
+
+    #hud-dock {
+        bottom: 10px;
+        width: calc(100% - 20px);
+    }
+}
+
+
+/* ============================================================ */
+/* CORE1 LAYOUT — HYBRID VERTICAL / SIDE MODE                   */
+/* Vertical mode returns to classic free-page scrolling.          */
+/* Side mode keeps the fixed app-shell player/grid experience.    */
+/* ============================================================ */
+
+/* Simple solid background for this stage */
+html {
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #07080d;
+}
+
+html:has(body.side-layout),
+html:has(body.cinema-mode) {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    min-height: 100%;
+    height: auto;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: block;
+    background: #07080d !important;
+}
+
+body::before,
+body::after,
+.featured-box::before {
+    display: none !important;
+}
+
+/* In vertical mode, keep the header/title visible and remove the auto-collapse behaviour. */
+body:not(.side-layout):not(.cinema-mode).top-chrome-hidden > .dropdown-wrap:first-of-type,
+body:not(.side-layout):not(.cinema-mode).top-chrome-hidden .fly-in-title {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    pointer-events: auto;
+    max-height: none;
+    padding-top: revert;
+    padding-bottom: revert;
+}
+
+body:not(.side-layout):not(.cinema-mode) .top-reveal-zone {
+    display: none;
+}
+
+/* Vertical mode: classic page flow, larger player, grid scrolls with page. */
+body:not(.side-layout):not(.cinema-mode) #player-section {
+    display: block;
+    width: 100%;
+    min-height: auto;
+    height: auto;
+    padding: 0;
+    overflow: visible;
+}
+
+body:not(.side-layout):not(.cinema-mode) #player-section.hidden {
+    display: none;
+}
+
+body:not(.side-layout):not(.cinema-mode) .featured-box {
+    width: min(1440px, 96vw);
+    max-width: 1440px;
+    height: auto;
+    margin: 0 auto 22px auto;
+    display: block;
+}
+
+body:not(.side-layout):not(.cinema-mode) #player-container {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    flex: none;
+    min-height: 0;
+}
+
+body:not(.side-layout):not(.cinema-mode) #player-section > .dropdown-wrap {
+    margin: 0 0 24px 0;
+    min-height: 0;
+    overflow: visible;
+}
+
+body:not(.side-layout):not(.cinema-mode) .command-shell {
+    overflow: visible;
+}
+
+body:not(.side-layout):not(.cinema-mode) .grid {
+    width: min(2200px, 100%);
+    max-width: 2200px;
+    overflow: visible;
+    min-height: auto;
+    height: auto;
+    padding: 0 clamp(3px, 1vw, 16px) 126px;
+    mask-image: none;
+    -webkit-mask-image: none;
+    --website1-thumb-height: clamp(150px, 9vw, 220px);
+}
+
+/* Side layout: fixed app shell, independent grid, fixed player. */
+body.side-layout,
+body.cinema-mode {
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #07080d !important;
+}
+
+body.side-layout > .dropdown-wrap:first-of-type,
+body.side-layout .fly-in-title,
+body.cinema-mode > .dropdown-wrap:first-of-type,
+body.cinema-mode .fly-in-title {
+    flex-shrink: 0;
+}
+
+body.side-layout #player-section {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 clamp(14px, 2.6vw, 42px) 92px;
+}
+
+body.side-layout .command-shell {
+    position: relative;
+    overflow: visible;
+}
+
+/* Tablet/mobile simplification: side layout toggle is desktop-only for now. */
+@media (max-width: 1199px), (pointer: coarse) {
+    .layout-mode-btn {
+        display: none !important;
+    }
+
+    body.cinema-mode .cinema-mode-btn {
+        position: static;
+        left: auto;
+        transform: none;
+    }
+}
+
+@media (max-width: 820px) {
+    #music-section {
+        padding: 58px 12px 96px;
+    }
+
+    .music-modal-box {
+        max-height: calc(100vh - 132px);
+        padding: 36px 14px 26px;
+    }
+
+    .music-page-header {
+        padding-left: 4px;
+        padding-right: 4px;
+        text-align: center;
+        line-height: 1.55;
+    }
+}
+
+@media (max-width: 820px) {
+    body:not(.side-layout):not(.cinema-mode) {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    body:not(.side-layout):not(.cinema-mode) .featured-box {
+        width: 100%;
+    }
+
+    body:not(.side-layout):not(.cinema-mode) .grid,
+    body:not(.side-layout):not(.cinema-mode) .grid.view-dense,
+    body:not(.side-layout):not(.cinema-mode) .grid.view-max {
+        --website1-thumb-height: max(104px, 25vw);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding-bottom: 118px;
+    }
+}
+
+@media (max-width: 520px) {
+    body:not(.side-layout):not(.cinema-mode) .grid,
+    body:not(.side-layout):not(.cinema-mode) .grid.view-dense,
+    body:not(.side-layout):not(.cinema-mode) .grid.view-max {
+        --website1-thumb-height: max(180px, 56vw);
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* ============================================================ */
+/* CORE1 CHROME — TOP LINK BAR / VERSION FOOTER                 */
+/* ============================================================ */
+.top-nav-wrap {
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 18px 22px 20px !important;
+    max-height: 88px !important;
+    overflow: visible !important;
+    z-index: 20 !important;
+    transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease, max-height 0.35s ease, padding 0.35s ease !important;
+}
+
+.top-nav-links {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: clamp(28px, 3vw, 72px) !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+}
+
+.top-nav-links a {
+    color: #00FFE6 !important;
+    text-decoration: none !important;
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 7px !important;
+    white-space: nowrap !important;
+    opacity: 0.92 !important;
+    transition: opacity 0.25s ease, text-shadow 0.25s ease !important;
+}
+
+.top-nav-links a:hover {
+    opacity: 1 !important;
+    text-shadow: 0 0 16px rgba(0,255,230,0.45) !important;
+}
+
+.fly-in-title {
+    padding-top: 10px !important;
+    padding-bottom: 6px !important;
+}
+
+body:not(.side-layout):not(.cinema-mode) .featured-box {
+    margin-top: -8px !important;
+}
+
+/* Let the top links + title fade in vertical mode too. */
+body.top-chrome-hidden > .top-nav-wrap,
+body.top-chrome-hidden .fly-in-title,
+body:not(.side-layout):not(.cinema-mode).top-chrome-hidden > .top-nav-wrap,
+body:not(.side-layout):not(.cinema-mode).top-chrome-hidden .fly-in-title {
+    opacity: 0 !important;
+    filter: blur(1px) !important;
+    transform: translateY(-26px) !important;
+    pointer-events: none !important;
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+body:not(.side-layout):not(.cinema-mode) .top-reveal-zone,
+body.top-chrome-hidden .top-reveal-zone {
+    display: block !important;
+    pointer-events: auto !important;
+}
+
+#version-footer {
+    display: block !important;
+    margin: 48px auto 110px !important;
+    padding: 16px 0 !important;
+    width: min(980px, calc(100% - 40px)) !important;
+    text-align: center !important;
+    color: rgba(255,255,255,0.28) !important;
+    font-size: 9px !important;
+    letter-spacing: 3px !important;
+    text-transform: uppercase !important;
+    border-top: 1px solid rgba(0,255,230,0.12) !important;
+}
+
+#version-footer strong {
+    color: #00FFE6 !important;
+    font-weight: 400 !important;
+    margin-left: 10px !important;
+}
+
+@media (max-width: 700px) {
+    .top-nav-wrap {
+        padding: 14px 12px 16px !important;
+    }
+    .top-nav-links {
+        gap: 18px !important;
+    }
+    .top-nav-links a {
+        font-size: 8px !important;
+        letter-spacing: 4px !important;
+    }
+}
+
+
+/* ============================================================ */
+/* CORE1 CONTROLS — COMPACT SINGLE-LINE CONTROLS                */
+/* ============================================================ */
+.command-control-wrap {
+    margin: 0 0 22px !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+}
+
+.compact-command-shell {
+    width: auto !important;
+    max-width: min(980px, calc(100vw - 32px)) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    margin: 0 auto !important;
+    position: relative !important;
+    transform: none !important;
+    opacity: 1 !important;
+}
+
+.compact-command-shell .cmd-arrow-btn,
+.compact-command-shell .icon-only-btn,
+.compact-command-shell .cinema-mode-btn,
+.compact-command-shell .layout-mode-btn {
+    width: 42px !important;
+    height: 38px !important;
+    min-width: 42px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid rgba(180, 225, 230, 0.16) !important;
+    border-radius: 6px !important;
+    background: rgba(5, 8, 13, 0.46) !important;
+    color: rgba(0, 255, 230, 0.78) !important;
+    box-sizing: border-box !important;
+}
+
+.compact-command-shell .cmd-play-btn {
+    width: 60px !important;
+    height: 60px !important;
+    min-width: 60px !important;
+    flex: 0 0 auto !important;
+}
+
+.compact-command-shell .icon-only-btn svg,
+.compact-command-shell .cinema-mode-btn svg,
+.compact-command-shell .layout-mode-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+    stroke: currentColor !important;
+}
+
+.compact-grid-modes {
+    height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    padding: 0 8px !important;
+    border: 1px solid rgba(180, 225, 230, 0.12) !important;
+    border-radius: 6px !important;
+    background: rgba(5, 8, 13, 0.34) !important;
+    flex: 0 0 auto !important;
+}
+
+.compact-grid-modes .bare-view-btn {
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+}
+
+.compact-grid-modes .bare-view-btn svg rect {
+    fill: #00FFE6 !important;
+}
+
+.compact-grid-modes .grid-collapse-btn svg rect {
+    fill: none !important;
+    stroke: currentColor !important;
+    opacity: 0.7 !important;
+}
+
+.compact-grid-modes .grid-collapse-btn svg path {
+    stroke: currentColor !important;
+}
+
+.compact-grid-modes .grid-collapse-btn {
+    color: #00FFE6 !important;
+    opacity: 0.78 !important;
+}
+
+.compact-grid-modes .grid-collapse-btn:hover,
+.compact-grid-modes .grid-collapse-btn.grid-btn-active {
+    color: #00FFE6 !important;
+    opacity: 1 !important;
+}
+
+#version-footer {
+    display: block !important;
+    margin: 48px auto 110px !important;
+    padding: 16px 0 !important;
+    width: min(980px, calc(100% - 40px)) !important;
+    text-align: center !important;
+    color: #00FFE6 !important;
+    font-family: 'Orbitron', sans-serif !important;
+    font-size: 9px !important;
+    font-weight: 400 !important;
+    letter-spacing: 3px !important;
+    text-transform: uppercase !important;
+    border-top: 1px solid rgba(0,255,230,0.12) !important;
+}
+
+body.side-layout .command-control-wrap {
+    grid-area: command !important;
+    align-self: start !important;
+    justify-self: center !important;
+    width: 100% !important;
+    position: static !important;
+}
+
+body.side-layout .compact-command-shell {
+    position: static !important;
+    transform: none !important;
+    left: auto !important;
+    bottom: auto !important;
+}
+
+body.cinema-mode .compact-command-shell {
+    opacity: 0.78 !important;
+}
+
+@media (max-width: 760px) {
+    .compact-command-shell {
+        gap: 7px !important;
+        max-width: calc(100vw - 20px) !important;
+        flex-wrap: wrap !important;
+    }
+
+    .compact-command-shell .cmd-arrow-btn,
+    .compact-command-shell .icon-only-btn,
+    .compact-command-shell .cinema-mode-btn,
+    .compact-command-shell .layout-mode-btn {
+        width: 38px !important;
+        height: 36px !important;
+        min-width: 38px !important;
+    }
+
+    .compact-command-shell .cmd-play-btn {
+        width: 54px !important;
+        height: 54px !important;
+        min-width: 54px !important;
+    }
+}
+
+    
+
+/* ============================================================ */
+/* CORE1 PATCH — LOCK CINEMA BUTTON POSITION                    */
+/* Prevent legacy cinema-mode rules from moving the button.      */
+/* ============================================================ */
+body.cinema-mode .compact-command-shell .cinema-mode-btn,
+body.side-layout .compact-command-shell .cinema-mode-btn,
+.compact-command-shell .cinema-mode-btn {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    flex: 0 0 42px !important;
+    order: 7 !important;
+}
+
+body.cinema-mode .compact-command-shell .layout-mode-btn,
+body.side-layout .compact-command-shell .layout-mode-btn,
+.compact-command-shell .layout-mode-btn {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    flex: 0 0 42px !important;
+    order: 8 !important;
+}
+
+@media (max-width: 760px) {
+    body.cinema-mode .compact-command-shell .cinema-mode-btn,
+    body.side-layout .compact-command-shell .cinema-mode-btn,
+    .compact-command-shell .cinema-mode-btn,
+    body.cinema-mode .compact-command-shell .layout-mode-btn,
+    body.side-layout .compact-command-shell .layout-mode-btn,
+    .compact-command-shell .layout-mode-btn {
+        flex-basis: 38px !important;
+    }
+}
+
+
+/* ============================================================ */
+/* CORE1 DESKTOP — GRID / CINEMA / TOP CHROME                   */
+/* ============================================================ */
+.thumb-container {
+    aspect-ratio: 16 / 9 !important;
+    height: auto !important;
+    width: 100% !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-color: #000 !important;
+}
+
+.video {
+    height: auto !important;
+}
+
+body:not(.side-layout):not(.cinema-mode) .grid {
+    grid-template-columns: repeat(auto-fill, minmax(390px, 1fr)) !important;
+    gap: clamp(14px, 1.1vw, 22px) !important;
+}
+
+body:not(.side-layout):not(.cinema-mode) .grid.view-dense {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    gap: 14px !important;
+}
+
+body:not(.side-layout):not(.cinema-mode) .grid.view-max {
+    grid-template-columns: repeat(auto-fill, minmax(620px, 1fr)) !important;
+    gap: clamp(18px, 1.5vw, 30px) !important;
+}
+
+#version-footer {
+    border-top: none !important;
+    margin-top: 30px !important;
+    padding-top: 0 !important;
+}
+
+body.side-layout #player-section {
+    grid-template-columns: minmax(620px, min(40vw, 1360px)) minmax(0, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr) 42px !important;
+    gap: 10px clamp(16px, 1.2vw, 24px) !important;
+    padding: 0 clamp(14px, 2vw, 34px) 72px !important;
+}
+
+body.side-layout .grid {
+    --website1-label-height: 40px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+    gap: 12px !important;
+    padding: 6px 8px 76px !important;
+}
+
+body.side-layout .video-label {
+    min-height: 40px !important;
+    padding: 10px 12px !important;
+    font-size: 9px !important;
+}
+
+body.side-layout #version-footer {
+    display: none !important;
+}
+
+body.cinema-mode #player-section {
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) 46px !important;
+    gap: 10px !important;
+    padding: 0 clamp(14px, 2vw, 42px) 92px !important;
+}
+
+body.cinema-mode .featured-box {
+    width: min(1720px, 96vw) !important;
+    max-width: none !important;
+    height: auto !important;
+    align-self: center !important;
+    justify-self: center !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+body.cinema-mode #player-container {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 16 / 9 !important;
+    flex: 0 0 auto !important;
+}
+
+body.cinema-mode .grid,
+body.cinema-mode #version-footer {
+    display: none !important;
+}
+
+body.cinema-mode .compact-command-shell {
+    opacity: 1 !important;
+    width: auto !important;
+}
+
+body.cinema-mode .compact-command-shell > :not(.cinema-mode-btn) {
+    display: none !important;
+}
+
+body.cinema-mode .compact-command-shell .cinema-mode-btn {
+    display: inline-flex !important;
+    color: rgba(0, 255, 230, 0.38) !important;
+    border-color: rgba(0, 255, 230, 0.16) !important;
+    background: rgba(4, 6, 10, 0.46) !important;
+    box-shadow: none !important;
+}
+
+body.top-chrome-hidden > .top-nav-wrap,
+body:not(.side-layout):not(.cinema-mode).top-chrome-hidden > .top-nav-wrap {
+    opacity: 0 !important;
+    filter: blur(1px) !important;
+    transform: translateY(-18px) !important;
+    pointer-events: none !important;
+    max-height: 88px !important;
+    padding: 18px 22px 20px !important;
+    margin: 0 !important;
+}
+
+body.top-chrome-hidden .fly-in-title,
+body:not(.side-layout):not(.cinema-mode).top-chrome-hidden .fly-in-title {
+    opacity: 0 !important;
+    filter: blur(1px) !important;
+    transform: translateY(-18px) !important;
+    pointer-events: none !important;
+    max-height: 48px !important;
+    padding: 10px 20px 6px !important;
+    margin: 0 !important;
+}
+
+body.side-layout.top-chrome-hidden #player-section {
+    grid-template-rows: minmax(0, 1fr) 42px !important;
+}
+
+body.cinema-mode.top-chrome-hidden #player-section {
+    grid-template-rows: minmax(0, 1fr) 46px !important;
+}
+
+.top-reveal-zone,
+body.top-chrome-hidden .top-reveal-zone,
+body:not(.side-layout):not(.cinema-mode) .top-reveal-zone {
+    display: block !important;
+    pointer-events: none !important;
+}
+
+body.top-chrome-hidden .top-reveal-cue {
+    pointer-events: auto !important;
+}
+
+@media (max-width: 900px) {
+    body:not(.side-layout):not(.cinema-mode) .grid,
+    body:not(.side-layout):not(.cinema-mode) .grid.view-dense,
+    body:not(.side-layout):not(.cinema-mode) .grid.view-max {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 560px) {
+    body:not(.side-layout):not(.cinema-mode) .grid,
+    body:not(.side-layout):not(.cinema-mode) .grid.view-dense,
+    body:not(.side-layout):not(.cinema-mode) .grid.view-max {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+
+/* ============================================================ */
+/* CORE1 MODAL/SIDE — FAST MUSIC MODAL / SIDE GRID RECOVERY     */
+/* ============================================================ */
+#music-section {
+    background: rgba(0, 0, 0, 0.68) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.music-modal-box {
+    border: 1px solid rgba(74, 78, 86, 0.95) !important;
+    background: rgba(5, 7, 12, 0.98) !important;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.68) !important;
+    padding-top: 30px !important;
+}
+
+.music-close-btn {
+    position: sticky !important;
+    top: 0 !important;
+    width: 30px !important;
+    height: 30px !important;
+    margin: -22px 0 10px auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #fff !important;
+    box-shadow: none !important;
+    font-size: 24px !important;
+    line-height: 1 !important;
+}
+
+.music-close-btn:hover,
+.music-close-btn:focus-visible {
+    color: #fff !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.music-card,
+.music-card * {
+    transition: none !important;
+}
+
+.music-card,
+.music-card:hover,
+.music-card.spotify:hover,
+.music-card.tidal:hover,
+.music-card.deezer:hover,
+.music-card.youtube:hover {
+    border-color: rgba(44, 48, 55, 0.95) !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.music-card:hover .card-arrow,
+.music-card.spotify:hover .card-arrow,
+.music-card.tidal:hover .card-arrow,
+.music-card.deezer:hover .card-arrow,
+.music-card.youtube:hover .card-arrow {
+    color: #333 !important;
+}
+
+body.side-layout #player-section {
+    grid-template-columns: minmax(620px, min(42vw, 1440px)) minmax(0, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr) 42px !important;
+    grid-template-areas:
+        "player grid"
+        "command grid" !important;
+    min-height: 0 !important;
+}
+
+body.side-layout .grid,
+body.side-layout .grid.view-dense,
+body.side-layout .grid.view-max {
+    --side-thumb-height: clamp(130px, 5vw, 176px);
+    --side-label-height: 40px;
+    grid-area: grid !important;
+    display: grid !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    align-content: start !important;
+    grid-auto-flow: row !important;
+    grid-auto-rows: calc(var(--side-thumb-height) + var(--side-label-height)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    gap: 14px !important;
+    padding: 8px 12px 96px !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(0, 255, 230, 0.35) transparent !important;
+}
+
+body.side-layout .grid::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+body.side-layout .grid::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 230, 0.35) !important;
+    border-radius: 999px !important;
+}
+
+body.side-layout .video {
+    display: flex !important;
+    flex-direction: column !important;
+    height: calc(var(--side-thumb-height) + var(--side-label-height)) !important;
+    min-height: calc(var(--side-thumb-height) + var(--side-label-height)) !important;
+    overflow: hidden !important;
+}
+
+body.side-layout .thumb-container {
+    aspect-ratio: auto !important;
+    height: var(--side-thumb-height) !important;
+    min-height: var(--side-thumb-height) !important;
+    flex: 0 0 auto !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+}
+
+body.side-layout .grid.view-dense {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)) !important;
+}
+
+body.side-layout .grid.view-max {
+    grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)) !important;
+}
+
+
+/* ============================================================ */
+/* CORE1 TABLET — SIDE VIEW / NEUTRAL SCROLLBARS                */
+/* ============================================================ */
+:root {
+    --core1-cyan: #00FFE6;
+    --core1-scroll-grey: #050507;
+}
+
+.music-modal-box {
+    scrollbar-color: var(--core1-scroll-grey) transparent !important;
+}
+
+.music-modal-box::-webkit-scrollbar-thumb {
+    background: var(--core1-scroll-grey) !important;
+}
+
+body.side-layout .grid,
+body.side-layout .grid.view-dense,
+body.side-layout .grid.view-max {
+    scrollbar-width: none !important;
+    scrollbar-color: var(--core1-scroll-grey) transparent !important;
+}
+
+body.side-layout .grid::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+}
+
+body.side-layout .grid::-webkit-scrollbar-thumb {
+    background: var(--core1-scroll-grey) !important;
+}
+
+body.side-layout .featured-box {
+    grid-area: player !important;
+    width: min(42vw, 1440px) !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    justify-self: stretch !important;
+}
+
+body.side-layout #player-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+}
+
+body.side-layout #player-section > .dropdown-wrap {
+    grid-area: command !important;
+}
+
+.video,
+.video:hover,
+.video.is-playing,
+body.side-layout .video,
+body.side-layout .video:hover,
+body.side-layout .video.is-playing {
+    border-color: var(--core1-cyan) !important;
+}
+
+@media (max-width: 1199px), (pointer: coarse) {
+    body.side-layout #hud-dock {
+        display: none !important;
+    }
+
+    body.side-layout #player-section {
+        padding-bottom: 18px !important;
+    }
+}
+
+@media (orientation: portrait) and (max-width: 1199px), (orientation: portrait) and (pointer: coarse) {
+    body.side-layout #player-section {
+        grid-template-columns: minmax(0, 58vw) minmax(0, 42vw) !important;
+        grid-template-rows: minmax(0, 1fr) 42px !important;
+        gap: 10px !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    body.side-layout .featured-box {
+        width: calc(58vw - 30px) !important;
+        max-width: calc(58vw - 30px) !important;
+    }
+
+    body.side-layout .grid,
+    body.side-layout .grid.view-dense,
+    body.side-layout .grid.view-max {
+        --side-thumb-height: clamp(86px, 16vw, 150px);
+        --side-label-height: 46px;
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        padding: 6px 4px 22px !important;
+    }
+
+    body.side-layout .video-label {
+        min-height: var(--side-label-height) !important;
+        padding: 9px 8px !important;
+        font-size: 8px !important;
+        line-height: 1.35 !important;
+        letter-spacing: 1.2px !important;
+    }
+}
+
+
+/* ============================================================ */
+/* CORE1 INTERACTION — HOVER BORDERS / CENTERED CONTROLS        */
+/* ============================================================ */
+#hud-inner {
+    justify-content: center !important;
+}
+
+#hud-controls {
+    margin: 0 auto !important;
+}
+
+#hud-dock {
+    width: min(548px, calc(100% - 28px)) !important;
+    height: 58px !important;
+}
+
+#hud-progress-container {
+    margin-top: 15px !important;
+    z-index: 1 !important;
+}
+
+#hud-inner {
+    padding: 0 14px !important;
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+#hud-controls {
+    gap: 7px !important;
+}
+
+.hud-btn {
+    padding: 5px 9px !important;
+    font-size: 8px !important;
+    pointer-events: auto !important;
+}
+
+.hud-playpause {
+    padding: 5px 13px !important;
+}
+
+body.cinema-mode .compact-command-shell .cinema-mode-btn,
+body.cinema-mode .compact-command-shell .cinema-mode-btn.is-active,
+body.cinema-mode .compact-command-shell .cinema-mode-btn:hover {
+    color: rgba(0, 255, 230, 0.32) !important;
+    border-color: rgba(0, 255, 230, 0.12) !important;
+    background: rgba(4, 6, 10, 0.42) !important;
+    box-shadow: none !important;
+}
+
+body.grid-collapsed #video-grid,
+body.grid-collapsed #version-footer {
+    display: none !important;
+}
+
+body.grid-collapsed:not(.side-layout):not(.cinema-mode) .featured-box {
+    width: min(1720px, 96vw) !important;
+    max-width: none !important;
+}
+
+body.grid-collapsed.side-layout #player-section {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas:
+        "player"
+        "command" !important;
+    padding-left: clamp(14px, 2vw, 42px) !important;
+    padding-right: clamp(14px, 2vw, 42px) !important;
+}
+
+body.grid-collapsed.side-layout .featured-box {
+    width: min(1720px, calc(100vw - 84px)) !important;
+    max-width: min(1720px, calc(100vw - 84px)) !important;
+    justify-self: center !important;
+}
+
+body.grid-collapsed .grid-collapse-btn {
+    opacity: 1 !important;
+    color: #00FFE6 !important;
+    border-color: rgba(0, 255, 230, 0.35) !important;
+}
+
+.video,
+.video:hover,
+.video.is-playing,
+body.side-layout .video,
+body.side-layout .video:hover,
+body.side-layout .video.is-playing {
+    border-color: rgba(204, 244, 246, 0.07) !important;
+    animation: none !important;
+    transition: transform 0.36s ease, box-shadow 0.36s ease, background 0.36s ease !important;
+}
+
+.video.is-hover-preview,
+body.side-layout .video.is-hover-preview {
+    border-color: var(--core1-cyan) !important;
+}
+
+@media (max-width: 1199px), (pointer: coarse) {
+    body.side-layout #player-section {
+        grid-template-areas:
+            "player grid"
+            "command command" !important;
+        grid-template-rows: minmax(0, 1fr) 78px !important;
+        padding-bottom: 18px !important;
+    }
+
+    body.side-layout .command-control-wrap {
+        grid-area: command !important;
+        align-self: center !important;
+        justify-self: center !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    body.side-layout .compact-command-shell {
+        width: max-content !important;
+        max-width: calc(100vw - 28px) !important;
+        margin: 0 auto !important;
+        justify-content: center !important;
+        transform: none !important;
+    }
+
+    body.side-layout .grid,
+    body.side-layout .grid.view-dense,
+    body.side-layout .grid.view-max {
+        padding-bottom: 34px !important;
+    }
+}
+
+@media (max-width: 1320px), (max-height: 820px) {
+    body:not(.side-layout) #hud-dock {
+        display: none !important;
+    }
+
+    body:not(.side-layout):not(.cinema-mode) #player-section {
+        padding-bottom: 110px !important;
+    }
+
+    body:not(.side-layout):not(.cinema-mode) .grid,
+    body:not(.side-layout):not(.cinema-mode) .grid.view-dense,
+    body:not(.side-layout):not(.cinema-mode) .grid.view-max {
+        padding-bottom: 150px !important;
+    }
+}
+
+@media (orientation: portrait) and (max-width: 1199px), (orientation: portrait) and (pointer: coarse) {
+    body.side-layout #player-section {
+        grid-template-rows: minmax(0, 1fr) 84px !important;
+        padding-bottom: 22px !important;
+    }
+
+    body.side-layout .compact-command-shell {
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    body.side-layout .grid,
+    body.side-layout .grid.view-dense,
+    body.side-layout .grid.view-max {
+        padding-bottom: 40px !important;
+    }
+}
+
+/* CORE1 1.2.5 — keep the hidden-nav cue on the viewport edge, not in player space. */
+.top-reveal-zone,
+body.top-chrome-hidden .top-reveal-zone,
+body:not(.side-layout):not(.cinema-mode) .top-reveal-zone {
+    height: 34px !important;
+    top: 0 !important;
+    z-index: 5000 !important;
+}
+
+.top-reveal-cue {
+    position: fixed !important;
+    top: 6px !important;
+    left: 50% !important;
+    height: 24px !important;
+    z-index: 5001 !important;
+    transform: translateX(-50%) translateY(-8px) !important;
+}
+
+body.top-chrome-hidden .top-reveal-cue {
+    transform: translateX(-50%) translateY(0) !important;
+}
+
+@media (orientation: landscape) and (max-width: 1199px), (orientation: landscape) and (pointer: coarse) {
+    body.side-layout.top-chrome-hidden > .top-nav-wrap,
+    body.side-layout.top-chrome-hidden .fly-in-title {
+        max-height: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        margin: 0 !important;
+    }
+
+    body.side-layout.top-chrome-hidden #player-section {
+        grid-template-rows: minmax(0, 1fr) 76px !important;
+    }
+}
+
+/* CORE1 1.2.6 — phone nav uses a fixed 2x2 grid instead of uneven flex wrapping. */
+@media (max-width: 560px) {
+    .top-nav-wrap {
+        padding: 28px 18px 22px !important;
+        max-height: none !important;
+    }
+
+    .top-nav-links {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 18px 12px !important;
+        width: min(430px, calc(100vw - 44px)) !important;
+        margin: 0 auto !important;
+        justify-items: center !important;
+        align-items: center !important;
+    }
+
+    .top-nav-links a {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        text-align: center !important;
+        font-size: 8px !important;
+        letter-spacing: 3.6px !important;
+        line-height: 1.5 !important;
+    }
+}
+
+/* CORE1 1.2.7 — phone-only command layout: playback, grid, secondary controls. */
+@media (max-width: 560px) {
+    body:not(.side-layout):not(.cinema-mode) #player-section {
+        grid-template-rows: minmax(154px, 27vh) auto minmax(0, 1fr) !important;
+    }
+
+    .command-control-wrap {
+        margin: 2px 0 24px !important;
+    }
+
+    .compact-command-shell {
+        display: grid !important;
+        grid-template-columns: repeat(4, 54px) !important;
+        grid-auto-rows: auto !important;
+        justify-content: center !important;
+        justify-items: center !important;
+        align-items: center !important;
+        gap: 12px 10px !important;
+        width: max-content !important;
+        max-width: calc(100vw - 24px) !important;
+        flex-wrap: initial !important;
+    }
+
+    .compact-command-shell #prev-btn {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+    }
+
+    .compact-command-shell #playpause-btn {
+        grid-column: 2 / 4 !important;
+        grid-row: 1 !important;
+        justify-self: center !important;
+    }
+
+    .compact-command-shell #next-btn {
+        grid-column: 4 !important;
+        grid-row: 1 !important;
+    }
+
+    .compact-command-shell .compact-grid-modes {
+        grid-column: 1 / -1 !important;
+        grid-row: 2 !important;
+        justify-self: center !important;
+    }
+
+    .compact-command-shell #shuffle-btn {
+        grid-column: 1 !important;
+        grid-row: 3 !important;
+    }
+
+    .compact-command-shell #fav-toggle-btn {
+        grid-column: 2 !important;
+        grid-row: 3 !important;
+    }
+
+    .compact-command-shell #cinema-mode-btn {
+        grid-column: 3 / 5 !important;
+        grid-row: 3 !important;
+        justify-self: center !important;
+    }
+
+    /* layout-mode-btn is desktop-only — always hidden on phone */
+    .compact-command-shell #layout-mode-btn {
+        display: none !important;
+    }
+}
+
+/* Belt-and-braces: hide layout-mode-btn on any narrow / touch screen,
+   regardless of which rule block got there first. */
+@media (max-width: 1199px) {
+    #layout-mode-btn { display: none !important; }
+}
+@media (pointer: coarse) {
+    #layout-mode-btn { display: none !important; }
+}
+</style>
 
 </head>
 <body>
 
     <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3A: NAVIGATION NODES DROPDOWN                    -->
+    <!-- SECTION 3A: TOP NAVIGATION LINKS                         -->
     <!-- -------------------------------------------------------- -->
-    <div class="dropdown-wrap">
-        <div>
-            <button class="dropdown-toggle" id="nav-toggle" aria-expanded="false" aria-label="Toggle navigation">
-                NAVIGATION NODES
-                <svg class="dropdown-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="1" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
-                    <line x1="9" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
-                </svg>
-            </button>
-            <div class="dropdown-content" id="nav-content">
-                <div class="nav-links">
-                    <a href="https://beacons.ai/weblinks" target="_blank">WEBLINKS</a>
-                    <a href="#" id="nav-music-link">MUSIC</a>
-                    <a href="tv.html">TV</a>
-		    <a href="imagevault.html">IMAGE VAULT</a>
-                    <a id="guide-open-btn" href="javascript:void(0)" title="Quick Start Guide">?</a>
-                </div>
-            </div>
+    <div class="dropdown-wrap top-nav-wrap" id="top-nav-wrap">
+        <div class="nav-links top-nav-links" id="nav-content">
+            <a href="https://beacons.ai/weblinks" target="_blank" rel="noopener noreferrer">WEBLINKS</a>
+            <a href="#" id="nav-music-link">MUSIC</a>
+            <a href="https://electroscapex.com/tv.html" target="_blank" rel="noopener noreferrer">TV</a>
+            <a href="https://electroscapex.com/imagevault.html" target="_blank" rel="noopener noreferrer">IMAGE VAULT</a>
         </div>
     </div>
 
@@ -1255,6 +2876,13 @@ nav a:hover {
         <span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span>
     </h1>
 
+    <div class="top-reveal-zone" id="top-reveal-zone" aria-hidden="true">
+        <div class="top-reveal-cue" id="top-reveal-cue" title="Show header">
+            <svg viewBox="0 0 14 9" fill="none" aria-hidden="true">
+                <path d="M1.5 1.5L7 7L12.5 1.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+    </div>
 
     <!-- -------------------------------------------------------- -->
     <!-- PLAYER SECTION (index view)                              -->
@@ -1263,120 +2891,110 @@ nav a:hover {
 
         <!-- SECTION 3C: FEATURED VIDEO PLAYER -->
         <div class="featured-box">
-            <div id="now-playing-label"></div>
             <div id="player-container">
                 <div id="yt-player"></div>
             </div>
         </div>
 
-        <!-- SECTION 3D: COMMAND CONTROL DROPDOWN -->
-        <div class="dropdown-wrap">
-            <div>
-                <button class="dropdown-toggle" id="cmd-toggle" aria-expanded="false" aria-label="Toggle command controls">
-                    COMMAND CONTROL
-                    <svg class="dropdown-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <line x1="1" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
-                        <line x1="9" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
+        <!-- SECTION 3D: COMPACT PLAYER CONTROL STRIP -->
+        <div class="dropdown-wrap command-control-wrap">
+            <div class="command-shell compact-command-shell" aria-label="Player controls">
+                <button class="ctrl-btn cmd-arrow-btn" id="prev-btn" aria-label="Previous">
+                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="3,6 9,1 9,11" fill="rgba(0,255,230,0.75)"/>
                     </svg>
                 </button>
-                <div class="dropdown-content" id="cmd-content">
-                    <div class="cmd-inner">
 
-                        <div class="action-bar cmd-row-transport">
-                            <button class="ctrl-btn cmd-arrow-btn" id="prev-btn" aria-label="Previous">
-                                <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <polygon points="3,6 9,1 9,11" fill="rgba(0,255,230,0.75)"/>
-                                </svg>
-                            </button>
-                            <button class="cmd-play-btn" id="playpause-btn" aria-label="Play / Pause">
-                                <svg class="play-ring" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-                                    <circle class="play-ring-track" cx="40" cy="40" r="34"/>
-                                    <circle class="play-ring-arc"   cx="40" cy="40" r="34"/>
-                                </svg>
-                                <svg class="play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path class="play-bar-left"  d="M7,4 L7,4 L7,20 L7,20 Z"/>
-                                    <path class="play-bar-right" d="M7,4 L7,4 L7,20 L7,20 Z"/>
-                                </svg>
-                                <span class="play-ripple"></span>
-                            </button>
-                            <button class="ctrl-btn cmd-arrow-btn" id="next-btn" aria-label="Next">
-                                <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <polygon points="9,6 3,1 3,11" fill="rgba(0,255,230,0.75)"/>
-                                </svg>
-                            </button>
-                        </div>
+                <button class="cmd-play-btn" id="playpause-btn" aria-label="Play / Pause">
+                    <svg class="play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path class="play-bar-left"  d="M7,4 L7,4 L7,20 L7,20 Z"/>
+                        <path class="play-bar-right" d="M7,4 L7,4 L7,20 L7,20 Z"/>
+                    </svg>
+                    <span class="play-ripple"></span>
+                </button>
 
-                        <div class="action-bar cmd-row-icons">
-                            <div class="bare-view-wrap">
-                                <button class="grid-btn bare-view-btn" data-size="dense" aria-label="Micro grid">
-                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <rect x="1"    y="1"    width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="5.5"  y="1"    width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="10"   y="1"    width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="14.5" y="1"    width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="1"    y="5.5"  width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="5.5"  y="5.5"  width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="10"   y="5.5"  width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="14.5" y="5.5"  width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="1"    y="10"   width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="5.5"  y="10"   width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="10"   y="10"   width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="14.5" y="10"   width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="1"    y="14.5" width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="5.5"  y="14.5" width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="10"   y="14.5" width="3.5" height="3.5" rx="0.4"/>
-                                        <rect x="14.5" y="14.5" width="3.5" height="3.5" rx="0.4"/>
-                                    </svg>
-                                </button>
-                                <button class="grid-btn bare-view-btn" data-size="default" aria-label="Core grid">
-                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <rect x="1"    y="1"    width="4.5" height="4.5" rx="0.5"/>
-                                        <rect x="6.75" y="1"    width="4.5" height="4.5" rx="0.5"/>
-                                        <rect x="12.5" y="1"    width="4.5" height="4.5" rx="0.5"/>
-                                        <rect x="1"    y="6.75" width="4.5" height="4.5" rx="0.5"/>
-                                        <rect x="6.75" y="6.75" width="4.5" height="4.5" rx="0.5"/>
-                                        <rect x="12.5" y="6.75" width="4.5" height="4.5" rx="0.5"/>
-                                        <rect x="1"    y="12.5" width="4.5" height="4.5" rx="0.5"/>
-                                        <rect x="6.75" y="12.5" width="4.5" height="4.5" rx="0.5"/>
-                                        <rect x="12.5" y="12.5" width="4.5" height="4.5" rx="0.5"/>
-                                    </svg>
-                                </button>
-                                <button class="grid-btn bare-view-btn" data-size="max" aria-label="Max grid">
-                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <rect x="1"  y="1"  width="7" height="7" rx="0.8"/>
-                                        <rect x="10" y="1"  width="7" height="7" rx="0.8"/>
-                                        <rect x="1"  y="10" width="7" height="7" rx="0.8"/>
-                                        <rect x="10" y="10" width="7" height="7" rx="0.8"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+                <button class="ctrl-btn cmd-arrow-btn" id="next-btn" aria-label="Next">
+                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="9,6 3,1 3,11" fill="rgba(0,255,230,0.75)"/>
+                    </svg>
+                </button>
 
-                        <div class="action-bar cmd-row-full">
-                            <button class="ctrl-btn shuffle-btn cmd-full-btn" id="shuffle-btn">[ Override Sequence ]</button>
-                        </div>
-
-                        <div class="action-bar cmd-row-full cmd-row-last">
-                            <button class="ctrl-btn cmd-full-btn" id="fav-toggle-btn" aria-label="Favourites">
-                                <svg id="fav-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="#00FFE6" stroke-width="1.5" fill="none"/>
-                                </svg>
-                                <span style="margin-left: 12px; letter-spacing: 4px; font-size: 10px;">SECTOR ZERO</span>
-                            </button>
-                        </div>
-
-                    </div>
+                <div class="bare-view-wrap compact-grid-modes" aria-label="Grid density">
+                    <button class="grid-btn bare-view-btn" data-size="dense" aria-label="Compact wide grid">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="1" y="2" width="5" height="4" rx="0.5"/>
+                            <rect x="6.5" y="2" width="5" height="4" rx="0.5"/>
+                            <rect x="12" y="2" width="5" height="4" rx="0.5"/>
+                            <rect x="1" y="7" width="5" height="4" rx="0.5"/>
+                            <rect x="6.5" y="7" width="5" height="4" rx="0.5"/>
+                            <rect x="12" y="7" width="5" height="4" rx="0.5"/>
+                            <rect x="1" y="12" width="5" height="4" rx="0.5"/>
+                            <rect x="6.5" y="12" width="5" height="4" rx="0.5"/>
+                            <rect x="12" y="12" width="5" height="4" rx="0.5"/>
+                        </svg>
+                    </button>
+                    <button class="grid-btn bare-view-btn" data-size="default" aria-label="Standard wide grid">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="1" y="2" width="7" height="5" rx="0.6"/>
+                            <rect x="10" y="2" width="7" height="5" rx="0.6"/>
+                            <rect x="1" y="11" width="7" height="5" rx="0.6"/>
+                            <rect x="10" y="11" width="7" height="5" rx="0.6"/>
+                        </svg>
+                    </button>
+                    <button class="grid-btn bare-view-btn" data-size="max" aria-label="Cinematic wide grid">
+                        <svg width="22" height="18" viewBox="0 0 22 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="1" y="3" width="20" height="4" rx="0.8"/>
+                            <rect x="1" y="11" width="20" height="4" rx="0.8"/>
+                        </svg>
+                    </button>
+                    <button class="grid-collapse-btn bare-view-btn" id="grid-collapse-btn" type="button" aria-label="Collapse grid" title="Collapse grid">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <rect x="2" y="3" width="14" height="12" rx="1"/>
+                            <path d="M6 6l-3 3 3 3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 6l3 3-3 3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
                 </div>
+
+                <button class="ctrl-btn icon-only-btn" id="shuffle-btn" aria-label="Shuffle">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M4 7h3.2c2.1 0 3.1 1.2 4.2 3.1l1.2 2.1c1.1 1.9 2.1 3.1 4.2 3.1H20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                        <path d="M17 12.5 20 15.5 17 18.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 16.5h3.2c1.4 0 2.3-.5 3.1-1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                        <path d="M14 8.7c.8-1.1 1.7-1.7 2.8-1.7H20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+                        <path d="M17 4 20 7 17 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+
+                <button class="ctrl-btn icon-only-btn" id="fav-toggle-btn" aria-label="Favourites">
+                    <svg id="fav-toggle-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    </svg>
+                </button>
+
+                <button class="cinema-mode-btn" id="cinema-mode-btn" aria-label="Toggle cinema mode" title="Cinema mode">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <rect x="3.5" y="5.5" width="17" height="11" rx="1.8" stroke-width="1.6"/>
+                        <path d="M8 20h8" stroke-width="1.6" stroke-linecap="round"/>
+                        <path d="M12 16.5V20" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                </button>
+
+                <button class="layout-mode-btn" id="layout-mode-btn" aria-label="Toggle side layout" title="Side layout / vertical layout">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <rect x="3.5" y="5" width="7" height="14" rx="1.4" stroke-width="1.6"/>
+                        <rect x="13.5" y="5" width="7" height="14" rx="1.4" stroke-width="1.6"/>
+                        <path d="M12 5v14" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+                    </svg>
+                </button>
             </div>
         </div>
 
         <!-- SECTION 3G: VIDEO GRID -->
         <div class="grid" id="video-grid"></div>
 
-        <!-- FOOTER -->
-        <div style="margin-top: 40px; padding: 15px 0; text-align: center; color: #444; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; border-top: 1px solid #1a1a1a; margin-bottom: 80px;">
-            <span style="color: #00FFE6;">7.0.1</span>
-        </div>
+        <!-- VERSION FOOTER -->
+        <div id="version-footer">1.3.0</div>
 
     </div><!-- end #player-section -->
 
@@ -1384,9 +3002,11 @@ nav a:hover {
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3M: MUSIC STREAMING DIRECTORY (inline)          -->
     <!-- -------------------------------------------------------- -->
-    <div id="music-section">
+    <div id="music-section" aria-hidden="true">
+        <div class="music-modal-box" role="dialog" aria-modal="true" aria-labelledby="music-modal-title">
+            <button class="music-close-btn" id="music-close-btn" type="button" aria-label="Close music directory">&times;</button>
 
-        <div class="music-page-header">STREAMING // DIRECTORY</div>
+        <div class="music-page-header" id="music-modal-title">STREAMING // DIRECTORY</div>
 
         <!-- SPOTIFY -->
         <div class="platform-section">
@@ -1482,6 +3102,7 @@ nav a:hover {
             </div>
         </div>
 
+        </div><!-- end .music-modal-box -->
     </div><!-- end #music-section -->
 
 
@@ -1493,7 +3114,6 @@ nav a:hover {
             <div id="hud-progress-bar"></div>
         </div>
         <div id="hud-inner">
-            <div id="hud-track-title">Initiate Audio Sequence</div>
             <div id="hud-controls">
                 <button class="hud-btn" id="hud-prev">&#9664;&#9664;</button>
                 <button class="hud-btn hud-playpause" id="hud-playpause">&#9654;</button>
@@ -1522,44 +3142,6 @@ nav a:hover {
         <ul id="fav-list"></ul>
         <div id="fav-footer">
             <button id="fav-clear-btn" class="ctrl-btn">[ Clear All ]</button>
-        </div>
-    </div>
-
-
-    <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3J: GUIDE POPUP                                  -->
-    <!-- -------------------------------------------------------- -->
-    <div id="guide-backdrop"></div>
-    <div id="guide-modal">
-        <div id="guide-header">
-            <span id="guide-title">Audio Sequence Protocol</span>
-            <button id="guide-close-btn" aria-label="Close guide">&#x2715;</button>
-        </div>
-        <div id="guide-content">
-            <div class="guide-section">
-                <h3>01 — FAVOURITES: SAVING TRACKS</h3>
-                <p>Click the <strong>HEART ICON (♥)</strong> on any track card to save it. The icon turns solid cyan when a track is favourited. Your list is stored locally and persists across sessions.</p>
-            </div>
-            <div class="guide-section">
-                <h3>02 — SIDEBAR: MANAGING LISTS</h3>
-                <p>Open the <strong>FAVOURITES</strong> sidebar via the action bar heart button. From here you can:</p>
-                <ul>
-                    <li><strong>PLAY ALL:</strong> Start the full favourites queue.</li>
-                    <li><strong>REORDER:</strong> Use the drag handle (6 dots) or arrows (▲/▼).</li>
-                    <li><strong>REMOVE:</strong> Click ✕ on any row to delete it.</li>
-                </ul>
-            </div>
-            <div class="guide-section">
-                <h3>03 — QUEUE: EXITING FAV MODE</h3>
-                <p>While in Favourite Mode, <strong>SELECT ANY TRACK</strong> from the main grid to exit the favourites queue and restore all tracks.</p>
-            </div>
-            <div class="guide-section">
-                <h3>04 — NAVIGATION & VIEW</h3>
-                <p>Use <strong>OVERRIDE SEQUENCE</strong> to shuffle the grid. Use the <strong>GRID ICONS</strong> (Micro, Core, Max) to switch display density. The <strong>ORBITAL HUD</strong> at the bottom provides persistent controls and seek.</p>
-            </div>
-        </div>
-        <div id="guide-footer">
-            <button id="guide-ok-btn" class="ctrl-btn" style="width: 100%; border-radius: 4px;">[ ACKNOWLEDGE ]</button>
         </div>
     </div>
 
@@ -1613,7 +3195,6 @@ function loadTracks() {
         })
         .catch(function(err) {
             console.error('Electroscape: Failed to load tracks.json —', err);
-            document.getElementById('now-playing-label').textContent = 'Error loading track data';
         });
 }
 
@@ -1664,21 +3245,22 @@ function setActiveCard(index) {
     }
 }
 
-function attachNowPlayingClick() {
-    var label = document.getElementById('now-playing-label');
-    label.onclick = function() {
-        if (!player || typeof player.getPlayerState !== 'function') return;
-        var state = player.getPlayerState();
-        if (state === -1 || state === YT.PlayerState.UNSTARTED || state === YT.PlayerState.CUED) {
-            playTrack(currentIndex === -1 ? 0 : currentIndex);
-        } else if (state === YT.PlayerState.PLAYING) {
-            player.pauseVideo();
-        } else {
-            player.playVideo();
-        }
-    };
-}
+function revealActiveCard(index) {
+    if (!queue[index] || !queue[index].el) return;
 
+    // Hybrid behaviour:
+    // - Side layout keeps the fixed player and reveals the active card inside the scrolling grid.
+    // - Vertical layout behaves like the original page: tile click returns to the main player.
+    if (document.body.classList.contains('side-layout')) {
+        queue[index].el.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'nearest'
+        });
+    } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
 
 /* ============================================================ */
 /* SECTION 4D: PLAY TRACK                                       */
@@ -1686,12 +3268,9 @@ function attachNowPlayingClick() {
 function playTrack(index) {
     if (!queue.length) return;
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
     currentIndex = ((index % queue.length) + queue.length) % queue.length;
     var track = queue[currentIndex];
 
-    document.getElementById('now-playing-label').textContent = track.title;
     document.getElementById('hud-progress-bar').style.width = '0%';
 
     if (player && typeof player.loadVideoById === 'function') {
@@ -1700,7 +3279,7 @@ function playTrack(index) {
     }
 
     setActiveCard(currentIndex);
-    updateHudTitle(track.title);
+    revealActiveCard(currentIndex);
 }
 
 
@@ -1734,9 +3313,7 @@ function createPlayer() {
                     player.cueVideoById(queue[0].id);
                     currentIndex = 0;
                     setActiveCard(0);
-                    updateHudTitle(queue[0].title);
                 }
-                attachNowPlayingClick();
                 startHudTracker();
                 setupHudSeeking();
                 attachHudControls();
@@ -1761,7 +3338,14 @@ function createPlayer() {
 /* ============================================================ */
 function attachCardClicks() {
     document.querySelectorAll('#video-grid .video').forEach(function(el) {
+        el.addEventListener('mouseenter', function() {
+            el.classList.add('is-hover-preview');
+        });
+        el.addEventListener('mouseleave', function() {
+            el.classList.remove('is-hover-preview');
+        });
         el.addEventListener('click', function() {
+            el.classList.remove('is-hover-preview');
             if (isFavPlaylistMode) {
                 buildQueue();
             }
@@ -1843,30 +3427,69 @@ function startHudTracker() {
     }, 500);
 }
 
-function updateHudTitle(title) {
-    document.getElementById('hud-track-title').textContent = title || '';
-}
-
-
 /* ============================================================ */
 /* SECTION 4M: HUD SEEK                                         */
 /* ============================================================ */
 function setupHudSeeking() {
+    var hudDock      = document.getElementById('hud-dock');
     var barContainer = document.getElementById('hud-progress-container');
     var visualBar    = document.getElementById('hud-progress-bar');
+    var isSeeking    = false;
 
-    barContainer.addEventListener('click', function(e) {
-        if (!player || typeof player.getDuration !== 'function') return;
+    if (!hudDock || !barContainer) return;
+    if (window.electroscapeHudSeekingAttached) return;
+    window.electroscapeHudSeekingAttached = true;
 
+    function getSeekPosition(clientX) {
         var rect = barContainer.getBoundingClientRect();
-        var pos  = (e.clientX - rect.left) / rect.width;
-        pos = Math.max(0, Math.min(1, pos));
+        var pos  = (clientX - rect.left) / rect.width;
+        return Math.max(0, Math.min(1, pos));
+    }
+
+    function applySeek(clientX) {
+        if (!player || typeof player.getDuration !== 'function') return;
+        var duration = player.getDuration();
+        if (!duration || duration <= 0) return;
+
+        var pos = getSeekPosition(clientX);
 
         if (visualBar) {
             visualBar.style.width = (pos * 100) + '%';
         }
 
-        player.seekTo(pos * player.getDuration(), true);
+        player.seekTo(pos * duration, true);
+    }
+
+    barContainer.addEventListener('pointerdown', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        isSeeking = true;
+        barContainer.setPointerCapture && barContainer.setPointerCapture(e.pointerId);
+        applySeek(e.clientX);
+    });
+
+    barContainer.addEventListener('pointermove', function(e) {
+        if (!isSeeking) return;
+        e.preventDefault();
+        e.stopPropagation();
+        applySeek(e.clientX);
+    });
+
+    function endSeek(e) {
+        if (!isSeeking) return;
+        e.preventDefault();
+        e.stopPropagation();
+        isSeeking = false;
+        barContainer.releasePointerCapture && barContainer.releasePointerCapture(e.pointerId);
+    }
+
+    barContainer.addEventListener('pointerup', endSeek);
+    barContainer.addEventListener('pointercancel', endSeek);
+
+    barContainer.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        applySeek(e.clientX);
     });
 }
 
@@ -1875,39 +3498,71 @@ function setupHudSeeking() {
 /* SECTION 4N: HUD CONTROLS                                     */
 /* ============================================================ */
 function attachHudControls() {
-    document.getElementById('hud-prev').addEventListener('click', function() {
+    if (window.electroscapeHudControlsAttached) return;
+    window.electroscapeHudControlsAttached = true;
+
+    function stopHudPointer(e) {
+        e.stopPropagation();
+    }
+
+    function togglePlayback() {
+        if (!player || typeof player.getPlayerState !== 'function') return;
+        var state = player.getPlayerState();
+        if (state === YT.PlayerState.PLAYING) {
+            player.pauseVideo();
+        } else if (
+            state === YT.PlayerState.PAUSED ||
+            state === YT.PlayerState.CUED ||
+            state === YT.PlayerState.UNSTARTED ||
+            state === -1
+        ) {
+            if (currentIndex === -1) {
+                playTrack(0);
+            } else {
+                player.playVideo();
+            }
+        }
+    }
+
+    var hudPrev = document.getElementById('hud-prev');
+    var hudPlay = document.getElementById('hud-playpause');
+    var hudNext = document.getElementById('hud-next');
+    var cmdPlay = document.getElementById('playpause-btn');
+
+    [hudPrev, hudPlay, hudNext].forEach(function(btn) {
+        if (!btn) return;
+        btn.addEventListener('pointerdown', stopHudPointer);
+        btn.addEventListener('pointerup', stopHudPointer);
+    });
+
+    if (cmdPlay) {
+        cmdPlay.addEventListener('pointerdown', stopHudPointer);
+        cmdPlay.addEventListener('pointerup', stopHudPointer);
+    }
+
+    hudPrev && hudPrev.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         if (!queue.length) buildQueue();
         playTrack(currentIndex - 1);
     });
 
-    document.getElementById('hud-playpause').addEventListener('click', function() {
-        if (!player || typeof player.getPlayerState !== 'function') return;
-        var state = player.getPlayerState();
-        if (state === -1 || state === YT.PlayerState.UNSTARTED || state === YT.PlayerState.CUED) {
-            playTrack(currentIndex === -1 ? 0 : currentIndex);
-        } else if (state === YT.PlayerState.PLAYING) {
-            player.pauseVideo();
-        } else {
-            player.playVideo();
-        }
+    hudPlay && hudPlay.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePlayback();
     });
 
-    document.getElementById('playpause-btn').addEventListener('click', function() {
-        if (!player || typeof player.getPlayerState !== 'function') return;
-
+    cmdPlay && cmdPlay.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         triggerPlayRipple();
-
-        var state = player.getPlayerState();
-        if (state === -1 || state === YT.PlayerState.UNSTARTED || state === YT.PlayerState.CUED) {
-            playTrack(currentIndex === -1 ? 0 : currentIndex);
-        } else if (state === YT.PlayerState.PLAYING) {
-            player.pauseVideo();
-        } else {
-            player.playVideo();
-        }
+        togglePlayback();
     });
 
-    document.getElementById('hud-next').addEventListener('click', function() {
+    hudNext && hudNext.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         if (!queue.length) buildQueue();
         playTrack(currentIndex + 1);
     });
@@ -2342,51 +3997,134 @@ function initFavourites() {
 
 
 /* ============================================================ */
-/* SECTION 4Q: GUIDE POPUP                                      */
+/* SECTION 4R-1: CINEMA MODE                                    */
 /* ============================================================ */
-function initGuide() {
-    var openBtn  = document.getElementById('guide-open-btn');
-    var closeBtn = document.getElementById('guide-close-btn');
-    var okBtn    = document.getElementById('guide-ok-btn');
-    var backdrop = document.getElementById('guide-backdrop');
-    var modal    = document.getElementById('guide-modal');
+function initCinemaMode() {
+    var btn = document.getElementById('cinema-mode-btn');
+    var layoutBtn = document.getElementById('layout-mode-btn');
+    if (!btn) return;
 
-    function openGuide() {
-        backdrop.classList.add('guide-visible');
-        modal.classList.add('guide-visible');
-        if (player && typeof player.pauseVideo === 'function' && player.getPlayerState() === 1) {
-            player.pauseVideo();
+    btn.setAttribute('aria-pressed', 'false');
+
+    btn.addEventListener('click', function() {
+        var active = document.body.classList.toggle('cinema-mode');
+        if (active) {
+            document.body.classList.remove('side-layout');
+            if (layoutBtn) {
+                layoutBtn.classList.remove('is-active');
+                layoutBtn.setAttribute('aria-pressed', 'false');
+            }
         }
-    }
-
-    function closeGuide() {
-        backdrop.classList.remove('guide-visible');
-        modal.classList.remove('guide-visible');
-    }
-
-    if (openBtn)  openBtn.addEventListener('click', openGuide);
-    if (closeBtn) closeBtn.addEventListener('click', closeGuide);
-    if (okBtn)    okBtn.addEventListener('click', closeGuide);
-    if (backdrop) backdrop.addEventListener('click', closeGuide);
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
 }
 
 
 /* ============================================================ */
-/* SECTION 4R: NAVIGATION DROPDOWNS                             */
+/* SECTION 4R-1B: SIDE / VERTICAL LAYOUT MODE                   */
 /* ============================================================ */
-function initDropdowns() {
-    function setupDropdown(toggleId, contentId) {
-        var toggle  = document.getElementById(toggleId);
-        var content = document.getElementById(contentId);
-        if (!toggle || !content) return;
-        toggle.addEventListener('click', function() {
-            var isOpen = content.classList.toggle('open');
-            toggle.classList.toggle('open', isOpen);
-            toggle.setAttribute('aria-expanded', isOpen);
-        });
+function initLayoutMode() {
+    var btn = document.getElementById('layout-mode-btn');
+    var cinemaBtn = document.getElementById('cinema-mode-btn');
+    if (!btn) return;
+
+    btn.setAttribute('aria-pressed', 'false');
+
+    btn.addEventListener('click', function() {
+        var active;
+        if (document.body.classList.contains('cinema-mode')) {
+            document.body.classList.remove('cinema-mode');
+            if (cinemaBtn) {
+                cinemaBtn.classList.remove('is-active');
+                cinemaBtn.setAttribute('aria-pressed', 'false');
+            }
+        }
+
+        active = document.body.classList.toggle('side-layout');
+        if (active) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+}
+
+
+/* ============================================================ */
+/* SECTION 4R-1C: GRID COLLAPSE                                 */
+/* ============================================================ */
+function initGridCollapse() {
+    var btn = document.getElementById('grid-collapse-btn');
+    if (!btn) return;
+
+    function syncButton() {
+        var collapsed = document.body.classList.contains('grid-collapsed');
+        btn.classList.toggle('grid-btn-active', collapsed);
+        btn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+        btn.setAttribute('aria-label', collapsed ? 'Expand grid' : 'Collapse grid');
+        btn.setAttribute('title', collapsed ? 'Expand grid' : 'Collapse grid');
     }
-    setupDropdown('nav-toggle', 'nav-content');
-    setupDropdown('cmd-toggle', 'cmd-content');
+
+    btn.setAttribute('aria-pressed', 'false');
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.body.classList.toggle('grid-collapsed');
+        syncButton();
+        btn.blur();
+    });
+    syncButton();
+}
+
+
+/* ============================================================ */
+/* SECTION 4R-2: TOP CHROME AUTO-HIDE                           */
+/* ============================================================ */
+function initTopChromeAutoHide() {
+    var revealCue = document.getElementById('top-reveal-cue');
+    var hideTimer;
+    var initialHideDone = false;
+    var INITIAL_HIDE_DELAY = 5000;
+    var REHIDE_DELAY = 3000;
+
+    function hideTopChrome() {
+        document.body.classList.add('top-chrome-hidden');
+        initialHideDone = true;
+    }
+
+    function showTopChrome() {
+        document.body.classList.remove('top-chrome-hidden');
+    }
+
+    function scheduleHide(delay) {
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(hideTopChrome, delay || REHIDE_DELAY);
+    }
+
+    function wakeTopChrome() {
+        showTopChrome();
+        scheduleHide(REHIDE_DELAY);
+    }
+
+    if (revealCue) {
+        revealCue.addEventListener('mouseenter', wakeTopChrome);
+        revealCue.addEventListener('focus', wakeTopChrome);
+        revealCue.addEventListener('pointerdown', wakeTopChrome);
+        revealCue.addEventListener('touchstart', wakeTopChrome, { passive: true });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            showTopChrome();
+            scheduleHide(REHIDE_DELAY);
+        }
+    });
+
+    window.addEventListener('load', function() {
+        if (!initialHideDone) scheduleHide(INITIAL_HIDE_DELAY);
+    });
+    scheduleHide(INITIAL_HIDE_DELAY);
 }
 
 
@@ -2399,18 +4137,25 @@ function initSectionToggle() {
     var musicLink     = document.getElementById('nav-music-link');
     var playerSection = document.getElementById('player-section');
     var musicSection  = document.getElementById('music-section');
+    var musicCloseBtn = document.getElementById('music-close-btn');
+    var musicModalBox = musicSection ? musicSection.querySelector('.music-modal-box') : null;
 
     function showPlayer() {
         playerSection.classList.remove('hidden');
         musicSection.classList.remove('active');
+        musicSection.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('music-modal-open');
         musicLink.style.color = '';
     }
 
     function showMusic() {
-        playerSection.classList.add('hidden');
+        playerSection.classList.remove('hidden');
         musicSection.classList.add('active');
+        musicSection.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('music-modal-open');
         musicLink.style.color = '#00FFE6';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (musicModalBox) musicModalBox.scrollTo({ top: 0, behavior: 'smooth' });
+        if (musicCloseBtn) musicCloseBtn.focus({ preventScroll: true });
     }
 
     musicLink.addEventListener('click', function(e) {
@@ -2420,11 +4165,24 @@ function initSectionToggle() {
         } else {
             showMusic();
         }
-        /* close the nav dropdown after clicking */
-        var navContent = document.getElementById('nav-content');
-        var navToggle  = document.getElementById('nav-toggle');
-        if (navContent) navContent.classList.remove('open');
-        if (navToggle)  { navToggle.classList.remove('open'); navToggle.setAttribute('aria-expanded', false); }
+    });
+
+    if (musicCloseBtn) {
+        musicCloseBtn.addEventListener('click', showPlayer);
+    }
+
+    if (musicSection) {
+        musicSection.addEventListener('click', function(e) {
+            if (e.target === musicSection) {
+                showPlayer();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && musicSection.classList.contains('active')) {
+            showPlayer();
+        }
     });
 
     /* ELECTROSCAPE title click always returns to player */
@@ -2437,9 +4195,31 @@ function initSectionToggle() {
 /* ============================================================ */
 loadTracks();
 initGridControls();
-initGuide();
-initDropdowns();
 initSectionToggle();
+initCinemaMode();
+initLayoutMode();
+initGridCollapse();
+initTopChromeAutoHide();
+
+/* ============================================================ */
+/* MOBILE SAFETY NET — auto-exit side-layout on small screens   */
+/* ============================================================ */
+(function() {
+    var MOBILE_BP = 1199;
+    function isMobile() {
+        return window.innerWidth <= MOBILE_BP ||
+               (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    }
+    function resetSideLayout() {
+        if (isMobile() && document.body.classList.contains('side-layout')) {
+            document.body.classList.remove('side-layout');
+            var btn = document.getElementById('layout-mode-btn');
+            if (btn) { btn.classList.remove('is-active'); btn.setAttribute('aria-pressed', 'false'); }
+        }
+    }
+    window.addEventListener('resize', resetSideLayout);
+    resetSideLayout();
+})();
     </script>
 
     <script src="https://www.youtube.com/iframe_api" async></script>
