@@ -857,7 +857,10 @@ body.glass-dark .music-card {
     transition: opacity 0.25s ease;
     pointer-events: none;
 }
-.video:hover .overlay-btn { opacity: 1; }
+
+@media (hover: hover) and (pointer: fine) {
+    .video:hover .overlay-btn { opacity: 1; }
+}
 
 /* ============================================================
    VERSION-FOOTER
@@ -1314,7 +1317,7 @@ body.glass-dark .music-card {
         <div id="video-grid"></div>
 
         <!-- VERSION FOOTER -->
-        <div id="version-footer">1.9.0</div>
+        <div id="version-footer">1.10.0</div>
 
     </div><!-- end #player-section -->
 
