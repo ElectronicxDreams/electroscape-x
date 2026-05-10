@@ -19,7 +19,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>if(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) && window.innerWidth < 1024) location.replace('tv-mobile.html');</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ELECTROSCAPE // TV</title>
@@ -49,69 +48,89 @@ body {
     display: flex;
     justify-content: center;
     margin-bottom: 30px;
+    position: relative;
+    z-index: 40;
+}
+
+.dropdown-wrap > div {
+    position: relative;
 }
 
 .dropdown-toggle {
     background: transparent;
     border: none;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    outline: none;
     font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    letter-spacing: 4px;
+    font-size: 7px;
+    letter-spacing: 8px;
     text-transform: uppercase;
     color: #00FFE6;
-    transition: color 0.3s;
+    padding: 8px 0;
+    outline: none;
+    transition: color 0.25s ease;
 }
 
-.dropdown-toggle:hover { color: rgba(0,255,230,0.7); }
-.dropdown-toggle:hover .dropdown-chevron line { stroke: rgba(0,255,230,0.7); }
-
-.dropdown-chevron { transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
-.dropdown-chevron line { stroke: #00FFE6; transition: stroke 0.3s; }
-.dropdown-toggle.open .dropdown-chevron { transform: rotate(180deg); }
+.dropdown-toggle:hover { color: rgba(0,255,230,0.75); }
 
 .dropdown-content {
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.35s;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    width: min(560px, calc(100vw - 28px));
+    transform: translateX(-50%) translateY(-8px);
+    background: rgba(8, 12, 18, 0.62);
+    border: 1px solid rgba(0, 255, 230, 0.20);
+    border-radius: 6px;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.04),
+        0 28px 72px rgba(0, 0, 0, 0.78),
+        0 0 40px rgba(0, 255, 230, 0.09);
+    backdrop-filter: blur(24px) saturate(125%);
+    -webkit-backdrop-filter: blur(24px) saturate(125%);
     opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
 .dropdown-content.open {
-    max-height: 500px;
     opacity: 1;
-    padding-top: 16px;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
 }
 
 .nav-links {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0 30px;
+    flex-direction: column;
     padding: 0;
 }
 
-@media (max-width: 900px) {
-    .nav-links { gap: 14px 30px; }
-}
-
 .nav-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 18px 24px;
     color: #fff;
     text-decoration: none;
-    font-size: 10px;
+    font-family: 'Michroma', sans-serif;
+    font-size: 8.4px;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 8px;
-    transition: color 0.25s;
-    white-space: nowrap;
+    letter-spacing: 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    transition: color 0.2s ease, background 0.2s ease;
+    text-align: center;
 }
 
-.nav-links a:hover { color: #00FFE6; }
-.nav-links a.active { color: #00FFE6; }
+.nav-links a:last-child {
+    border-bottom: none;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: #00FFE6;
+    background: rgba(0,255,230,0.06);
+}
 
 /* ============================================================ */
 /* SECTION 2C: TV GRID                                          */
@@ -271,11 +290,7 @@ body {
     <div class="dropdown-wrap">
         <div>
             <button class="dropdown-toggle" id="nav-toggle" aria-expanded="false" aria-label="Toggle navigation">
-                NAVIGATION NODES
-                <svg class="dropdown-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="1" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
-                    <line x1="9" y1="1" x2="5" y2="5" stroke-width="1.2" stroke-linecap="round"/>
-                </svg>
+                LINKS
             </button>
             <div class="dropdown-content" id="nav-content">
                 <div class="nav-links">
@@ -449,10 +464,32 @@ function initNav() {
     const toggle  = document.getElementById('nav-toggle');
     const content = document.getElementById('nav-content');
     if (!toggle || !content) return;
-    toggle.addEventListener('click', () => {
-        const open = content.classList.toggle('open');
-        toggle.classList.toggle('open', open);
-        toggle.setAttribute('aria-expanded', open);
+
+    function openNav() {
+        content.classList.add('open');
+        toggle.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeNav() {
+        content.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (content.classList.contains('open')) {
+            closeNav();
+        } else {
+            openNav();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!content.contains(e.target) && e.target !== toggle) closeNav();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeNav();
     });
 }
 
