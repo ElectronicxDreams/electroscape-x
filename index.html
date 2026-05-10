@@ -1314,7 +1314,7 @@ body.glass-dark .music-card {
         <div id="video-grid"></div>
 
         <!-- VERSION FOOTER -->
-        <div id="version-footer">1.7.0</div>
+        <div id="version-footer">1.9.0</div>
 
     </div><!-- end #player-section -->
 
@@ -1676,7 +1676,9 @@ body.glass-dark .music-card {
                     /* Sync play/pause icon */
                     updatePlayIcon(event.data);
                     if (event.data === YT.PlayerState.PLAYING) {
-                        setActiveCard(window.esCurrentIndex);
+                        if (!window.esActiveCardTimer) {
+                            setActiveCard(window.esCurrentIndex);
+                        }
                     } else {
                         clearActiveCards();
                     }
@@ -1995,10 +1997,17 @@ function setActiveCard(index) {
     clearActiveCards();
     if (window.esQueue[index]) {
         window.esQueue[index].el.classList.add('is-playing');
+        window.esActiveCardTimer = setTimeout(function () {
+            clearActiveCards();
+        }, 650);
     }
 }
 
 function clearActiveCards() {
+    if (window.esActiveCardTimer) {
+        clearTimeout(window.esActiveCardTimer);
+        window.esActiveCardTimer = null;
+    }
     document.querySelectorAll('#video-grid .video').forEach(function (el) {
         el.classList.remove('is-playing');
     });
@@ -2013,7 +2022,7 @@ function playTrack(index) {
     if (window.esPlayer && typeof window.esPlayer.loadVideoById === 'function') {
         window.esPlayer.loadVideoById(track.id);
     }
-    clearActiveCards();
+    setActiveCard(window.esCurrentIndex);
     /* Scroll to top so player is visible — target both window and body/html for tablet compat */
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
