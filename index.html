@@ -1,83 +1,275 @@
-<!--
-    Name: website.html | Version: 1.3.0    Project: Electroscape
-    Description: Website 1 - Sticky Cinematic Core. Single-file build. Combines:
-                 - style.css (inlined in the style block)
-                 - player.js (inlined in the script block)
-                 - music.html (toggled section, no page reload)
-                 Track data still loaded from tracks.json.
-
-    Sections:
-        Stage 1 — HEAD  : Page setup, font imports, all styles
-        Stage 3 — BODY
-            3A — Navigation dropdown
-            3B — Page title
-            3C — Featured video player
-            3D — Command control dropdown
-            3G — Video grid
-            3H — Orbital HUD footer
-            3I — Favourites sidebar
-            3J — Guide popup
-            3M — Music section (streaming directory)
-        Stage 4 — SCRIPTS : All player + UI logic (inlined)
--->
-
 <!DOCTYPE html>
 <html lang="en">
-
-
-
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Electroscape</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Orbitron:wght@400;700&family=Exo+2:wght@300;400;500&display=swap" rel="stylesheet">
 
     <style>
-/* ============================================================ */
-/* SECTION 2A: PAGE BASE                                        */
-/* ============================================================ */
-body {
-    background: #07080d;
-    color: #fff;
-    font-family: 'Orbitron', sans-serif;
-    margin: 0;
-    padding: 20px;
-    text-align: center;
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root {
+    --color-accent:       #00FFE6;
+    --color-accent-dim:   rgba(0, 255, 230, 0.45);
+    --color-accent-faint: rgba(0, 255, 230, 0.06);
+    --color-bg:           #07080d;
+    --color-bg-card:      rgba(5, 7, 12, 0.97);
+    --color-border:       #1e1e1e;
+    --color-border-accent:rgba(0, 255, 230, 0.22);
+    --color-text:         #ffffff;
+    --color-text-dim:     rgba(255, 255, 255, 0.45);
+    --font-ui:            'Orbitron', sans-serif;
+    --font-title:         'Michroma', sans-serif;
+    --nav-height:         48px;
+    --nav-logo-height:    56px;
+    --z-nav:              20;
+    --z-popup:            100;
+    --z-logo:             10;
+}
+
+/* ============================================================
+   RESET / BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    height: 100%;
+    color: var(--color-text);
+    font-family: var(--font-ui);
     overflow-x: hidden;
 }
 
-body > *:not(.orb) {
-    position: relative;
-    z-index: 1;
+body {
+    background: #000000;
+    /* BACKGROUND DISABLED — solid black for build phase
+       gradients and vignettes added last once site is complete */
 }
 
-/* ============================================================ */
-/* SECTION 2B: TOP NAVIGATION BAR                               */
-/* ============================================================ */
-nav {
-    margin-bottom: 30px;
+/* ============================================================
+   GLASS-MODES
+   ============================================================ */
+body.glass-dark {
+    --glass-panel-bg: rgba(5, 8, 13, 0.64);
+    --glass-surface-bg: rgba(10, 14, 20, 0.58);
+    --glass-card-bg: rgba(255, 255, 255, 0.045);
+    --glass-backdrop-bg: rgba(0, 0, 0, 0.62);
+    --glass-border: rgba(0, 255, 230, 0.18);
+    --glass-border-soft: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 30px 90px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --glass-blur: blur(22px) saturate(135%);
+}
+
+body.glass-dark #nav-popup,
+body.glass-dark #fav-sidebar,
+body.glass-dark .music-modal-box {
+    background: var(--glass-panel-bg);
+    border-color: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+}
+
+body.glass-dark #fav-backdrop,
+body.glass-dark #music-section {
+    background: var(--glass-backdrop-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+}
+
+body.glass-dark .video,
+body.glass-dark .music-card,
+body.glass-dark .fav-row,
+body.glass-dark #player-container {
+    background: var(--glass-card-bg);
+    border-color: var(--glass-border-soft);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+}
+
+body.glass-dark .ctrl-btn,
+body.glass-dark .cmd-play-btn {
+    background: var(--glass-surface-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+}
+
+/* Dark glass tuning: keep the link popup vivid, but make larger panels neutral black. */
+body.glass-dark #fav-backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(18px) saturate(70%);
+    -webkit-backdrop-filter: blur(18px) saturate(70%);
+}
+
+body.glass-dark #fav-sidebar {
+    background: rgba(3, 4, 6, 0.78);
+    border-left-color: rgba(0, 255, 230, 0.22);
+    box-shadow: -18px 0 70px rgba(0, 0, 0, 0.78), inset 1px 0 0 rgba(255,255,255,0.04);
+    backdrop-filter: blur(24px) saturate(80%);
+    -webkit-backdrop-filter: blur(24px) saturate(80%);
+}
+
+body.glass-dark .fav-row {
+    background: rgba(4, 5, 7, 0.52);
+    border-bottom-color: rgba(255,255,255,0.07);
+}
+
+body.glass-dark #music-section {
+    background: rgba(0, 0, 0, 0.42);
+    backdrop-filter: blur(18px) saturate(95%);
+    -webkit-backdrop-filter: blur(18px) saturate(95%);
+}
+
+body.glass-dark .music-modal-box {
+    background: rgba(4, 5, 7, 0.48);
+    border: 1px solid rgba(0, 255, 230, 0.14);
+    box-shadow: 0 34px 90px rgba(0,0,0,0.72), inset 0 1px 0 rgba(255,255,255,0.055);
+    backdrop-filter: blur(30px) saturate(120%);
+    -webkit-backdrop-filter: blur(30px) saturate(120%);
+}
+
+body.glass-dark .music-card {
+    background: rgba(5, 7, 10, 0.26);
+    border-color: rgba(255,255,255,0.12);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.085),
+        inset 0 -1px 0 rgba(0,0,0,0.34),
+        0 16px 42px rgba(0,0,0,0.22);
+    backdrop-filter: blur(34px) saturate(118%);
+    -webkit-backdrop-filter: blur(34px) saturate(118%);
+}
+
+/* ============================================================
+   NAV-TOP
+   ============================================================ */
+#nav-top {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: var(--nav-height);
+    padding: 0 24px;
+    z-index: var(--z-nav);
 }
 
-nav a {
-    color: #fff;
-    text-decoration: none;
-    margin: 0 25px;
+/* ============================================================
+   NAV-LINKS-BTN
+   ============================================================ */
+#nav-links-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-ui);
     font-size: 10px;
-    text-transform: uppercase;
+    font-weight: 400;
     letter-spacing: 8px;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    padding: 8px 0;
+    transition: color 0.25s ease;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
 }
 
-nav a:hover {
-    color: #00FFE6;
+/* LINKS text label */
+#nav-links-btn .btn-label {
+    display: block;
+    transition: opacity 0.5s ease;
 }
 
-/* ============================================================ */
-/* SECTION 2C: PAGE TITLE (H1)                                  */
-/* ============================================================ */
-.fly-in-title {
+#nav-links-btn.is-dimmed .btn-label {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#nav-links-btn:hover .btn-label,
+#nav-links-btn.is-open .btn-label {
+    opacity: 1;
+}
+
+/* ============================================================
+   NAV POPUP
+   ============================================================ */
+#nav-popup {
+    position: absolute;
+    top: calc(var(--nav-height) + 2px);
+    left: 50%;
+    z-index: var(--z-popup);
+    width: 520px;
+
+    background: var(--color-bg-card);
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 28px 72px rgba(0, 0, 0, 0.82),
+        0 0 40px rgba(0, 255, 230, 0.07);
+
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(-8px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+#nav-popup.is-open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+.nav-popup-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 28px;
+    font-family: 'Michroma', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--color-text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border);
+    transition: color 0.2s ease, background 0.2s ease;
+    cursor: pointer;
+    background: transparent;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    width: 100%;
+    text-align: center;
+    outline: none;
+}
+
+.nav-popup-item:first-child { border-radius: 5px 5px 0 0; }
+.nav-popup-item:last-child  { border-bottom: none; border-radius: 0 0 5px 5px; }
+
+.nav-popup-item:hover {
+    color: var(--color-accent);
+    background: var(--color-accent-faint);
+}
+
+/* ============================================================
+   NAV-LOGO — 100% original elasticAssemble, untouched
+   ============================================================ */
+#nav-logo {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+#nav-logo.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Exact copy of original .fly-in-title */
+#nav-logo h1 {
     font-family: 'Michroma', sans-serif;
     font-size: 13px;
     font-weight: 400;
@@ -87,9 +279,11 @@ nav a:hover {
     display: flex;
     justify-content: center;
     overflow: hidden;
+    cursor: pointer;
 }
 
-.fly-in-title span {
+/* Exact copy of original .fly-in-title span */
+#nav-logo h1 span {
     display: inline-block;
     letter-spacing: 22px;
     text-indent: 22px;
@@ -98,452 +292,193 @@ nav a:hover {
     transform: translateX(-100vw);
 }
 
-.fly-in-title span:nth-child(1)  { animation-delay: 0.1s; }
-.fly-in-title span:nth-child(2)  { animation-delay: 0.3s; }
-.fly-in-title span:nth-child(3)  { animation-delay: 0.5s; }
-.fly-in-title span:nth-child(4)  { animation-delay: 0.7s; }
-.fly-in-title span:nth-child(5)  { animation-delay: 0.9s; }
-.fly-in-title span:nth-child(6)  { animation-delay: 1.1s; }
-.fly-in-title span:nth-child(7)  { animation-delay: 1.3s; }
-.fly-in-title span:nth-child(8)  { animation-delay: 1.5s; }
-.fly-in-title span:nth-child(9)  { animation-delay: 1.7s; }
-.fly-in-title span:nth-child(10) { animation-delay: 1.9s; }
-.fly-in-title span:nth-child(11) { animation-delay: 2.1s; }
-.fly-in-title span:nth-child(12) { animation-delay: 2.3s; }
+/* Exact original delays */
+#nav-logo h1 span:nth-child(1)  { animation-delay: 0.1s; }
+#nav-logo h1 span:nth-child(2)  { animation-delay: 0.3s; }
+#nav-logo h1 span:nth-child(3)  { animation-delay: 0.5s; }
+#nav-logo h1 span:nth-child(4)  { animation-delay: 0.7s; }
+#nav-logo h1 span:nth-child(5)  { animation-delay: 0.9s; }
+#nav-logo h1 span:nth-child(6)  { animation-delay: 1.1s; }
+#nav-logo h1 span:nth-child(7)  { animation-delay: 1.3s; }
+#nav-logo h1 span:nth-child(8)  { animation-delay: 1.5s; }
+#nav-logo h1 span:nth-child(9)  { animation-delay: 1.7s; }
+#nav-logo h1 span:nth-child(10) { animation-delay: 1.9s; }
+#nav-logo h1 span:nth-child(11) { animation-delay: 2.1s; }
+#nav-logo h1 span:nth-child(12) { animation-delay: 2.3s; }
 
+/* Exact original keyframes */
 @keyframes elasticAssemble {
     0%   { opacity: 0; transform: translateX(-100vw); }
     30%  { opacity: 1; }
     100% { opacity: 1; transform: translateX(0); }
 }
 
-/* ============================================================ */
-/* SECTION 2D: FEATURED VIDEO PLAYER                            */
-/* ============================================================ */
-.featured-box {
-    max-width: 1200px;
-    margin: 0 auto 30px auto;
+/* NAV-REVEAL-CUE */
+#nav-reveal-cue {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    width: 34px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5, 8, 13, 0.56);
+    border: 1px solid var(--color-border-accent);
+    border-radius: 0 0 7px 7px;
+    color: var(--color-accent);
+    z-index: 1450;
+    opacity: 0;
+    pointer-events: none;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+    cursor: pointer;
+}
+
+#nav-reveal-cue.is-visible {
+    opacity: 0.78;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+#nav-reveal-cue:hover {
+    opacity: 1;
+    border-color: var(--color-accent-dim);
+}
+
+#nav-reveal-cue svg {
+    width: 14px;
+    height: 9px;
+    stroke: currentColor;
+    fill: none;
+}
+
+/* ============================================================
+   PLAYER-CONTROLS
+   ============================================================ */
+#player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 24px 20px;
     position: relative;
 }
 
-#player-container {
-    aspect-ratio: 16 / 9;
-    border-radius: 4px;
-    width: 100%;
-    border: 1px solid #222;
-    background: #000;
-    overflow: hidden;
+/* Dim button active state */
+#grid-toggle-btn.is-active {
+    opacity: 0.4;
+    border-color: rgba(0,255,230,0.25);
 }
 
 .ctrl-btn {
     background: transparent;
-    border: 1px solid rgba(0, 255, 230, 0.5);
-    color: rgba(0, 255, 230, 0.6);
-    padding: 12px 25px;
+    border: 1px solid rgba(0,255,230,0.5);
+    color: rgba(0,255,230,0.6);
     font-family: 'Orbitron', sans-serif;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 6px;
     cursor: pointer;
-    transition: 0.4s;
+    transition: border-color 0.4s, color 0.4s;
     border-radius: 6px;
     outline: none;
-    white-space: nowrap;
-}
-
-.ctrl-btn:hover {
-    border-color: #00FFE6;
-    color: #00FFE6;
-}
-
-.ctrl-btn:focus {
-    border-color: rgba(0, 255, 230, 0.25);
-    color: rgba(0, 255, 230, 0.6);
-}
-
-.shuffle-btn {
-    color: rgba(0, 255, 230, 0.85);
-}
-.shuffle-btn:focus {
-    color: rgba(0, 255, 230, 0.85);
-}
-
-.cmd-arrow-btn {
-    border-radius: 6px;
-    border: 2px solid rgba(0, 255, 230, 0.6);
-    width: 56px;
-    height: 44px;
-    padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    white-space: nowrap;
+}
+.ctrl-btn:hover { border-color: #00FFE6; color: #00FFE6; }
+.ctrl-btn:focus { border-color: rgba(0,255,230,0.25); }
+
+.cmd-arrow-btn {
+    border: 2px solid rgba(0,255,230,0.6);
+    border-radius: 6px;
+    width: 56px;
+    height: 44px;
+    padding: 0;
     flex-shrink: 0;
 }
-
-.cmd-arrow-btn:hover {
-    border-color: #00FFE6;
-    border-width: 2px;
-}
+.cmd-arrow-btn:hover { border-color: #00FFE6; }
 
 .cmd-play-btn {
     position: relative;
     background: transparent;
-    border: none;
+    border: 2px solid rgba(0,255,230,0.6);
+    border-radius: 6px;
     outline: none;
     cursor: pointer;
-    width: 80px;
-    height: 80px;
+    width: 56px;
+    height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     padding: 0;
     filter: drop-shadow(0 0 4px rgba(0,255,230,0.2));
-    transition: filter 0.2s ease-out, transform 0.15s ease-out;
+    transition: filter 0.2s ease-out, transform 0.15s ease-out, border-color 0.4s;
 }
+.cmd-play-btn:hover  { transform: scale(1.05); filter: drop-shadow(0 0 10px rgba(0,255,230,0.55)); border-color: #00FFE6; }
+.cmd-play-btn:active { transform: scale(0.97); }
+.cmd-play-btn.is-playing { filter: drop-shadow(0 0 8px rgba(0,255,230,0.38)); border-color: #00FFE6; }
 
-.cmd-play-btn:hover {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 10px rgba(0,255,230,0.55));
-}
-
-.cmd-play-btn:active {
-    transform: scale(0.97);
-}
-
-@keyframes playGlow {
-    0%, 100% { filter: drop-shadow(0 0 6px rgba(0,255,230,0.35)); }
-    50%       { filter: drop-shadow(0 0 14px rgba(0,255,230,0.7)); }
-}
-
-.cmd-play-btn.is-playing {
-    filter: drop-shadow(0 0 8px rgba(0,255,230,0.38));
-}
-
-.play-icon {
-    position: relative;
-    width: 26px;
-    height: 26px;
-    overflow: visible;
-    flex-shrink: 0;
-}
+.play-icon { width: 26px; height: 26px; overflow: visible; flex-shrink: 0; }
 
 .play-bar-left {
     fill: rgba(0,255,230,0.85);
     d: path("M7,4 L17,12 L7,20 Z");
-    transition: d 0.18s ease-out, fill 0.18s ease-out;
+    transition: d 0.18s ease-out;
 }
-
 .play-bar-right {
     fill: rgba(0,255,230,0.85);
     d: path("M7,4 L7,4 L7,20 L7,20 Z");
-    transition: d 0.18s ease-out, fill 0.18s ease-out;
+    transition: d 0.18s ease-out;
 }
+.cmd-play-btn.is-playing .play-bar-left  { d: path("M5,4 L9,4 L9,20 L5,20 Z"); }
+.cmd-play-btn.is-playing .play-bar-right { d: path("M13,4 L17,4 L17,20 L13,20 Z"); }
 
-.cmd-play-btn.is-playing .play-bar-left {
-    d: path("M5,4 L9,4 L9,20 L5,20 Z");
-}
-.cmd-play-btn.is-playing .play-bar-right {
-    d: path("M13,4 L17,4 L17,20 L13,20 Z");
-}
-
-.play-ripple {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    pointer-events: none;
-}
-
+.play-ripple { position: absolute; inset: 0; border-radius: 50%; pointer-events: none; }
 @keyframes rippleOut {
     0%   { box-shadow: 0 0 0 0px rgba(0,255,230,0.45); opacity: 1; }
     100% { box-shadow: 0 0 0 18px rgba(0,255,230,0);   opacity: 0; }
 }
+.cmd-play-btn.ripple-active .play-ripple { animation: rippleOut 0.35s ease-out forwards; }
 
-.cmd-play-btn.ripple-active .play-ripple {
-    animation: rippleOut 0.35s ease-out forwards;
+.icon-only-btn {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-width: 2px;
 }
+.icon-only-btn svg { width: 20px; height: 20px; stroke: currentColor; }
 
-@media (max-width: 600px) {
-    .cmd-arrow-btn { width: 44px; height: 38px; }
-}
-
-/* ============================================================ */
-/* SECTION 2E-2: GRID VIEW CONTROLS                             */
-/* ============================================================ */
-.view-controls-bar { margin: 0; }
-
-.bare-view-wrap {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.bare-view-btn {
-    background: transparent;
-    border: none;
-    padding: 7px 9px;
-    cursor: pointer;
-    border-radius: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.2;
-    transition: opacity 0.25s;
-    outline: none;
-}
-
-.bare-view-btn svg rect { fill: #00FFE6; }
-.bare-view-btn.grid-btn-active { opacity: 1; }
-.bare-view-btn:hover { opacity: 0.6; }
-.bare-view-btn:focus { outline: none; }
-
-/* ============================================================ */
-/* SECTION 2F: VIDEO GRID — DEFAULT RESPONSIVE LAYOUT           */
-/* ============================================================ */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(390px, 390px));
-    gap: 25px;
-    max-width: 100%;
-    margin: 0 auto;
-    justify-content: center;
-}
-
-@media (max-width: 1900px) {
-    .grid {
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 18px;
-    }
-}
-
-@media (orientation: landscape) and (max-width: 1400px) {
-    .grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 15px;
-    }
-}
-
-@media (max-width: 1300px) and (orientation: portrait) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-}
-
-/* ============================================================ */
-/* SECTION 2F-2: VIDEO GRID — CUSTOM DENSITY VIEWS              */
-/* ============================================================ */
-@media (max-width: 600px) and (orientation: portrait) {
-    .grid.view-dense { grid-template-columns: repeat(1, 1fr); gap: 10px; }
-    .grid.view-max   { grid-template-columns: repeat(1, 1fr); gap: 14px; }
-}
-
-@media (min-width: 601px) and (max-width: 1300px) {
-    .grid.view-dense { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-    .grid.view-max   { grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); gap: 20px; }
-}
-
-@media (min-width: 1301px) {
-    .grid.view-dense { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
-    .grid.view-max   { grid-template-columns: repeat(auto-fill, minmax(550px, 1fr)); gap: 30px; }
-}
-
-/* ============================================================ */
-/* SECTION 2G: VIDEO CARDS                                      */
-/* ============================================================ */
-.video {
-    background: #080808;
-    border-radius: 4px;
-    transition: 0.3s;
-    position: relative;
-    cursor: pointer;
-    border: 1px solid #1a1a1a;
-    overflow: visible;
-}
-
-.video:hover {
-    transform: scale(1.03);
-    background: #111;
-}
-
-@keyframes activePulse {
-    0%   { box-shadow: 0 0 5px rgba(0, 255, 230, 0.1); }
-    50%  { box-shadow: 0 0 20px rgba(0, 255, 230, 0.35); }
-    100% { box-shadow: 0 0 5px rgba(0, 255, 230, 0.1); }
-}
-
-.video.is-playing {
-    border-color: #00FFE6 !important;
-    animation: activePulse 2s infinite ease-in-out;
-}
-
-.thumb-container {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    background-size: cover;
-    background-position: center;
-    border-radius: 4px 4px 0 0;
-}
-
-.video-label {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #fff;
-    text-align: center;
-    box-sizing: border-box;
-}
-
-.overlay-btn {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    color: #00FFE6;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    border: 1px solid rgba(0, 255, 230, 0.25);
-    border-radius: 2px;
-    padding: 10px 18px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+.control-spacer {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
     pointer-events: none;
 }
 
-.video:hover .overlay-btn { opacity: 1; }
+.video:hover .fav-heart-btn,
+.fav-heart-btn.is-active { opacity: 1; }
+.fav-heart-btn:hover { background: rgba(0,0,0,0.7); border-color: #00FFE6; }
+.fav-heart-svg { width: 14px; height: 14px; display: block; }
 
-/* ============================================================ */
-/* SECTION 2H: MOBILE ADJUSTMENTS                               */
-/* ============================================================ */
-@media (max-width: 900px) {
-    h1 { letter-spacing: 20px; text-indent: 20px; }
-    nav a { font-size: 9px; letter-spacing: 5px; margin: 0 12px; }
-}
+@media (max-width: 1024px) { #fav-sidebar { width: 360px; } }
+@media (max-width: 500px)  { #fav-sidebar { width: 60vw; max-width: 60vw; min-width: 280px; } }
 
-/* ============================================================ */
-/* SECTION 2I: ORBITAL HUD                                      */
-/* ============================================================ */
-#hud-dock {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    z-index: 999;
-    background: rgba(5, 4, 14, 0.75);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border-top: 1px solid rgba(80, 0, 180, 0.25);
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-    box-sizing: border-box;
-}
-
-#hud-dock.hud-active {
-    opacity: 1;
-    pointer-events: all;
-}
-
-#hud-progress-container {
-    width: 100%;
-    height: 3px;
-    background: #1a1a1a;
-    cursor: pointer;
-    flex-shrink: 0;
-    position: relative;
-}
-
-#hud-progress-bar {
-    height: 100%;
-    width: 0%;
-    background: #00FFE6;
-    transition: width 0.15s linear;
-    pointer-events: none;
-}
-
-#hud-progress-container::before {
-    content: '';
-    position: absolute;
-    top: -22px;
-    left: 0;
-    right: 0;
-    height: 48px;
-    z-index: 10;
-    background: transparent;
-}
-
-#hud-inner {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 0 20px;
-    gap: 16px;
-    min-width: 0;
-}
-
-#hud-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-.hud-btn {
-    background: transparent;
-    border: 1px solid #333;
-    color: #666;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 9px;
-    padding: 6px 10px;
-    cursor: pointer;
-    border-radius: 2px;
-    transition: 0.3s;
-    line-height: 1;
-    letter-spacing: 1px;
-}
-
-.hud-btn:hover { border-color: #00FFE6; color: #fff; }
-
-.hud-playpause {
-    border-color: #00FFE6;
-    color: #00FFE6;
-    padding: 6px 14px;
-}
-
-.hud-playpause:hover { background: rgba(0, 255, 230, 0.1); }
-
-@media (max-width: 500px) {
-    #hud-inner { padding: 0 10px; gap: 8px; }
-    .hud-btn { padding: 5px 8px; font-size: 8px; }
-}
-
-/* ============================================================ */
-/* SECTION 2J: FAVOURITES SIDEBAR                               */
-/* ============================================================ */
 #fav-backdrop {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0,0,0,0.55);
     z-index: 1199;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
-
-#fav-backdrop.fav-backdrop-visible { display: block; opacity: 1; }
+#fav-backdrop.is-visible { display: block; opacity: 1; }
 
 #fav-sidebar {
     position: fixed;
@@ -559,20 +494,18 @@ nav a:hover {
     flex-direction: column;
     transform: translateX(100%);
     transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
+    box-shadow: -8px 0 32px rgba(0,0,0,0.6);
 }
-
-#fav-sidebar.fav-sidebar-open { transform: translateX(0); }
+#fav-sidebar.is-open { transform: translateX(0); }
 
 #fav-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 20px 14px 20px;
+    padding: 18px 20px 14px;
     border-bottom: 1px solid #1a1a1a;
     flex-shrink: 0;
 }
-
 #fav-title {
     font-family: 'Orbitron', sans-serif;
     font-size: 10px;
@@ -580,7 +513,6 @@ nav a:hover {
     text-transform: uppercase;
     color: #00FFE6;
 }
-
 #fav-close-btn {
     background: transparent;
     border: none;
@@ -590,10 +522,21 @@ nav a:hover {
     padding: 4px 6px;
     line-height: 1;
     transition: color 0.2s;
-    border-radius: 2px;
 }
-
 #fav-close-btn:hover { color: #00FFE6; }
+
+#fav-actions {
+    display: none;
+    padding: 12px 14px 4px;
+    flex-shrink: 0;
+}
+#fav-play-all-btn {
+    width: 100%;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 9px;
+    letter-spacing: 4px;
+}
 
 #fav-empty {
     display: flex;
@@ -621,31 +564,23 @@ nav a:hover {
     scrollbar-width: thin;
     scrollbar-color: #222 transparent;
 }
-
 #fav-list::-webkit-scrollbar { width: 4px; }
 #fav-list::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
 
 .fav-row {
     display: flex;
     flex-direction: column;
-    padding: 12px 14px 10px 14px;
+    padding: 12px 14px 10px;
     border-bottom: 1px solid #151515;
     cursor: grab;
     transition: background 0.2s;
     user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
     gap: 0;
     position: relative;
 }
-
 .fav-row:hover { background: #111; }
-.fav-row:active { cursor: grabbing; }
 .fav-row-dragging { opacity: 0.4; }
-.fav-row-over {
-    border-top: 2px solid rgba(0, 255, 230, 0.5);
-    background: #0d0d0d;
-}
+.fav-row-over { border-top: 2px solid rgba(0,255,230,0.5); background: #0d0d0d; }
 
 .fav-drag-handle {
     position: absolute;
@@ -660,12 +595,8 @@ nav a:hover {
     cursor: grab;
     background: rgba(0,0,0,0.55);
     border-radius: 3px;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
     transition: opacity 0.2s;
 }
-
 .fav-row:hover .fav-drag-handle { opacity: 0.7; }
 
 .fav-row-thumb {
@@ -673,20 +604,19 @@ nav a:hover {
     aspect-ratio: 16 / 9;
     background-size: cover;
     background-position: center;
-    border-radius: 3px;
     background-color: #111;
+    border-radius: 3px;
     flex-shrink: 0;
 }
 
 .fav-row-title {
-    width: 100%;
     font-family: 'Orbitron', sans-serif;
     font-size: 9px;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: #ccc;
     line-height: 1.5;
-    padding: 10px 0 8px 0;
+    padding: 10px 0 8px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -699,7 +629,6 @@ nav a:hover {
     gap: 6px;
     width: 100%;
 }
-
 .fav-row-btn {
     background: transparent;
     border: 1px solid #2a2a2a;
@@ -712,10 +641,9 @@ nav a:hover {
     transition: border-color 0.2s, color 0.2s;
     flex: 1;
 }
-
-.fav-play-btn svg { width: 12px; height: 12px; }
 .fav-move-btn { font-size: 10px; color: #555; }
 .fav-move-btn:hover { border-color: #00FFE6; color: #00FFE6; }
+.fav-play-btn svg { width: 12px; height: 12px; }
 .fav-play-btn:hover { border-color: #00FFE6; }
 .fav-remove-btn { color: #444; font-size: 11px; line-height: 1; }
 .fav-remove-btn:hover { border-color: #ff4466; color: #ff4466; }
@@ -727,26 +655,24 @@ nav a:hover {
     border-top: 1px solid #1a1a1a;
     flex-shrink: 0;
 }
-
 #fav-clear-btn {
     font-size: 9px;
     letter-spacing: 4px;
     padding: 8px 20px;
-    color: rgba(255, 68, 102, 0.6);
-    border-color: rgba(255, 68, 102, 0.3);
+    color: rgba(255,68,102,0.6);
+    border-color: rgba(255,68,102,0.3);
     border-radius: 22px;
 }
-
 #fav-clear-btn:hover { color: #ff4466; border-color: #ff4466; }
 
 .fav-heart-btn {
     position: absolute;
     top: 8px;
     right: 8px;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0,0,0,0.45);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 255, 230, 0.2);
+    border: 1px solid rgba(0,255,230,0.2);
     border-radius: 50%;
     width: 30px;
     height: 30px;
@@ -759,73 +685,360 @@ nav a:hover {
     transition: opacity 0.25s, border-color 0.25s, background 0.25s;
     padding: 0;
 }
-
 .video:hover .fav-heart-btn,
-.fav-heart-btn.fav-heart-active { opacity: 1; }
-
-.fav-heart-btn:hover {
-    background: rgba(0, 0, 0, 0.7);
-    border-color: #00FFE6;
-}
-
+.fav-heart-btn.is-active { opacity: 1; }
+.fav-heart-btn:hover { background: rgba(0,0,0,0.7); border-color: #00FFE6; }
 .fav-heart-svg { width: 14px; height: 14px; display: block; }
 
 @media (max-width: 1024px) { #fav-sidebar { width: 360px; } }
-@media (max-width: 500px)  { #fav-sidebar { width: 100vw; max-width: 100vw; border-left: none; } }
+@media (max-width: 500px)  { #fav-sidebar { width: 60vw; max-width: 60vw; min-width: 280px; } }
 
-/* ============================================================ */
-/* SECTION 2K: SHARED WRAPPERS                                  */
-/* ============================================================ */
-.dropdown-wrap {
-    display: flex;
+/* ============================================================
+   VIDEO-GRID
+   ============================================================ */
+#video-grid {
+    --video-grid-gap: 12px;
+    --video-card-max: 280px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, var(--video-card-max)));
+    gap: var(--video-grid-gap);
     justify-content: center;
-    margin-bottom: 30px;
+    width: fit-content;
+    max-width: calc((var(--video-card-max) * 4) + (var(--video-grid-gap) * 3));
+    margin: 0 auto;
+    padding: 16px 0 48px;
+    box-sizing: border-box;
 }
 
-.nav-links {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0 30px;
-    padding: 0;
+@media (max-width: 1200px) {
+    #video-grid { grid-template-columns: repeat(3, minmax(0, var(--video-card-max))); }
 }
 
-.nav-links a {
-    color: #fff;
-    text-decoration: none;
+@media (max-width: 920px) {
+    #video-grid { grid-template-columns: repeat(2, minmax(0, var(--video-card-max))); }
+}
+
+@media (max-width: 620px) {
+    #video-grid { grid-template-columns: minmax(0, var(--video-card-max)); }
+}
+
+/* Mobile-only: hide dim + shuffle, tighten control bar */
+@media (max-width: 620px) {
+    #grid-toggle-btn,
+    #shuffle-btn { display: none; }
+    #player-controls { gap: 8px; padding: 12px 8px 16px; }
+    .control-spacer { width: 8px; flex: 0 0 8px; }
+}
+
+/* Grid dimmed states */
+#video-grid.is-dim-1 {
+    opacity: 0.5;
+    transition: opacity 0.4s ease;
+}
+#video-grid.is-dim-2 {
+    opacity: 0.1;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+#player-controls.is-dim-1 {
+    opacity: 0.5;
+    transition: opacity 0.4s ease;
+}
+
+#player-controls.is-dim-2 {
+    opacity: 0.5;
+    transition: opacity 0.4s ease;
+}
+
+.video {
+    background: #080808;
+    border-radius: 4px;
+    border: 1px solid #1a1a1a;
+    cursor: pointer;
+    position: relative;
+    overflow: visible;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+.video:hover { transform: scale(1.03); background: #111; }
+
+@keyframes activePulse {
+    0%   { box-shadow: 0 0 5px rgba(0,255,230,0.10); }
+    50%  { box-shadow: 0 0 20px rgba(0,255,230,0.35); }
+    100% { box-shadow: 0 0 5px rgba(0,255,230,0.10); }
+}
+.video.is-playing {
+    border-color: #00FFE6 !important;
+    animation: activePulse 2s infinite ease-in-out;
+}
+
+.thumb-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-size: cover;
+    background-position: center;
+    background-color: #050505;
+    border-radius: 4px 4px 0 0;
+}
+
+.video-label {
+    display: block;
+    width: 100%;
+    padding: 12px 14px;
+    font-family: 'Orbitron', sans-serif;
     font-size: 10px;
     text-transform: uppercase;
-    letter-spacing: 8px;
-    transition: color 0.25s;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.85);
+    text-align: center;
+    box-sizing: border-box;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.nav-links a:hover { color: #00FFE6; }
+.overlay-btn {
+    position: absolute;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    color: #00FFE6;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border: 1px solid rgba(0,255,230,0.25);
+    border-radius: 3px;
+    padding: 9px 16px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+.video:hover .overlay-btn { opacity: 1; }
 
-/* ============================================================ */
-/* SECTION 2M: MUSIC PAGE (inline section)                      */
-/* ============================================================ */
-#music-section {
-    display: none;
-    text-align: left;
+/* ============================================================
+   VERSION-FOOTER
+   ============================================================ */
+#version-footer {
+    display: block;
+    margin: 48px auto 110px;
+    padding: 16px 0;
+    width: min(980px, calc(100% - 40px));
+    text-align: center;
+    color: #00FFE6;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
 }
 
-#music-section.active { display: block; }
+/* ============================================================
+   PROGRESS-BAR
+   ============================================================ */
+#progress-bar-wrap {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 0 24px;
+    box-sizing: border-box;
+}
 
-#player-section { display: block; }
-#player-section.hidden { display: none; }
+#progress-bar-track {
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 999px;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 0 8px rgba(0,255,230,0.04);
+}
 
-.music-page-header {
-    padding: 10px 20px 30px 20px;
-    font-family: 'Michroma', sans-serif;
-    font-size: 13px;
-    color: #fff;
+/* Extended hit area — easier to grab */
+#progress-bar-track::before {
+    content: '';
+    position: absolute;
+    inset: -12px 0;
+}
+
+#progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, rgba(0,180,160,0.7) 0%, #00FFE6 60%, rgba(200,255,250,0.95) 100%);
+    border-radius: 999px;
+    pointer-events: none;
+    transition: width 0.15s linear;
+    box-shadow: 0 0 6px rgba(0,255,230,0.5), 0 0 14px rgba(0,255,230,0.2);
+    position: relative;
+}
+
+/* Glowing tip at the leading edge */
+#progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(220,255,252,0.9);
+    box-shadow: 0 0 3px 1px rgba(0,255,230,0.4);
+    opacity: 0.8;
+}
+
+/* ============================================================
+   PLAYER-BOX
+   ============================================================ */
+#player-section {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+#player-box {
+    max-width: 900px;
+    margin: 0 auto 24px auto;
+    position: relative;
+}
+
+#player-container {
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    width: 100%;
+    border: 1px solid #1a1a1a;
+    background: #000;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Loading state — shown before YouTube API fires */
+#player-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    color: rgba(0,255,230,0.3);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    border-radius: 6px;
+}
+
+#player-loading.is-hidden {
+    opacity: 0;
+}
+
+#yt-player {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+}
+#page-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - var(--nav-height) - var(--nav-logo-height));
+    color: var(--color-text-dim);
+    font-size: 9px;
     letter-spacing: 4px;
     text-transform: uppercase;
 }
 
+/* ============================================================
+   MUSIC-SECTION
+   ============================================================ */
+#music-section {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1700;
+    padding: clamp(64px, 8vh, 88px) clamp(14px, 4vw, 48px) 102px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    text-align: left;
+}
+
+#music-section.active {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.music-modal-box {
+    width: min(1180px, 100%);
+    max-height: calc(100vh - 156px);
+    overflow-y: auto;
+    padding: 38px clamp(16px, 3vw, 34px) 34px;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
+    scrollbar-width: thin;
+    scrollbar-color: #000000 transparent;
+    position: relative;
+}
+
+.music-modal-box::-webkit-scrollbar { width: 6px; }
+.music-modal-box::-webkit-scrollbar-thumb {
+    background: #000000;
+    border-radius: 999px;
+}
+
+.music-close-btn {
+    position: absolute;
+    top: 16px;
+    left: 20px;
+    z-index: 2;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.music-close-btn:hover { color: #00FFE6; outline: none; }
+
+.music-page-header {
+    padding: 10px 20px 30px 20px;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #fff;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
 .platform-section {
-    padding: 0 20px 50px 20px;
+    padding: 0 20px 38px 20px;
     width: 98%;
     margin: 0 auto;
     box-sizing: border-box;
@@ -843,14 +1056,12 @@ nav a:hover {
     border-bottom: 1px solid #1a1a1a;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
 }
 
 .platform-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: #1a1a1a;
+    content: none;
 }
 
 .platform-dot {
@@ -862,63 +1073,76 @@ nav a:hover {
 }
 
 .dot-youtube { background: #ff0000; }
-.dot-spotify { background: #FD4095; }
-.dot-tidal   { background: #00ffff; }
+.dot-spotify { background: #00FFE6; }
+.dot-tidal   { background: #ff6b35; }
 .dot-deezer  { background: #a238ff; }
 
 .music-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 15px;
+    justify-content: center;
+    align-items: stretch;
 }
 
 .music-card {
-    background: #080808;
-    border: 1px solid #1a1a1a;
-    padding: 24px 20px 20px 20px;
+    flex: 0 1 250px;
+    min-width: 0;
+    width: 250px;
+    max-width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 28px 24px 44px 24px;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 10px;
     text-decoration: none;
     position: relative;
     overflow: hidden;
+    text-align: center;
+    border-radius: 8px;
 }
 
-.music-card:hover { border-color: #00FFE6; box-shadow: 0 0 15px rgba(0,255,230,0.15); transform: translateY(-2px); }
-.music-card.spotify:hover { border-color: #FD4095; box-shadow: 0 0 15px rgba(253,64,149,0.15); }
-.music-card.tidal:hover   { border-color: #00ffff; box-shadow: 0 0 15px rgba(0,255,255,0.15); }
-.music-card.deezer:hover  { border-color: #a238ff; box-shadow: 0 0 15px rgba(162,56,255,0.15); }
-.music-card.youtube:hover { border-color: #ff0000; box-shadow: 0 0 15px rgba(255,0,0,0.15); }
+.music-card:hover          { border-color: #00FFE6; box-shadow: 0 0 15px rgba(0,255,230,0.15); transform: translateY(-2px); }
+.music-card.spotify:hover  { border-color: #00FFE6; box-shadow: 0 0 15px rgba(0,255,230,0.15); }
+.music-card.tidal:hover    { border-color: #ff6b35; box-shadow: 0 0 15px rgba(255,107,53,0.15); }
+.music-card.deezer:hover   { border-color: #a238ff; box-shadow: 0 0 15px rgba(162,56,255,0.15); }
+.music-card.youtube:hover  { border-color: #ff0000; box-shadow: 0 0 15px rgba(255,0,0,0.15); }
 
 .card-platform {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 9px;
-    font-weight: bold;
-    letter-spacing: 3px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 4px;
     text-transform: uppercase;
 }
 
-.card-platform.spotify { color: #FD4095; }
-.card-platform.tidal   { color: #00ffff; }
+.card-platform.spotify { color: #00FFE6; }
+.card-platform.tidal   { color: #ff6b35; }
 .card-platform.deezer  { color: #a238ff; }
 .card-platform.youtube { color: #ff0000; }
 
 .card-title {
-    font-family: 'Michroma', sans-serif;
-    font-size: 13px;
-    letter-spacing: 2px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 3px;
     color: #ffffff;
     text-transform: uppercase;
     line-height: 1.3;
 }
 
 .card-meta {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 9px;
-    color: #ffffff;
-    letter-spacing: 2px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 3px;
     text-transform: uppercase;
     margin-top: auto;
 }
@@ -926,7 +1150,8 @@ nav a:hover {
 .card-arrow {
     position: absolute;
     bottom: 18px;
-    right: 18px;
+    left: 50%;
+    transform: translateX(-50%);
     font-family: 'Orbitron', sans-serif;
     font-size: 12px;
     color: #333;
@@ -934,2807 +1159,643 @@ nav a:hover {
 }
 
 .music-card:hover .card-arrow         { color: #00FFE6; }
-.music-card.spotify:hover .card-arrow { color: #FD4095; }
-.music-card.tidal:hover .card-arrow   { color: #00ffff; }
-.music-card.deezer:hover .card-arrow  { color: #a238ff; }
-.music-card.youtube:hover .card-arrow { color: #ff0000; }
-
-@media (max-width: 1000px) { .music-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 700px)  { .music-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 420px)  { .music-grid { grid-template-columns: 1fr; } }
-
-/* ============================================================ */
-/* WEBSITE 1: STICKY CINEMATIC CORE OVERRIDES                  */
-/* ============================================================ */
-html {
-    height: 100%;
-    overflow: hidden;
-}
-
-body {
-    min-height: 100%;
-    height: 100%;
-    padding: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background:
-        radial-gradient(circle at 50% -15%, rgba(0, 255, 230, 0.12), transparent 34%),
-        radial-gradient(circle at 18% 22%, rgba(50, 80, 140, 0.22), transparent 30%),
-        linear-gradient(180deg, #03050a 0%, #07080d 42%, #030409 100%);
-}
-
-body::before,
-body::after {
-    content: '';
-    position: fixed;
-    left: 0;
-    right: 0;
-    z-index: 3;
-    pointer-events: none;
-}
-
-body::before {
-    top: 0;
-    height: 130px;
-    background: linear-gradient(180deg, rgba(3, 5, 10, 0.95), rgba(3, 5, 10, 0));
-}
-
-body::after {
-    bottom: 0;
-    height: 145px;
-    background: linear-gradient(0deg, rgba(3, 4, 9, 0.96), rgba(3, 4, 9, 0));
-}
-
-body > .dropdown-wrap:first-of-type {
-    flex-shrink: 0;
-    margin: 0;
-    padding: 10px 22px 0;
-    max-height: 62px;
-    overflow: hidden;
-    z-index: 20;
-    transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease, max-height 0.35s ease, padding 0.35s ease;
-}
-
-.fly-in-title {
-    flex-shrink: 0;
-    margin: 0;
-    padding: 4px 20px 8px;
-    max-height: 48px;
-    color: #00FFE6;
-    text-shadow: 0 0 28px rgba(0, 255, 230, 0.22);
-    z-index: 10;
-    transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease, max-height 0.35s ease, padding 0.35s ease;
-}
-
-.fly-in-title span {
-    letter-spacing: 18px;
-    text-indent: 18px;
-}
-
-.top-reveal-zone {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 96px;
-    z-index: 1450;
-    pointer-events: none;
-}
-
-.top-reveal-cue {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    width: 34px;
-    height: 28px;
-    transform: translateX(-50%) translateY(-12px);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(0, 255, 230, 0.18);
-    border-radius: 0 0 7px 7px;
-    background: rgba(5, 8, 13, 0.56);
-    color: #00FFE6;
-    opacity: 0;
-    pointer-events: none;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
-}
-
-.top-reveal-cue svg {
-    width: 14px;
-    height: 9px;
-    stroke: currentColor;
-}
-
-body.top-chrome-hidden > .dropdown-wrap:first-of-type,
-body.top-chrome-hidden .fly-in-title {
-    opacity: 0;
-    filter: blur(1px);
-    transform: translateY(-26px);
-    pointer-events: none;
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-}
-
-body.top-chrome-hidden .top-reveal-zone {
-    pointer-events: auto;
-}
-
-body.top-chrome-hidden .top-reveal-cue {
-    opacity: 0.78;
-    transform: translateX(-50%) translateY(0);
-    pointer-events: auto;
-}
-
-body.top-chrome-hidden .top-reveal-cue:hover {
-    opacity: 1;
-    border-color: rgba(0, 255, 230, 0.52);
-    background: rgba(0, 255, 230, 0.065);
-}
-
-body.top-chrome-hidden #player-section {
-    grid-template-rows: minmax(220px, 41vh) 46px minmax(0, 1fr);
-}
-
-#player-section {
-    flex: 1;
-    min-height: 0;
-    display: grid;
-    grid-template-rows: minmax(220px, 40vh) 46px minmax(0, 1fr);
-    gap: 8px;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0 clamp(14px, 2.6vw, 42px) 92px;
-    overflow: hidden;
-    transition: grid-template-rows 0.45s ease, grid-template-columns 0.45s ease, gap 0.45s ease;
-}
-
-#player-section.hidden {
-    display: none;
-}
-
-.featured-box {
-    width: min(1120px, 92vw);
-    height: 100%;
-    min-height: 0;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: stretch;
-    isolation: isolate;
-    transition: width 0.45s ease;
-}
-
-.featured-box::before {
-    content: '';
-    position: absolute;
-    inset: 22px -50px -22px;
-    z-index: -1;
-    background:
-        radial-gradient(circle at 50% 48%, rgba(0, 255, 230, 0.16), transparent 58%),
-        linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.035), transparent);
-    filter: blur(20px);
-    opacity: 0.8;
-}
-
-#player-container {
-    flex: 1;
-    min-height: 0;
-    border: 1px solid rgba(162, 215, 220, 0.12);
-    border-radius: 8px;
-    background: #000;
-    box-shadow:
-        0 28px 90px rgba(0, 0, 0, 0.64),
-        0 0 70px rgba(0, 255, 230, 0.09),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.035);
-}
-
-#player-section > .dropdown-wrap {
-    margin: 0;
-    min-height: 42px;
-    z-index: 15;
-    transition: opacity 0.35s ease, filter 0.35s ease;
-}
-
-.command-shell {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    gap: 8px;
-}
-
-.nav-links a:hover {
-    color: #00FFE6;
-}
-
-.nav-links {
-    gap: 0 24px;
-}
-
-.nav-links a {
-    color: #00FFE6;
-    letter-spacing: 5px;
-}
-
-.ctrl-btn {
-    border-color: rgba(168, 214, 216, 0.18);
-    color: rgba(230, 246, 246, 0.64);
-    border-radius: 5px;
-}
-
-.ctrl-btn:hover {
-    border-color: rgba(0, 255, 230, 0.72);
-    color: rgba(0, 255, 230, 0.95);
-    box-shadow: 0 0 20px rgba(0, 255, 230, 0.08);
-}
-
-.bare-view-btn svg rect {
-    fill: rgba(0, 255, 230, 0.72);
-}
-
-.grid {
-    --website1-thumb-height: clamp(128px, 8.6vw, 184px);
-    --website1-label-height: 52px;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    align-content: start;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: clamp(12px, 1.1vw, 20px);
-    width: min(1640px, 100%);
-    max-width: 1640px;
-    margin: 0 auto;
-    padding: 12px clamp(3px, 1vw, 16px) 104px;
-    box-sizing: border-box;
-    scrollbar-width: none;
-    mask-image: linear-gradient(to bottom, transparent 0, #000 28px, #000 calc(100% - 62px), transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 28px, #000 calc(100% - 62px), transparent 100%);
-    transition: opacity 0.35s ease, filter 0.35s ease;
-}
-
-.grid::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-}
-
-#player-section > div[style*="margin-top: 40px"] {
-    display: none;
-}
-
-.video {
-    background: linear-gradient(180deg, rgba(18, 24, 31, 0.84), rgba(6, 8, 13, 0.92));
-    border: 1px solid rgba(204, 244, 246, 0.07);
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    height: calc(var(--website1-thumb-height) + var(--website1-label-height) + 2px);
-    min-height: 0;
-    overflow: hidden;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
-    transform: translateZ(0);
-    transition: transform 0.36s ease, border-color 0.36s ease, box-shadow 0.36s ease, background 0.36s ease;
-}
-
-.video:hover {
-    transform: translateY(-4px) scale(1.012);
-    background: linear-gradient(180deg, rgba(24, 33, 42, 0.92), rgba(8, 11, 17, 0.96));
-    border-color: rgba(0, 255, 230, 0.34);
-    box-shadow: 0 24px 52px rgba(0, 0, 0, 0.38), 0 0 26px rgba(0, 255, 230, 0.08);
-}
-
-.video.is-playing {
-    border-color: rgba(0, 255, 230, 0.82) !important;
-}
-
-.thumb-container {
-    border-radius: 8px 8px 0 0;
-    flex: 0 0 auto;
-    height: var(--website1-thumb-height);
-    min-height: 0;
-    aspect-ratio: auto;
-}
-
-.video-label {
-    color: #00FFE6;
-    font-size: 10px;
-    line-height: 1.45;
-    flex: 0 0 auto;
-    min-height: 52px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.overlay-btn {
-    border-color: rgba(0, 255, 230, 0.24);
-    border-radius: 4px;
-    background: rgba(2, 7, 12, 0.46);
-}
-
-#hud-dock {
-    left: 50%;
-    bottom: 14px;
-    width: min(820px, calc(100% - 28px));
-    height: 76px;
-    transform: translateX(-50%);
-    border: 1px solid rgba(180, 225, 230, 0.1);
-    border-radius: 8px;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.58) 0 22px, rgba(5, 7, 12, 0.82) 22px 100%);
-    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.5), 0 0 34px rgba(0, 255, 230, 0.08);
-    overflow: hidden;
-    touch-action: none;
-}
-
-#hud-progress-container {
-    height: 2px;
-    margin-top: 22px;
-    background: rgba(255, 255, 255, 0.055);
-    position: relative;
-    z-index: 3;
-    touch-action: none;
-}
-
-#hud-progress-bar {
-    background: #00FFE6;
-}
-
-.hud-btn {
-    border-color: rgba(180, 225, 230, 0.12);
-    color: rgba(235, 248, 248, 0.58);
-    border-radius: 4px;
-}
-
-.hud-playpause {
-    border-color: rgba(0, 255, 230, 0.58);
-    color: rgba(0, 255, 230, 0.9);
-}
-
-#music-section {
-    position: fixed;
-    inset: 0;
-    z-index: 1700;
-    padding: clamp(64px, 8vh, 88px) clamp(14px, 4vw, 48px) 102px;
-    box-sizing: border-box;
-    background: rgba(0, 0, 0, 0.72);
-    backdrop-filter: blur(11px);
-    -webkit-backdrop-filter: blur(11px);
-}
-
-#music-section.active {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-}
-
-.music-modal-box {
-    width: min(1180px, 100%);
-    max-height: calc(100vh - 156px);
-    overflow-y: auto;
-    padding: 38px clamp(16px, 3vw, 34px) 34px;
-    box-sizing: border-box;
-    border: 2px solid rgba(0, 255, 230, 0.72);
-    border-radius: 6px;
-    background: rgba(5, 7, 12, 0.96);
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.055), 0 28px 90px rgba(0, 0, 0, 0.78), 0 0 38px rgba(0, 255, 230, 0.13);
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 255, 230, 0.35) transparent;
-    position: relative;
-}
-
-.music-modal-box::-webkit-scrollbar {
-    width: 6px;
-}
-
-.music-modal-box::-webkit-scrollbar-thumb {
-    background: rgba(0, 255, 230, 0.35);
-    border-radius: 999px;
-}
-
-.music-close-btn {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    width: 42px;
-    height: 34px;
-    margin: -30px auto 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(0, 255, 230, 0.7);
-    border-radius: 4px;
-    background: #05070c;
-    color: #fff;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 18px;
-    line-height: 1;
-    cursor: pointer;
-    box-shadow: 0 0 18px rgba(0, 255, 230, 0.22);
-}
-
-.music-close-btn:hover,
-.music-close-btn:focus-visible {
-    color: #00FFE6;
-    outline: none;
-}
-
-.cinema-mode-btn {
-    width: 38px;
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: 1px solid rgba(180, 225, 230, 0.16);
-    border-radius: 6px;
-    background: rgba(5, 8, 13, 0.46);
-    color: rgba(230, 246, 246, 0.62);
-    cursor: pointer;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
-}
-
-.cinema-mode-btn svg {
-    width: 19px;
-    height: 19px;
-    stroke: currentColor;
-}
-
-.layout-mode-btn {
-    width: 38px;
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: 1px solid rgba(180, 225, 230, 0.16);
-    border-radius: 6px;
-    background: rgba(5, 8, 13, 0.46);
-    color: rgba(230, 246, 246, 0.62);
-    cursor: pointer;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
-}
-
-.layout-mode-btn svg {
-    width: 19px;
-    height: 19px;
-    stroke: currentColor;
-}
-
-.layout-mode-btn:hover,
-.layout-mode-btn.is-active {
-    color: #00FFE6;
-    border-color: rgba(0, 255, 230, 0.5);
-    background: rgba(0, 255, 230, 0.055);
-    box-shadow: 0 0 18px rgba(0, 255, 230, 0.1);
-}
-
-@media (min-width: 1200px) and (orientation: landscape) {
-    body.side-layout #player-section {
-        grid-template-columns: minmax(520px, min(42vw, 1220px)) minmax(0, 1fr);
-        grid-template-rows: minmax(0, 1fr) 46px;
-        grid-template-areas:
-            "player grid"
-            "command grid";
-        gap: 14px clamp(18px, 1.4vw, 28px);
-        padding-top: 0;
-    }
-
-    body.side-layout .featured-box {
-        grid-area: player;
-        width: 100%;
-        max-width: none;
-        align-self: stretch;
-        justify-self: stretch;
-    }
-
-    body.side-layout #player-section > .dropdown-wrap {
-        grid-area: command;
-        align-self: start;
-        justify-self: center;
-        width: 100%;
-    }
-
-    body.side-layout .grid {
-        grid-area: grid;
-        width: 100%;
-        max-width: none;
-        height: 100%;
-        padding-top: 8px;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    }
-
-    body.side-layout .command-shell {
-        width: 100%;
-    }
-}
-
-@media (min-aspect-ratio: 21/10) and (min-width: 1800px) {
-    #player-section {
-        grid-template-rows: minmax(230px, 38vh) 44px minmax(0, 1fr);
-    }
-
-    body.top-chrome-hidden #player-section {
-        grid-template-rows: minmax(230px, 39vh) 44px minmax(0, 1fr);
-    }
-
-    .featured-box {
-        width: min(1180px, 76vw);
-    }
-
-    .grid {
-        --website1-thumb-height: clamp(112px, 6.2vw, 172px);
-        width: min(2200px, 100%);
-        max-width: 2200px;
-        grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
-        padding-top: 8px;
-    }
-
-    body.side-layout #player-section {
-        grid-template-columns: minmax(640px, min(44vw, 1380px)) minmax(0, 1fr);
-    }
-
-    body.side-layout .featured-box {
-        width: 100%;
-    }
-}
-
-.cinema-mode-btn:hover,
-.cinema-mode-btn.is-active {
-    color: #00FFE6;
-    border-color: rgba(0, 255, 230, 0.5);
-    background: rgba(0, 255, 230, 0.055);
-    box-shadow: 0 0 18px rgba(0, 255, 230, 0.1);
-}
-
-body.cinema-mode > .dropdown-wrap:first-of-type,
-body.cinema-mode .fly-in-title {
-    opacity: 0.09;
-    filter: blur(0.6px);
-}
-
-body.cinema-mode #player-section {
-    grid-template-rows: minmax(330px, 72vh) 74px minmax(0, 1fr);
-}
-
-body.cinema-mode .featured-box {
-    width: min(1400px, 94vw);
-}
-
-body.cinema-mode #player-section > .dropdown-wrap {
-    opacity: 1;
-    filter: none;
-    pointer-events: auto;
-    align-self: center;
-    transform: none;
-}
-
-body.cinema-mode .grid {
-    opacity: 0.025;
-    filter: blur(3px);
-    pointer-events: none;
-}
-
-body.cinema-mode #hud-dock:not(.hud-active) {
-    opacity: 0;
-}
-
-body.cinema-mode .command-shell {
-    opacity: 0.74;
-    width: 100%;
-}
-
-body.cinema-mode .cinema-mode-btn {
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(0, 255, 230, 0.58);
-    border-color: rgba(0, 255, 230, 0.22);
-    background: rgba(5, 8, 13, 0.36);
-    box-shadow: 0 0 16px rgba(0, 255, 230, 0.055);
-}
-
-.music-card {
-    border-radius: 8px;
-    border-color: rgba(204, 244, 246, 0.07);
-    background: rgba(12, 16, 23, 0.82);
-}
-
-@media (max-width: 820px) {
-    body > .dropdown-wrap:first-of-type {
-        padding-top: 12px;
-    }
-
-    .fly-in-title {
-        font-size: 11px;
-        padding-bottom: 10px;
-    }
-
-    .fly-in-title span {
-        letter-spacing: 8px;
-        text-indent: 8px;
-    }
-
-    #player-section {
-        grid-template-rows: minmax(176px, 31vh) 42px minmax(0, 1fr);
-        padding-left: 12px;
-        padding-right: 12px;
-        gap: 10px;
-    }
-
-    body.cinema-mode #player-section {
-        grid-template-rows: minmax(220px, 54vh) 74px minmax(0, 1fr);
-    }
-
-    .cinema-mode-btn,
-    .layout-mode-btn {
-        width: 34px;
-        height: 31px;
-    }
-
-    .featured-box {
-        width: 100%;
-    }
-
-    .grid {
-        --website1-thumb-height: max(104px, 25vw);
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        padding-top: 14px;
-    }
-
-    .grid.view-dense,
-    .grid.view-max {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .video-label {
-        font-size: 9px;
-        letter-spacing: 1px;
-        padding: 11px 8px;
-    }
-
-}
-
-@media (max-width: 520px) {
-    .nav-links {
-        flex-direction: column;
-        gap: 14px;
-    }
-
-    .fly-in-title {
-        font-size: 9px;
-    }
-
-    .fly-in-title span {
-        letter-spacing: 4px;
-        text-indent: 4px;
-    }
-
-    #player-section {
-        grid-template-rows: minmax(154px, 27vh) 42px minmax(0, 1fr);
-        padding-bottom: 88px;
-    }
-
-    body.cinema-mode #player-section {
-        grid-template-rows: minmax(190px, 44vh) 74px minmax(0, 1fr);
-    }
-
-    .cmd-play-btn {
-        width: 62px;
-        height: 62px;
-    }
-
-    .grid,
-    .grid.view-dense,
-    .grid.view-max {
-        --website1-thumb-height: max(180px, 56vw);
-        grid-template-columns: 1fr;
-    }
-
-    #hud-dock {
-        bottom: 10px;
-        width: calc(100% - 20px);
-    }
-}
-
-
-/* ============================================================ */
-/* CORE1 LAYOUT — HYBRID VERTICAL / SIDE MODE                   */
-/* Vertical mode returns to classic free-page scrolling.          */
-/* Side mode keeps the fixed app-shell player/grid experience.    */
-/* ============================================================ */
-
-/* Simple solid background for this stage */
-html {
-    height: auto;
-    overflow-x: hidden;
-    overflow-y: auto;
-    background: #07080d;
-}
-
-html:has(body.side-layout),
-html:has(body.cinema-mode) {
-    height: 100%;
-    overflow: hidden;
-}
-
-body {
-    min-height: 100%;
-    height: auto;
-    padding: 20px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    display: block;
-    background: #07080d !important;
-}
-
-body::before,
-body::after,
-.featured-box::before {
-    display: none !important;
-}
-
-/* In vertical mode, keep the header/title visible and remove the auto-collapse behaviour. */
-body:not(.side-layout):not(.cinema-mode).top-chrome-hidden > .dropdown-wrap:first-of-type,
-body:not(.side-layout):not(.cinema-mode).top-chrome-hidden .fly-in-title {
-    opacity: 1;
-    filter: none;
-    transform: none;
-    pointer-events: auto;
-    max-height: none;
-    padding-top: revert;
-    padding-bottom: revert;
-}
-
-body:not(.side-layout):not(.cinema-mode) .top-reveal-zone {
-    display: none;
-}
-
-/* Vertical mode: classic page flow, larger player, grid scrolls with page. */
-body:not(.side-layout):not(.cinema-mode) #player-section {
-    display: block;
-    width: 100%;
-    min-height: auto;
-    height: auto;
-    padding: 0;
-    overflow: visible;
-}
-
-body:not(.side-layout):not(.cinema-mode) #player-section.hidden {
-    display: none;
-}
-
-body:not(.side-layout):not(.cinema-mode) .featured-box {
-    width: min(1440px, 96vw);
-    max-width: 1440px;
-    height: auto;
-    margin: 0 auto 22px auto;
-    display: block;
-}
-
-body:not(.side-layout):not(.cinema-mode) #player-container {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    flex: none;
-    min-height: 0;
-}
-
-body:not(.side-layout):not(.cinema-mode) #player-section > .dropdown-wrap {
-    margin: 0 0 24px 0;
-    min-height: 0;
-    overflow: visible;
-}
-
-body:not(.side-layout):not(.cinema-mode) .command-shell {
-    overflow: visible;
-}
-
-body:not(.side-layout):not(.cinema-mode) .grid {
-    width: min(2200px, 100%);
-    max-width: 2200px;
-    overflow: visible;
-    min-height: auto;
-    height: auto;
-    padding: 0 clamp(3px, 1vw, 16px) 126px;
-    mask-image: none;
-    -webkit-mask-image: none;
-    --website1-thumb-height: clamp(150px, 9vw, 220px);
-}
-
-/* Side layout: fixed app shell, independent grid, fixed player. */
-body.side-layout,
-body.cinema-mode {
-    height: 100%;
-    padding: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background: #07080d !important;
-}
-
-body.side-layout > .dropdown-wrap:first-of-type,
-body.side-layout .fly-in-title,
-body.cinema-mode > .dropdown-wrap:first-of-type,
-body.cinema-mode .fly-in-title {
-    flex-shrink: 0;
-}
-
-body.side-layout #player-section {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-    padding: 0 clamp(14px, 2.6vw, 42px) 92px;
-}
-
-body.side-layout .command-shell {
-    position: relative;
-    overflow: visible;
-}
-
-/* Tablet/mobile simplification: side layout toggle is desktop-only for now. */
-@media (max-width: 1199px), (pointer: coarse) {
-    .layout-mode-btn {
-        display: none !important;
-    }
-
-    body.cinema-mode .cinema-mode-btn {
-        position: static;
-        left: auto;
-        transform: none;
-    }
-}
-
-@media (max-width: 820px) {
-    #music-section {
-        padding: 58px 12px 96px;
-    }
-
-    .music-modal-box {
-        max-height: calc(100vh - 132px);
-        padding: 36px 14px 26px;
-    }
-
-    .music-page-header {
-        padding-left: 4px;
-        padding-right: 4px;
-        text-align: center;
-        line-height: 1.55;
-    }
-}
-
-@media (max-width: 820px) {
-    body:not(.side-layout):not(.cinema-mode) {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    body:not(.side-layout):not(.cinema-mode) .featured-box {
-        width: 100%;
-    }
-
-    body:not(.side-layout):not(.cinema-mode) .grid,
-    body:not(.side-layout):not(.cinema-mode) .grid.view-dense,
-    body:not(.side-layout):not(.cinema-mode) .grid.view-max {
-        --website1-thumb-height: max(104px, 25vw);
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        padding-bottom: 118px;
-    }
-}
-
-@media (max-width: 520px) {
-    body:not(.side-layout):not(.cinema-mode) .grid,
-    body:not(.side-layout):not(.cinema-mode) .grid.view-dense,
-    body:not(.side-layout):not(.cinema-mode) .grid.view-max {
-        --website1-thumb-height: max(180px, 56vw);
-        grid-template-columns: 1fr;
-    }
-}
-
-
-
-/* ============================================================ */
-/* CORE1 CHROME — TOP LINK BAR / VERSION FOOTER                 */
-/* ============================================================ */
-.top-nav-wrap {
-    flex-shrink: 0 !important;
-    margin: 0 !important;
-    padding: 18px 22px 20px !important;
-    max-height: 88px !important;
-    overflow: visible !important;
-    z-index: 20 !important;
-    transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease, max-height 0.35s ease, padding 0.35s ease !important;
-}
-
-.top-nav-links {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    flex-wrap: wrap !important;
-    gap: clamp(28px, 3vw, 72px) !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-}
-
-.top-nav-links a {
-    color: #00FFE6 !important;
-    text-decoration: none !important;
-    font-size: 10px !important;
-    text-transform: uppercase !important;
-    letter-spacing: 7px !important;
-    white-space: nowrap !important;
-    opacity: 0.92 !important;
-    transition: opacity 0.25s ease, text-shadow 0.25s ease !important;
-}
-
-.top-nav-links a:hover {
-    opacity: 1 !important;
-    text-shadow: 0 0 16px rgba(0,255,230,0.45) !important;
-}
-
-.fly-in-title {
-    padding-top: 10px !important;
-    padding-bottom: 6px !important;
-}
-
-body:not(.side-layout):not(.cinema-mode) .featured-box {
-    margin-top: -8px !important;
-}
-
-/* Let the top links + title fade in vertical mode too. */
-body.top-chrome-hidden > .top-nav-wrap,
-body.top-chrome-hidden .fly-in-title,
-body:not(.side-layout):not(.cinema-mode).top-chrome-hidden > .top-nav-wrap,
-body:not(.side-layout):not(.cinema-mode).top-chrome-hidden .fly-in-title {
-    opacity: 0 !important;
-    filter: blur(1px) !important;
-    transform: translateY(-26px) !important;
-    pointer-events: none !important;
-    max-height: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-body:not(.side-layout):not(.cinema-mode) .top-reveal-zone,
-body.top-chrome-hidden .top-reveal-zone {
-    display: block !important;
-    pointer-events: auto !important;
-}
-
-#version-footer {
-    display: block !important;
-    margin: 48px auto 110px !important;
-    padding: 16px 0 !important;
-    width: min(980px, calc(100% - 40px)) !important;
-    text-align: center !important;
-    color: rgba(255,255,255,0.28) !important;
-    font-size: 9px !important;
-    letter-spacing: 3px !important;
-    text-transform: uppercase !important;
-    border-top: 1px solid rgba(0,255,230,0.12) !important;
-}
-
-#version-footer strong {
-    color: #00FFE6 !important;
-    font-weight: 400 !important;
-    margin-left: 10px !important;
-}
-
-@media (max-width: 700px) {
-    .top-nav-wrap {
-        padding: 14px 12px 16px !important;
-    }
-    .top-nav-links {
-        gap: 18px !important;
-    }
-    .top-nav-links a {
-        font-size: 8px !important;
-        letter-spacing: 4px !important;
-    }
-}
-
-
-/* ============================================================ */
-/* CORE1 CONTROLS — COMPACT SINGLE-LINE CONTROLS                */
-/* ============================================================ */
-.command-control-wrap {
-    margin: 0 0 22px !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-}
-
-.compact-command-shell {
-    width: auto !important;
-    max-width: min(980px, calc(100vw - 32px)) !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 10px !important;
-    margin: 0 auto !important;
-    position: relative !important;
-    transform: none !important;
-    opacity: 1 !important;
-}
-
-.compact-command-shell .cmd-arrow-btn,
-.compact-command-shell .icon-only-btn,
-.compact-command-shell .cinema-mode-btn,
-.compact-command-shell .layout-mode-btn {
-    width: 42px !important;
-    height: 38px !important;
-    min-width: 42px !important;
-    padding: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border: 1px solid rgba(180, 225, 230, 0.16) !important;
-    border-radius: 6px !important;
-    background: rgba(5, 8, 13, 0.46) !important;
-    color: rgba(0, 255, 230, 0.78) !important;
-    box-sizing: border-box !important;
-}
-
-.compact-command-shell .cmd-play-btn {
-    width: 60px !important;
-    height: 60px !important;
-    min-width: 60px !important;
-    flex: 0 0 auto !important;
-}
-
-.compact-command-shell .icon-only-btn svg,
-.compact-command-shell .cinema-mode-btn svg,
-.compact-command-shell .layout-mode-btn svg {
-    width: 18px !important;
-    height: 18px !important;
-    stroke: currentColor !important;
-}
-
-.compact-grid-modes {
-    height: 38px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 2px !important;
-    padding: 0 8px !important;
-    border: 1px solid rgba(180, 225, 230, 0.12) !important;
-    border-radius: 6px !important;
-    background: rgba(5, 8, 13, 0.34) !important;
-    flex: 0 0 auto !important;
-}
-
-.compact-grid-modes .bare-view-btn {
-    width: 30px !important;
-    height: 30px !important;
-    padding: 0 !important;
-}
-
-.compact-grid-modes .bare-view-btn svg rect {
-    fill: #00FFE6 !important;
-}
-
-.compact-grid-modes .grid-collapse-btn svg rect {
-    fill: none !important;
-    stroke: currentColor !important;
-    opacity: 0.7 !important;
-}
-
-.compact-grid-modes .grid-collapse-btn svg path {
-    stroke: currentColor !important;
-}
-
-.compact-grid-modes .grid-collapse-btn {
-    color: #00FFE6 !important;
-    opacity: 0.78 !important;
-}
-
-.compact-grid-modes .grid-collapse-btn:hover,
-.compact-grid-modes .grid-collapse-btn.grid-btn-active {
-    color: #00FFE6 !important;
-    opacity: 1 !important;
-}
-
-#version-footer {
-    display: block !important;
-    margin: 48px auto 110px !important;
-    padding: 16px 0 !important;
-    width: min(980px, calc(100% - 40px)) !important;
-    text-align: center !important;
-    color: #00FFE6 !important;
-    font-family: 'Orbitron', sans-serif !important;
-    font-size: 9px !important;
-    font-weight: 400 !important;
-    letter-spacing: 3px !important;
-    text-transform: uppercase !important;
-    border-top: 1px solid rgba(0,255,230,0.12) !important;
-}
-
-body.side-layout .command-control-wrap {
-    grid-area: command !important;
-    align-self: start !important;
-    justify-self: center !important;
-    width: 100% !important;
-    position: static !important;
-}
-
-body.side-layout .compact-command-shell {
-    position: static !important;
-    transform: none !important;
-    left: auto !important;
-    bottom: auto !important;
-}
-
-body.cinema-mode .compact-command-shell {
-    opacity: 0.78 !important;
-}
-
-@media (max-width: 760px) {
-    .compact-command-shell {
-        gap: 7px !important;
-        max-width: calc(100vw - 20px) !important;
-        flex-wrap: wrap !important;
-    }
-
-    .compact-command-shell .cmd-arrow-btn,
-    .compact-command-shell .icon-only-btn,
-    .compact-command-shell .cinema-mode-btn,
-    .compact-command-shell .layout-mode-btn {
-        width: 38px !important;
-        height: 36px !important;
-        min-width: 38px !important;
-    }
-
-    .compact-command-shell .cmd-play-btn {
-        width: 54px !important;
-        height: 54px !important;
-        min-width: 54px !important;
-    }
-}
-
-    
-
-/* ============================================================ */
-/* CORE1 PATCH — LOCK CINEMA BUTTON POSITION                    */
-/* Prevent legacy cinema-mode rules from moving the button.      */
-/* ============================================================ */
-body.cinema-mode .compact-command-shell .cinema-mode-btn,
-body.side-layout .compact-command-shell .cinema-mode-btn,
-.compact-command-shell .cinema-mode-btn {
-    position: static !important;
-    left: auto !important;
-    right: auto !important;
-    top: auto !important;
-    bottom: auto !important;
-    transform: none !important;
-    margin: 0 !important;
-    flex: 0 0 42px !important;
-    order: 7 !important;
-}
-
-body.cinema-mode .compact-command-shell .layout-mode-btn,
-body.side-layout .compact-command-shell .layout-mode-btn,
-.compact-command-shell .layout-mode-btn {
-    position: static !important;
-    left: auto !important;
-    right: auto !important;
-    top: auto !important;
-    bottom: auto !important;
-    transform: none !important;
-    margin: 0 !important;
-    flex: 0 0 42px !important;
-    order: 8 !important;
-}
-
-@media (max-width: 760px) {
-    body.cinema-mode .compact-command-shell .cinema-mode-btn,
-    body.side-layout .compact-command-shell .cinema-mode-btn,
-    .compact-command-shell .cinema-mode-btn,
-    body.cinema-mode .compact-command-shell .layout-mode-btn,
-    body.side-layout .compact-command-shell .layout-mode-btn,
-    .compact-command-shell .layout-mode-btn {
-        flex-basis: 38px !important;
-    }
-}
-
-
-/* ============================================================ */
-/* CORE1 DESKTOP — GRID / CINEMA / TOP CHROME                   */
-/* ============================================================ */
-.thumb-container {
-    aspect-ratio: 16 / 9 !important;
-    height: auto !important;
-    width: 100% !important;
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-    background-color: #000 !important;
-}
-
-.video {
-    height: auto !important;
-}
-
-body:not(.side-layout):not(.cinema-mode) .grid {
-    grid-template-columns: repeat(auto-fill, minmax(390px, 1fr)) !important;
-    gap: clamp(14px, 1.1vw, 22px) !important;
-}
-
-body:not(.side-layout):not(.cinema-mode) .grid.view-dense {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
-    gap: 14px !important;
-}
-
-body:not(.side-layout):not(.cinema-mode) .grid.view-max {
-    grid-template-columns: repeat(auto-fill, minmax(620px, 1fr)) !important;
-    gap: clamp(18px, 1.5vw, 30px) !important;
-}
-
-#version-footer {
-    border-top: none !important;
-    margin-top: 30px !important;
-    padding-top: 0 !important;
-}
-
-body.side-layout #player-section {
-    grid-template-columns: minmax(620px, min(40vw, 1360px)) minmax(0, 1fr) !important;
-    grid-template-rows: minmax(0, 1fr) 42px !important;
-    gap: 10px clamp(16px, 1.2vw, 24px) !important;
-    padding: 0 clamp(14px, 2vw, 34px) 72px !important;
-}
-
-body.side-layout .grid {
-    --website1-label-height: 40px;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
-    gap: 12px !important;
-    padding: 6px 8px 76px !important;
-}
-
-body.side-layout .video-label {
-    min-height: 40px !important;
-    padding: 10px 12px !important;
-    font-size: 9px !important;
-}
-
-body.side-layout #version-footer {
-    display: none !important;
-}
-
-body.cinema-mode #player-section {
-    display: grid !important;
-    grid-template-rows: minmax(0, 1fr) 46px !important;
-    gap: 10px !important;
-    padding: 0 clamp(14px, 2vw, 42px) 92px !important;
-}
-
-body.cinema-mode .featured-box {
-    width: min(1720px, 96vw) !important;
-    max-width: none !important;
-    height: auto !important;
-    align-self: center !important;
-    justify-self: center !important;
-    display: flex !important;
-    justify-content: center !important;
-}
-
-body.cinema-mode #player-container {
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    aspect-ratio: 16 / 9 !important;
-    flex: 0 0 auto !important;
-}
-
-body.cinema-mode .grid,
-body.cinema-mode #version-footer {
-    display: none !important;
-}
-
-body.cinema-mode .compact-command-shell {
-    opacity: 1 !important;
-    width: auto !important;
-}
-
-body.cinema-mode .compact-command-shell > :not(.cinema-mode-btn) {
-    display: none !important;
-}
-
-body.cinema-mode .compact-command-shell .cinema-mode-btn {
-    display: inline-flex !important;
-    color: rgba(0, 255, 230, 0.38) !important;
-    border-color: rgba(0, 255, 230, 0.16) !important;
-    background: rgba(4, 6, 10, 0.46) !important;
-    box-shadow: none !important;
-}
-
-body.top-chrome-hidden > .top-nav-wrap,
-body:not(.side-layout):not(.cinema-mode).top-chrome-hidden > .top-nav-wrap {
-    opacity: 0 !important;
-    filter: blur(1px) !important;
-    transform: translateY(-18px) !important;
-    pointer-events: none !important;
-    max-height: 88px !important;
-    padding: 18px 22px 20px !important;
-    margin: 0 !important;
-}
-
-body.top-chrome-hidden .fly-in-title,
-body:not(.side-layout):not(.cinema-mode).top-chrome-hidden .fly-in-title {
-    opacity: 0 !important;
-    filter: blur(1px) !important;
-    transform: translateY(-18px) !important;
-    pointer-events: none !important;
-    max-height: 48px !important;
-    padding: 10px 20px 6px !important;
-    margin: 0 !important;
-}
-
-body.side-layout.top-chrome-hidden #player-section {
-    grid-template-rows: minmax(0, 1fr) 42px !important;
-}
-
-body.cinema-mode.top-chrome-hidden #player-section {
-    grid-template-rows: minmax(0, 1fr) 46px !important;
-}
-
-.top-reveal-zone,
-body.top-chrome-hidden .top-reveal-zone,
-body:not(.side-layout):not(.cinema-mode) .top-reveal-zone {
-    display: block !important;
-    pointer-events: none !important;
-}
-
-body.top-chrome-hidden .top-reveal-cue {
-    pointer-events: auto !important;
-}
-
-@media (max-width: 900px) {
-    body:not(.side-layout):not(.cinema-mode) .grid,
-    body:not(.side-layout):not(.cinema-mode) .grid.view-dense,
-    body:not(.side-layout):not(.cinema-mode) .grid.view-max {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-}
-
-@media (max-width: 560px) {
-    body:not(.side-layout):not(.cinema-mode) .grid,
-    body:not(.side-layout):not(.cinema-mode) .grid.view-dense,
-    body:not(.side-layout):not(.cinema-mode) .grid.view-max {
-        grid-template-columns: 1fr !important;
-    }
-}
-
-
-/* ============================================================ */
-/* CORE1 MODAL/SIDE — FAST MUSIC MODAL / SIDE GRID RECOVERY     */
-/* ============================================================ */
-#music-section {
-    background: rgba(0, 0, 0, 0.68) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-}
-
-.music-modal-box {
-    border: 1px solid rgba(74, 78, 86, 0.95) !important;
-    background: rgba(5, 7, 12, 0.98) !important;
-    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.68) !important;
-    padding-top: 30px !important;
-}
-
-.music-close-btn {
-    position: sticky !important;
-    top: 0 !important;
-    width: 30px !important;
-    height: 30px !important;
-    margin: -22px 0 10px auto !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    color: #fff !important;
-    box-shadow: none !important;
-    font-size: 24px !important;
-    line-height: 1 !important;
-}
-
-.music-close-btn:hover,
-.music-close-btn:focus-visible {
-    color: #fff !important;
-    background: transparent !important;
-    box-shadow: none !important;
-}
-
-.music-card,
-.music-card * {
-    transition: none !important;
-}
-
-.music-card,
-.music-card:hover,
-.music-card.spotify:hover,
-.music-card.tidal:hover,
-.music-card.deezer:hover,
-.music-card.youtube:hover {
-    border-color: rgba(44, 48, 55, 0.95) !important;
-    box-shadow: none !important;
-    transform: none !important;
-}
-
-.music-card:hover .card-arrow,
-.music-card.spotify:hover .card-arrow,
-.music-card.tidal:hover .card-arrow,
-.music-card.deezer:hover .card-arrow,
-.music-card.youtube:hover .card-arrow {
-    color: #333 !important;
-}
-
-body.side-layout #player-section {
-    grid-template-columns: minmax(620px, min(42vw, 1440px)) minmax(0, 1fr) !important;
-    grid-template-rows: minmax(0, 1fr) 42px !important;
-    grid-template-areas:
-        "player grid"
-        "command grid" !important;
-    min-height: 0 !important;
-}
-
-body.side-layout .grid,
-body.side-layout .grid.view-dense,
-body.side-layout .grid.view-max {
-    --side-thumb-height: clamp(130px, 5vw, 176px);
-    --side-label-height: 40px;
-    grid-area: grid !important;
-    display: grid !important;
-    width: 100% !important;
-    max-width: none !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    align-content: start !important;
-    grid-auto-flow: row !important;
-    grid-auto-rows: calc(var(--side-thumb-height) + var(--side-label-height)) !important;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
-    gap: 14px !important;
-    padding: 8px 12px 96px !important;
-    mask-image: none !important;
-    -webkit-mask-image: none !important;
-    scrollbar-width: thin !important;
-    scrollbar-color: rgba(0, 255, 230, 0.35) transparent !important;
-}
-
-body.side-layout .grid::-webkit-scrollbar {
-    width: 6px !important;
-}
-
-body.side-layout .grid::-webkit-scrollbar-thumb {
-    background: rgba(0, 255, 230, 0.35) !important;
-    border-radius: 999px !important;
-}
-
-body.side-layout .video {
-    display: flex !important;
-    flex-direction: column !important;
-    height: calc(var(--side-thumb-height) + var(--side-label-height)) !important;
-    min-height: calc(var(--side-thumb-height) + var(--side-label-height)) !important;
-    overflow: hidden !important;
-}
-
-body.side-layout .thumb-container {
-    aspect-ratio: auto !important;
-    height: var(--side-thumb-height) !important;
-    min-height: var(--side-thumb-height) !important;
-    flex: 0 0 auto !important;
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-}
-
-body.side-layout .grid.view-dense {
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)) !important;
-}
-
-body.side-layout .grid.view-max {
-    grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)) !important;
-}
-
-
-/* ============================================================ */
-/* CORE1 TABLET — SIDE VIEW / NEUTRAL SCROLLBARS                */
-/* ============================================================ */
-:root {
-    --core1-cyan: #00FFE6;
-    --core1-scroll-grey: #050507;
-}
-
-.music-modal-box {
-    scrollbar-color: var(--core1-scroll-grey) transparent !important;
-}
-
-.music-modal-box::-webkit-scrollbar-thumb {
-    background: var(--core1-scroll-grey) !important;
-}
-
-body.side-layout .grid,
-body.side-layout .grid.view-dense,
-body.side-layout .grid.view-max {
-    scrollbar-width: none !important;
-    scrollbar-color: var(--core1-scroll-grey) transparent !important;
-}
-
-body.side-layout .grid::-webkit-scrollbar {
-    width: 0 !important;
-    height: 0 !important;
-}
-
-body.side-layout .grid::-webkit-scrollbar-thumb {
-    background: var(--core1-scroll-grey) !important;
-}
-
-body.side-layout .featured-box {
-    grid-area: player !important;
-    width: min(42vw, 1440px) !important;
-    max-width: none !important;
-    min-width: 0 !important;
-    overflow: hidden !important;
-    justify-self: stretch !important;
-}
-
-body.side-layout #player-container {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-}
-
-body.side-layout #player-section > .dropdown-wrap {
-    grid-area: command !important;
-}
-
-.video,
-.video:hover,
-.video.is-playing,
-body.side-layout .video,
-body.side-layout .video:hover,
-body.side-layout .video.is-playing {
-    border-color: var(--core1-cyan) !important;
-}
-
-@media (max-width: 1199px), (pointer: coarse) {
-    body.side-layout #hud-dock {
-        display: none !important;
-    }
-
-    body.side-layout #player-section {
-        padding-bottom: 18px !important;
-    }
-}
-
-@media (orientation: portrait) and (max-width: 1199px), (orientation: portrait) and (pointer: coarse) {
-    body.side-layout #player-section {
-        grid-template-columns: minmax(0, 58vw) minmax(0, 42vw) !important;
-        grid-template-rows: minmax(0, 1fr) 42px !important;
-        gap: 10px !important;
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-    }
-
-    body.side-layout .featured-box {
-        width: calc(58vw - 30px) !important;
-        max-width: calc(58vw - 30px) !important;
-    }
-
-    body.side-layout .grid,
-    body.side-layout .grid.view-dense,
-    body.side-layout .grid.view-max {
-        --side-thumb-height: clamp(86px, 16vw, 150px);
-        --side-label-height: 46px;
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
-        padding: 6px 4px 22px !important;
-    }
-
-    body.side-layout .video-label {
-        min-height: var(--side-label-height) !important;
-        padding: 9px 8px !important;
-        font-size: 8px !important;
-        line-height: 1.35 !important;
-        letter-spacing: 1.2px !important;
-    }
-}
-
-
-/* ============================================================ */
-/* CORE1 INTERACTION — HOVER BORDERS / CENTERED CONTROLS        */
-/* ============================================================ */
-#hud-inner {
-    justify-content: center !important;
-}
-
-#hud-controls {
-    margin: 0 auto !important;
-}
-
-#hud-dock {
-    width: min(548px, calc(100% - 28px)) !important;
-    height: 58px !important;
-}
-
-#hud-progress-container {
-    margin-top: 15px !important;
-    z-index: 1 !important;
-}
-
-#hud-inner {
-    padding: 0 14px !important;
-    position: relative !important;
-    z-index: 2 !important;
-}
-
-#hud-controls {
-    gap: 7px !important;
-}
-
-.hud-btn {
-    padding: 5px 9px !important;
-    font-size: 8px !important;
-    pointer-events: auto !important;
-}
-
-.hud-playpause {
-    padding: 5px 13px !important;
-}
-
-body.cinema-mode .compact-command-shell .cinema-mode-btn,
-body.cinema-mode .compact-command-shell .cinema-mode-btn.is-active,
-body.cinema-mode .compact-command-shell .cinema-mode-btn:hover {
-    color: rgba(0, 255, 230, 0.32) !important;
-    border-color: rgba(0, 255, 230, 0.12) !important;
-    background: rgba(4, 6, 10, 0.42) !important;
-    box-shadow: none !important;
-}
-
-body.grid-collapsed #video-grid,
-body.grid-collapsed #version-footer {
-    display: none !important;
-}
-
-body.grid-collapsed:not(.side-layout):not(.cinema-mode) .featured-box {
-    width: min(1720px, 96vw) !important;
-    max-width: none !important;
-}
-
-body.grid-collapsed.side-layout #player-section {
-    grid-template-columns: minmax(0, 1fr) !important;
-    grid-template-areas:
-        "player"
-        "command" !important;
-    padding-left: clamp(14px, 2vw, 42px) !important;
-    padding-right: clamp(14px, 2vw, 42px) !important;
-}
-
-body.grid-collapsed.side-layout .featured-box {
-    width: min(1720px, calc(100vw - 84px)) !important;
-    max-width: min(1720px, calc(100vw - 84px)) !important;
-    justify-self: center !important;
-}
-
-body.grid-collapsed .grid-collapse-btn {
-    opacity: 1 !important;
-    color: #00FFE6 !important;
-    border-color: rgba(0, 255, 230, 0.35) !important;
-}
-
-.video,
-.video:hover,
-.video.is-playing,
-body.side-layout .video,
-body.side-layout .video:hover,
-body.side-layout .video.is-playing {
-    border-color: rgba(204, 244, 246, 0.07) !important;
-    animation: none !important;
-    transition: transform 0.36s ease, box-shadow 0.36s ease, background 0.36s ease !important;
-}
-
-.video.is-hover-preview,
-body.side-layout .video.is-hover-preview {
-    border-color: var(--core1-cyan) !important;
-}
-
-@media (max-width: 1199px), (pointer: coarse) {
-    body.side-layout #player-section {
-        grid-template-areas:
-            "player grid"
-            "command command" !important;
-        grid-template-rows: minmax(0, 1fr) 78px !important;
-        padding-bottom: 18px !important;
-    }
-
-    body.side-layout .command-control-wrap {
-        grid-area: command !important;
-        align-self: center !important;
-        justify-self: center !important;
-        width: 100% !important;
-        margin: 0 !important;
-    }
-
-    body.side-layout .compact-command-shell {
-        width: max-content !important;
-        max-width: calc(100vw - 28px) !important;
-        margin: 0 auto !important;
-        justify-content: center !important;
-        transform: none !important;
-    }
-
-    body.side-layout .grid,
-    body.side-layout .grid.view-dense,
-    body.side-layout .grid.view-max {
-        padding-bottom: 34px !important;
-    }
-}
-
-@media (max-width: 1320px), (max-height: 820px) {
-    body:not(.side-layout) #hud-dock {
-        display: none !important;
-    }
-
-    body:not(.side-layout):not(.cinema-mode) #player-section {
-        padding-bottom: 110px !important;
-    }
-
-    body:not(.side-layout):not(.cinema-mode) .grid,
-    body:not(.side-layout):not(.cinema-mode) .grid.view-dense,
-    body:not(.side-layout):not(.cinema-mode) .grid.view-max {
-        padding-bottom: 150px !important;
-    }
-}
-
-@media (orientation: portrait) and (max-width: 1199px), (orientation: portrait) and (pointer: coarse) {
-    body.side-layout #player-section {
-        grid-template-rows: minmax(0, 1fr) 84px !important;
-        padding-bottom: 22px !important;
-    }
-
-    body.side-layout .compact-command-shell {
-        gap: 8px !important;
-        flex-wrap: nowrap !important;
-    }
-
-    body.side-layout .grid,
-    body.side-layout .grid.view-dense,
-    body.side-layout .grid.view-max {
-        padding-bottom: 40px !important;
-    }
-}
-
-/* CORE1 1.2.5 — keep the hidden-nav cue on the viewport edge, not in player space. */
-.top-reveal-zone,
-body.top-chrome-hidden .top-reveal-zone,
-body:not(.side-layout):not(.cinema-mode) .top-reveal-zone {
-    height: 34px !important;
-    top: 0 !important;
-    z-index: 5000 !important;
-}
-
-.top-reveal-cue {
-    position: fixed !important;
-    top: 6px !important;
-    left: 50% !important;
-    height: 24px !important;
-    z-index: 5001 !important;
-    transform: translateX(-50%) translateY(-8px) !important;
-}
-
-body.top-chrome-hidden .top-reveal-cue {
-    transform: translateX(-50%) translateY(0) !important;
-}
-
-@media (orientation: landscape) and (max-width: 1199px), (orientation: landscape) and (pointer: coarse) {
-    body.side-layout.top-chrome-hidden > .top-nav-wrap,
-    body.side-layout.top-chrome-hidden .fly-in-title {
-        max-height: 0 !important;
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-        margin: 0 !important;
-    }
-
-    body.side-layout.top-chrome-hidden #player-section {
-        grid-template-rows: minmax(0, 1fr) 76px !important;
-    }
-}
-
-/* CORE1 1.2.6 — phone nav uses a fixed 2x2 grid instead of uneven flex wrapping. */
-@media (max-width: 560px) {
-    .top-nav-wrap {
-        padding: 28px 18px 22px !important;
-        max-height: none !important;
-    }
-
-    .top-nav-links {
-        display: grid !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 18px 12px !important;
-        width: min(430px, calc(100vw - 44px)) !important;
-        margin: 0 auto !important;
-        justify-items: center !important;
-        align-items: center !important;
-    }
-
-    .top-nav-links a {
-        display: block !important;
-        width: 100% !important;
-        margin: 0 !important;
-        text-align: center !important;
-        font-size: 8px !important;
-        letter-spacing: 3.6px !important;
-        line-height: 1.5 !important;
-    }
-}
-
-/* CORE1 1.2.7 — phone-only command layout: playback, grid, secondary controls. */
-@media (max-width: 560px) {
-    body:not(.side-layout):not(.cinema-mode) #player-section {
-        grid-template-rows: minmax(154px, 27vh) auto minmax(0, 1fr) !important;
-    }
-
-    .command-control-wrap {
-        margin: 2px 0 24px !important;
-    }
-
-    .compact-command-shell {
-        display: grid !important;
-        grid-template-columns: repeat(4, 54px) !important;
-        grid-auto-rows: auto !important;
-        justify-content: center !important;
-        justify-items: center !important;
-        align-items: center !important;
-        gap: 12px 10px !important;
-        width: max-content !important;
-        max-width: calc(100vw - 24px) !important;
-        flex-wrap: initial !important;
-    }
-
-    .compact-command-shell #prev-btn {
-        grid-column: 1 !important;
-        grid-row: 1 !important;
-    }
-
-    .compact-command-shell #playpause-btn {
-        grid-column: 2 / 4 !important;
-        grid-row: 1 !important;
-        justify-self: center !important;
-    }
-
-    .compact-command-shell #next-btn {
-        grid-column: 4 !important;
-        grid-row: 1 !important;
-    }
-
-    .compact-command-shell .compact-grid-modes {
-        grid-column: 1 / -1 !important;
-        grid-row: 2 !important;
-        justify-self: center !important;
-    }
-
-    .compact-command-shell #shuffle-btn {
-        grid-column: 1 !important;
-        grid-row: 3 !important;
-    }
-
-    .compact-command-shell #fav-toggle-btn {
-        grid-column: 2 !important;
-        grid-row: 3 !important;
-    }
-
-    .compact-command-shell #cinema-mode-btn {
-        grid-column: 3 / 5 !important;
-        grid-row: 3 !important;
-        justify-self: center !important;
-    }
-
-    /* layout-mode-btn is desktop-only — always hidden on phone */
-    .compact-command-shell #layout-mode-btn {
-        display: none !important;
-    }
-}
-
-/* Belt-and-braces: hide layout-mode-btn on any narrow / touch screen,
-   regardless of which rule block got there first. */
-@media (max-width: 1199px) {
-    #layout-mode-btn { display: none !important; }
-}
-@media (pointer: coarse) {
-    #layout-mode-btn { display: none !important; }
-}
-</style>
-
+.music-card.spotify:hover .card-arrow  { color: #00FFE6; }
+.music-card.tidal:hover .card-arrow    { color: #ff6b35; }
+.music-card.deezer:hover .card-arrow   { color: #a238ff; }
+.music-card.youtube:hover .card-arrow  { color: #ff0000; }
+
+    </style>
 </head>
-<body>
+<body class="glass-dark">
 
-    <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3A: TOP NAVIGATION LINKS                         -->
-    <!-- -------------------------------------------------------- -->
-    <div class="dropdown-wrap top-nav-wrap" id="top-nav-wrap">
-        <div class="nav-links top-nav-links" id="nav-content">
-            <a href="https://links.electroscapex.com/" target="_blank" rel="noopener noreferrer">WEBLINKS</a>
-            <a href="#" id="nav-music-link">MUSIC</a>
-            <a href="https://electroscapex.com/tv.html" target="_blank" rel="noopener noreferrer">TV</a>
-            <a href="https://electroscapex.com/imagevault.html" target="_blank" rel="noopener noreferrer">IMAGE VAULT</a>
+    <!-- NAV-TOP -->
+    <nav id="nav-top">
+        <button id="nav-links-btn" aria-expanded="false" aria-controls="nav-popup">
+            <span class="btn-label">Links</span>
+        </button>
+
+        <div id="nav-popup" role="dialog" aria-label="Navigation links">
+            <a class="nav-popup-item" href="https://links.electroscapex.com/" target="_blank" rel="noopener noreferrer">Weblinks</a>
+            <button class="nav-popup-item" id="nav-music-btn">Music Directory</button>
+            <a class="nav-popup-item" href="https://electroscapex.com/tv.html" target="_blank" rel="noopener noreferrer">TV</a>
+                   
         </div>
+    </nav>
+
+    <!-- NAV-LOGO -->
+    <div id="nav-logo">
+        <h1 aria-label="Electroscape">
+            <span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span>
+        </h1>
     </div>
 
-
-    <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3B: PAGE TITLE                                   -->
-    <!-- -------------------------------------------------------- -->
-    <h1 class="fly-in-title">
-        <span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span>
-    </h1>
-
-    <div class="top-reveal-zone" id="top-reveal-zone" aria-hidden="true">
-        <div class="top-reveal-cue" id="top-reveal-cue" title="Show header">
-            <svg viewBox="0 0 14 9" fill="none" aria-hidden="true">
-                <path d="M1.5 1.5L7 7L12.5 1.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </div>
+    <!-- NAV-REVEAL-CUE -->
+    <div id="nav-reveal-cue" role="button" tabindex="0" aria-label="Show header">
+        <svg viewBox="0 0 14 9" aria-hidden="true">
+            <path d="M1.5 1.5L7 7L12.5 1.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
     </div>
 
-    <!-- -------------------------------------------------------- -->
-    <!-- PLAYER SECTION (index view)                              -->
-    <!-- -------------------------------------------------------- -->
+    <!-- =====================================================
+         PLAYER-SECTION
+         ===================================================== -->
     <div id="player-section">
 
-        <!-- SECTION 3C: FEATURED VIDEO PLAYER -->
-        <div class="featured-box">
+        <!-- PLAYER-BOX -->
+        <div id="player-box">
             <div id="player-container">
+                <div id="player-loading">Initialising player&hellip;</div>
                 <div id="yt-player"></div>
             </div>
         </div>
 
-        <!-- SECTION 3D: COMPACT PLAYER CONTROL STRIP -->
-        <div class="dropdown-wrap command-control-wrap">
-            <div class="command-shell compact-command-shell" aria-label="Player controls">
-                <button class="ctrl-btn cmd-arrow-btn" id="prev-btn" aria-label="Previous">
-                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <polygon points="3,6 9,1 9,11" fill="rgba(0,255,230,0.75)"/>
-                    </svg>
-                </button>
+        <!-- PLAYER-CONTROLS -->
+        <div id="player-controls">
 
-                <button class="cmd-play-btn" id="playpause-btn" aria-label="Play / Pause">
-                    <svg class="play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path class="play-bar-left"  d="M7,4 L7,4 L7,20 L7,20 Z"/>
-                        <path class="play-bar-right" d="M7,4 L7,4 L7,20 L7,20 Z"/>
-                    </svg>
-                    <span class="play-ripple"></span>
-                </button>
+            <!-- Grid toggle — left edge -->
+            <button class="ctrl-btn icon-only-btn" id="grid-toggle-btn" aria-label="Toggle grid density" title="Toggle grid density">
+                <svg id="grid-toggle-icon" width="20" height="20" viewBox="0 0 18 18" fill="none">
+                    <line x1="5"  y1="2" x2="5"  y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="9"  y1="2" x2="9"  y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="13" y1="2" x2="13" y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
 
-                <button class="ctrl-btn cmd-arrow-btn" id="next-btn" aria-label="Next">
-                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <polygon points="9,6 3,1 3,11" fill="rgba(0,255,230,0.75)"/>
-                    </svg>
-                </button>
+            <!-- Shuffle -->
+            <button class="ctrl-btn icon-only-btn" id="shuffle-btn" aria-label="Shuffle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#00FFE6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 3 21 3 21 8"/>
+                    <line x1="4" y1="20" x2="21" y2="3"/>
+                    <polyline points="21 16 21 21 16 21"/>
+                    <line x1="15" y1="15" x2="21" y2="21"/>
+                </svg>
+            </button>
 
-                <div class="bare-view-wrap compact-grid-modes" aria-label="Grid density">
-                    <button class="grid-btn bare-view-btn" data-size="dense" aria-label="Compact wide grid">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="1" y="2" width="5" height="4" rx="0.5"/>
-                            <rect x="6.5" y="2" width="5" height="4" rx="0.5"/>
-                            <rect x="12" y="2" width="5" height="4" rx="0.5"/>
-                            <rect x="1" y="7" width="5" height="4" rx="0.5"/>
-                            <rect x="6.5" y="7" width="5" height="4" rx="0.5"/>
-                            <rect x="12" y="7" width="5" height="4" rx="0.5"/>
-                            <rect x="1" y="12" width="5" height="4" rx="0.5"/>
-                            <rect x="6.5" y="12" width="5" height="4" rx="0.5"/>
-                            <rect x="12" y="12" width="5" height="4" rx="0.5"/>
-                        </svg>
-                    </button>
-                    <button class="grid-btn bare-view-btn" data-size="default" aria-label="Standard wide grid">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="1" y="2" width="7" height="5" rx="0.6"/>
-                            <rect x="10" y="2" width="7" height="5" rx="0.6"/>
-                            <rect x="1" y="11" width="7" height="5" rx="0.6"/>
-                            <rect x="10" y="11" width="7" height="5" rx="0.6"/>
-                        </svg>
-                    </button>
-                    <button class="grid-btn bare-view-btn" data-size="max" aria-label="Cinematic wide grid">
-                        <svg width="22" height="18" viewBox="0 0 22 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="1" y="3" width="20" height="4" rx="0.8"/>
-                            <rect x="1" y="11" width="20" height="4" rx="0.8"/>
-                        </svg>
-                    </button>
-                    <button class="grid-collapse-btn bare-view-btn" id="grid-collapse-btn" type="button" aria-label="Collapse grid" title="Collapse grid">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <rect x="2" y="3" width="14" height="12" rx="1"/>
-                            <path d="M6 6l-3 3 3 3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M12 6l3 3-3 3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
+            <!-- Favourites -->
+            <button class="ctrl-btn icon-only-btn" id="fav-toggle-btn" aria-label="Favourites">
+                <svg id="fav-toggle-icon" viewBox="0 0 24 24" fill="#00FFE6" stroke="#00FFE6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+            </button>
 
-                <button class="ctrl-btn icon-only-btn" id="shuffle-btn" aria-label="Shuffle">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M4 7h3.2c2.1 0 3.1 1.2 4.2 3.1l1.2 2.1c1.1 1.9 2.1 3.1 4.2 3.1H20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                        <path d="M17 12.5 20 15.5 17 18.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M4 16.5h3.2c1.4 0 2.3-.5 3.1-1.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                        <path d="M14 8.7c.8-1.1 1.7-1.7 2.8-1.7H20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-                        <path d="M17 4 20 7 17 10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
+            <span class="control-spacer" aria-hidden="true"></span>
 
-                <button class="ctrl-btn icon-only-btn" id="fav-toggle-btn" aria-label="Favourites">
-                    <svg id="fav-toggle-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                    </svg>
-                </button>
+            <!-- Prev -->
+            <button class="ctrl-btn cmd-arrow-btn" id="prev-btn" aria-label="Previous">
+                <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+                    <polygon points="3,6 9,1 9,11" fill="rgba(0,255,230,0.75)"/>
+                </svg>
+            </button>
 
-                <button class="cinema-mode-btn" id="cinema-mode-btn" aria-label="Toggle cinema mode" title="Cinema mode">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <rect x="3.5" y="5.5" width="17" height="11" rx="1.8" stroke-width="1.6"/>
-                        <path d="M8 20h8" stroke-width="1.6" stroke-linecap="round"/>
-                        <path d="M12 16.5V20" stroke-width="1.6" stroke-linecap="round"/>
-                    </svg>
-                </button>
+            <!-- Play / Pause -->
+            <button class="cmd-play-btn" id="playpause-btn" aria-label="Play / Pause">
+                <svg class="play-icon" viewBox="0 0 24 24">
+                    <path class="play-bar-left"/>
+                    <path class="play-bar-right"/>
+                </svg>
+                <span class="play-ripple"></span>
+            </button>
 
-                <button class="layout-mode-btn" id="layout-mode-btn" aria-label="Toggle side layout" title="Side layout / vertical layout">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <rect x="3.5" y="5" width="7" height="14" rx="1.4" stroke-width="1.6"/>
-                        <rect x="13.5" y="5" width="7" height="14" rx="1.4" stroke-width="1.6"/>
-                        <path d="M12 5v14" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
-                    </svg>
-                </button>
+            <!-- Next -->
+            <button class="ctrl-btn cmd-arrow-btn" id="next-btn" aria-label="Next">
+                <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+                    <polygon points="9,6 3,1 3,11" fill="rgba(0,255,230,0.75)"/>
+                </svg>
+            </button>
+
+        </div><!-- end #player-controls -->
+
+        <!-- PROGRESS-BAR -->
+        <div id="progress-bar-wrap">
+            <div id="progress-bar-track">
+                <div id="progress-bar-fill"></div>
             </div>
         </div>
 
-        <!-- SECTION 3G: VIDEO GRID -->
-        <div class="grid" id="video-grid"></div>
+        <!-- VIDEO-GRID -->
+        <div id="video-grid"></div>
 
         <!-- VERSION FOOTER -->
-        <div id="version-footer">1.3.0</div>
+        <div id="version-footer">1.1.0</div>
 
     </div><!-- end #player-section -->
 
+    <!-- FAV-BACKDROP -->
+    <div id="fav-backdrop"></div>
 
-    <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3M: MUSIC STREAMING DIRECTORY (inline)          -->
-    <!-- -------------------------------------------------------- -->
+    <!-- FAV-SIDEBAR -->
+    <div id="fav-sidebar">
+        <div id="fav-header">
+            <span id="fav-title">Favourites</span>
+            <button id="fav-close-btn" aria-label="Close">&times;</button>
+        </div>
+        <div id="fav-actions">
+            <button class="ctrl-btn" id="fav-play-all-btn">[ Play All ]</button>
+        </div>
+        <div id="fav-empty">
+            <span>No favourites yet.</span>
+            <span>Click the ♥ on any track.</span>
+        </div>
+        <ul id="fav-list"></ul>
+        <div id="fav-footer">
+            <button class="ctrl-btn" id="fav-clear-btn">[ Clear All ]</button>
+        </div>
+    </div>
+
+
+    <!-- =====================================================
+         MUSIC-SECTION
+         ===================================================== -->
     <div id="music-section" aria-hidden="true">
         <div class="music-modal-box" role="dialog" aria-modal="true" aria-labelledby="music-modal-title">
             <button class="music-close-btn" id="music-close-btn" type="button" aria-label="Close music directory">&times;</button>
 
-        <div class="music-page-header" id="music-modal-title">STREAMING // DIRECTORY</div>
+            <div class="music-page-header" id="music-modal-title">STREAMING // DIRECTORY</div>
 
-        <!-- SPOTIFY -->
-        <div class="platform-section">
-            <div class="platform-label">
-                <span class="platform-dot dot-spotify"></span>
-                Spotify
+            <!-- SPOTIFY -->
+            <div class="platform-section">
+                <div class="platform-label">
+                    <span class="platform-dot dot-spotify"></span>Spotify
+                </div>
+                <div class="music-grid">
+                    <a class="music-card spotify" href="https://open.spotify.com/user/3147hrg3uxl6ywo7dja4zzwhrdha/playlists" target="_blank" rel="noopener noreferrer">
+                        <span class="card-platform spotify">Spotify</span>
+                        <span class="card-title">Electroscape</span>
+                        <span class="card-meta">Profile Page</span>
+                        <span class="card-arrow">→</span>
+                    </a>
+                    <a class="music-card spotify" href="https://open.spotify.com/playlist/2mz99e3dQJsrtTCCrS3pCf" target="_blank" rel="noopener noreferrer">
+                        <span class="card-platform spotify">Spotify</span>
+                        <span class="card-title">Electroscape</span>
+                        <span class="card-meta">Playlist</span>
+                        <span class="card-arrow">→</span>
+                    </a>
+                    <a class="music-card spotify" href="https://open.spotify.com/playlist/5FPPQ0dQV7LFdOJGx83mWl" target="_blank" rel="noopener noreferrer">
+                        <span class="card-platform spotify">Spotify</span>
+                        <span class="card-title">Trance Classics</span>
+                        <span class="card-meta">Playlist</span>
+                        <span class="card-arrow">→</span>
+                    </a>
+                    <a class="music-card spotify" href="https://open.spotify.com/playlist/5BOGr40V6nzLhNfMKbRkON" target="_blank" rel="noopener noreferrer">
+                        <span class="card-platform spotify">Spotify</span>
+                        <span class="card-title">Soundscape 5k</span>
+                        <span class="card-meta">Playlist</span>
+                        <span class="card-arrow">→</span>
+                    </a>
+                </div>
             </div>
-            <div class="music-grid">
-                <a class="music-card spotify" href="https://open.spotify.com/user/3147hrg3uxl6ywo7dja4zzwhrdha/playlists" target="_blank">
-                    <span class="card-platform spotify">Spotify</span>
-                    <span class="card-title">Electroscape</span>
-                    <span class="card-meta">Profile Page</span>
-                    <span class="card-arrow">→</span>
-                </a>
-                <a class="music-card spotify" href="https://open.spotify.com/playlist/2mz99e3dQJsrtTCCrS3pCf" target="_blank">
-                    <span class="card-platform spotify">Spotify</span>
-                    <span class="card-title">Electroscape</span>
-                    <span class="card-meta">Playlist</span>
-                    <span class="card-arrow">→</span>
-                </a>
-                <a class="music-card spotify" href="https://open.spotify.com/playlist/5FPPQ0dQV7LFdOJGx83mWl" target="_blank">
-                    <span class="card-platform spotify">Spotify</span>
-                    <span class="card-title">Trance Classics</span>
-                    <span class="card-meta">Playlist</span>
-                    <span class="card-arrow">→</span>
-                </a>
-                <a class="music-card spotify" href="https://open.spotify.com/playlist/5BOGr40V6nzLhNfMKbRkON" target="_blank">
-                    <span class="card-platform spotify">Spotify</span>
-                    <span class="card-title">Soundscape 5k</span>
-                    <span class="card-meta">Playlist</span>
-                    <span class="card-arrow">→</span>
-                </a>
-            </div>
-        </div>
 
-        <!-- YOUTUBE -->
-        <div class="platform-section">
-            <div class="platform-label">
-                <span class="platform-dot dot-youtube"></span>
-                YouTube
+            <!-- YOUTUBE -->
+            <div class="platform-section">
+                <div class="platform-label">
+                    <span class="platform-dot dot-youtube"></span>YouTube
+                </div>
+                <div class="music-grid">
+                    <a class="music-card youtube" href="https://www.youtube.com/@ElectroscapeX" target="_blank" rel="noopener noreferrer">
+                        <span class="card-platform youtube">YouTube</span>
+                        <span class="card-title">Electroscape</span>
+                        <span class="card-meta">Channel</span>
+                        <span class="card-arrow">→</span>
+                    </a>
+                </div>
             </div>
-            <div class="music-grid">
-                <a class="music-card youtube" href="https://www.youtube.com/@ElectroscapeX" target="_blank">
-                    <span class="card-platform youtube">YouTube</span>
-                    <span class="card-title">Electroscape</span>
-                    <span class="card-meta">Channel</span>
-                    <span class="card-arrow">→</span>
-                </a>
-            </div>
-        </div>
 
-        <!-- TIDAL -->
-        <div class="platform-section">
-            <div class="platform-label">
-                <span class="platform-dot dot-tidal"></span>
-                Tidal
+            <!-- TIDAL -->
+            <div class="platform-section">
+                <div class="platform-label">
+                    <span class="platform-dot dot-tidal"></span>Tidal
+                </div>
+                <div class="music-grid">
+                    <a class="music-card tidal" href="https://tidal.com/playlist/f2d1abca-f526-4ff9-81c3-72c30ca71545" target="_blank" rel="noopener noreferrer">
+                        <span class="card-platform tidal">Tidal</span>
+                        <span class="card-title">Electroscape</span>
+                        <span class="card-meta">Playlist</span>
+                        <span class="card-arrow">→</span>
+                    </a>
+                    <a class="music-card tidal" href="https://tidal.com/playlist/bc4655e4-80fd-418a-989a-7b3449fbaa98" target="_blank" rel="noopener noreferrer">
+                        <span class="card-platform tidal">Tidal</span>
+                        <span class="card-title">Trance Classics</span>
+                        <span class="card-meta">Playlist</span>
+                        <span class="card-arrow">→</span>
+                    </a>
+                </div>
             </div>
-            <div class="music-grid">
-                <a class="music-card tidal" href="https://tidal.com/playlist/f2d1abca-f526-4ff9-81c3-72c30ca71545" target="_blank">
-                    <span class="card-platform tidal">Tidal</span>
-                    <span class="card-title">Electroscape</span>
-                    <span class="card-meta">Playlist</span>
-                    <span class="card-arrow">→</span>
-                </a>
-                <a class="music-card tidal" href="https://tidal.com/playlist/bc4655e4-80fd-418a-989a-7b3449fbaa98" target="_blank">
-                    <span class="card-platform tidal">Tidal</span>
-                    <span class="card-title">Trance Classics</span>
-                    <span class="card-meta">Playlist</span>
-                    <span class="card-arrow">→</span>
-                </a>
-            </div>
-        </div>
 
-        <!-- DEEZER -->
-        <div class="platform-section">
-            <div class="platform-label">
-                <span class="platform-dot dot-deezer"></span>
-                Deezer
+            <!-- DEEZER -->
+            <div class="platform-section">
+                <div class="platform-label">
+                    <span class="platform-dot dot-deezer"></span>Deezer
+                </div>
+                <div class="music-grid">
+                    <a class="music-card deezer" href="https://link.deezer.com/s/33bHb6Wk6pRiI4qa6yLzr" target="_blank" rel="noopener noreferrer">
+                        <span class="card-platform deezer">Deezer</span>
+                        <span class="card-title">Electroscape</span>
+                        <span class="card-meta">Playlist</span>
+                        <span class="card-arrow">→</span>
+                    </a>
+                    <a class="music-card deezer" href="https://link.deezer.com/s/33bHcNMMIW1H4ekD6yAjc" target="_blank" rel="noopener noreferrer">
+                        <span class="card-platform deezer">Deezer</span>
+                        <span class="card-title">Trance Classics</span>
+                        <span class="card-meta">Playlist</span>
+                        <span class="card-arrow">→</span>
+                    </a>
+                </div>
             </div>
-            <div class="music-grid">
-                <a class="music-card deezer" href="https://link.deezer.com/s/33bHb6Wk6pRiI4qa6yLzr" target="_blank">
-                    <span class="card-platform deezer">Deezer</span>
-                    <span class="card-title">Electroscape</span>
-                    <span class="card-meta">Playlist</span>
-                    <span class="card-arrow">→</span>
-                </a>
-                <a class="music-card deezer" href="https://link.deezer.com/s/33bHcNMMIW1H4ekD6yAjc" target="_blank">
-                    <span class="card-platform deezer">Deezer</span>
-                    <span class="card-title">Trance Classics</span>
-                    <span class="card-meta">Playlist</span>
-                    <span class="card-arrow">→</span>
-                </a>
-            </div>
-        </div>
 
         </div><!-- end .music-modal-box -->
     </div><!-- end #music-section -->
 
 
-    <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3H: ORBITAL HUD                                  -->
-    <!-- -------------------------------------------------------- -->
-    <div id="hud-dock">
-        <div id="hud-progress-container">
-            <div id="hud-progress-bar"></div>
-        </div>
-        <div id="hud-inner">
-            <div id="hud-controls">
-                <button class="hud-btn" id="hud-prev">&#9664;&#9664;</button>
-                <button class="hud-btn hud-playpause" id="hud-playpause">&#9654;</button>
-                <button class="hud-btn" id="hud-next">&#9654;&#9654;</button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- -------------------------------------------------------- -->
-    <!-- SECTION 3I: FAVOURITES SIDEBAR                           -->
-    <!-- -------------------------------------------------------- -->
-    <div id="fav-backdrop"></div>
-    <div id="fav-sidebar">
-        <div id="fav-header">
-            <span id="fav-title">Favourites</span>
-            <button id="fav-close-btn" aria-label="Close favourites">&#x2715;</button>
-        </div>
-        <div id="fav-actions" style="display:none; justify-content:center; padding: 12px 20px; border-bottom: 1px solid #1a1a1a;">
-            <button id="fav-play-all-btn" class="ctrl-btn" style="width: 100%; border-radius: 4px; padding: 10px; font-size: 9px; letter-spacing: 4px;">[ PLAY PLAYLIST ]</button>
-        </div>
-        <div id="fav-empty">
-            <span>No favourites yet.</span>
-            <span>Click the ♥ on any track card to add it here.</span>
-        </div>
-        <ul id="fav-list"></ul>
-        <div id="fav-footer">
-            <button id="fav-clear-btn" class="ctrl-btn">[ Clear All ]</button>
-        </div>
-    </div>
-
-
-    <!-- -------------------------------------------------------- -->
-    <!-- STAGE 4: ALL SCRIPTS (inlined)                           -->
-    <!-- -------------------------------------------------------- -->
     <script>
-/* ============================================================ */
-/* SECTION 4A: TRACK LOADER                                     */
-/* ============================================================ */
-function loadTracks() {
-    fetch('tracks.json')
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('Could not load tracks.json — status: ' + response.status);
+/* ============================================================
+   MUSIC-SECTION toggle
+   ============================================================ */
+(function () {
+    var musicSection = document.getElementById('music-section');
+    var musicBtn     = document.getElementById('nav-music-btn');
+    var closeBtn     = document.getElementById('music-close-btn');
+    var logo         = document.getElementById('nav-logo');
+    var modalBox     = musicSection.querySelector('.music-modal-box');
+
+    function openMusic() {
+        musicSection.classList.add('active');
+        musicSection.setAttribute('aria-hidden', 'false');
+        logo.classList.add('is-hidden');
+        if (modalBox) modalBox.scrollTo({ top: 0, behavior: 'smooth' });
+        if (closeBtn) closeBtn.focus({ preventScroll: true });
+    }
+
+    function closeMusic() {
+        musicSection.classList.remove('active');
+        musicSection.setAttribute('aria-hidden', 'true');
+        logo.classList.remove('is-hidden');
+    }
+
+    musicBtn.addEventListener('click', openMusic);
+    closeBtn.addEventListener('click', closeMusic);
+
+    /* Close on backdrop click (outside modal box) */
+    musicSection.addEventListener('click', function (e) {
+        if (e.target === musicSection) closeMusic();
+    });
+
+    /* Close on Escape */
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && musicSection.classList.contains('active')) closeMusic();
+    });
+}());
+
+/* ============================================================
+   NAV-TOP — popup toggle
+   ============================================================ */
+(function () {
+    var btn   = document.getElementById('nav-links-btn');
+    var logo  = document.getElementById('nav-logo');
+    var popup = document.getElementById('nav-popup');
+
+    function openPopup() {
+        popup.classList.add('is-open');
+        btn.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+        logo.classList.add('is-hidden');
+    }
+
+    function closePopup() {
+        popup.classList.remove('is-open');
+        btn.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+        logo.classList.remove('is-hidden');
+    }
+
+    btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        popup.classList.contains('is-open') ? closePopup() : openPopup();
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!popup.contains(e.target) && e.target !== btn) closePopup();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closePopup();
+    });
+
+    document.getElementById('nav-music-btn').addEventListener('click', function () {
+        closePopup();
+        /* MUSIC-SECTION wired here later */
+    });
+}());
+
+/* ============================================================
+   AUTO-DIM / WAKE SYSTEM
+   ============================================================ */
+(function () {
+    var btn          = document.getElementById('nav-links-btn');
+    var nav          = document.getElementById('nav-top');
+    var logo         = document.getElementById('nav-logo');
+    var cue          = document.getElementById('nav-reveal-cue');
+    var popup        = document.getElementById('nav-popup');
+    var hideTimer;
+    var initialHoldActive = true;
+    var topHoverActive = false;
+    var INITIAL_DELAY = 15000;  /* 15s — logo finishes animating at ~4.7s */
+    var REHIDE_DELAY  = 4000;
+
+    function dim() {
+        if (popup.classList.contains('is-open')) return;
+        btn.classList.add('is-dimmed');
+        logo.classList.add('is-hidden');
+        cue.classList.add('is-visible');
+    }
+
+    function wake() {
+        clearTimeout(hideTimer);
+        btn.classList.remove('is-dimmed');
+        logo.classList.remove('is-hidden');
+        cue.classList.remove('is-visible');
+    }
+
+    function scheduleHide(delay) {
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(dim, delay);
+    }
+
+    function scheduleRehideIfReady() {
+        if (initialHoldActive) return;
+        if (!popup.classList.contains('is-open')) {
+            scheduleHide(REHIDE_DELAY);
+        }
+    }
+
+    function enterTopArea() {
+        topHoverActive = true;
+        wake();
+    }
+
+    function leaveTopArea() {
+        topHoverActive = false;
+        scheduleRehideIfReady();
+    }
+
+    nav.addEventListener('mouseenter', enterTopArea);
+    nav.addEventListener('mouseleave', leaveTopArea);
+    logo.addEventListener('mouseenter', enterTopArea);
+    logo.addEventListener('mouseleave', leaveTopArea);
+    popup.addEventListener('mouseenter', enterTopArea);
+    popup.addEventListener('mouseleave', leaveTopArea);
+    cue.addEventListener('mouseenter', enterTopArea);
+    cue.addEventListener('mouseleave', leaveTopArea);
+    cue.addEventListener('pointerdown', wake);
+    cue.addEventListener('touchstart', wake, { passive: true });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') wake();
+    });
+
+    logo.addEventListener('click', function () {
+        scheduleRehideIfReady();
+    });
+
+    btn.addEventListener('click', function () {
+        if (popup.classList.contains('is-open')) {
+            clearTimeout(hideTimer);
+        } else {
+            scheduleRehideIfReady();
+        }
+    });
+
+    new MutationObserver(function () {
+        if (popup.classList.contains('is-open')) {
+            clearTimeout(hideTimer);
+        } else {
+            scheduleRehideIfReady();
+        }
+    }).observe(popup, { attributes: true, attributeFilter: ['class'] });
+
+    setTimeout(function () {
+        initialHoldActive = false;
+        if (!topHoverActive) dim();
+    }, INITIAL_DELAY);
+}());
+
+
+/* ============================================================
+   PLAYER-EMBED — YouTube IFrame API
+   ============================================================ */
+(function () {
+
+    /* Load the YouTube IFrame API script */
+    var tag    = document.createElement('script');
+    tag.src    = 'https://www.youtube.com/iframe_api';
+    tag.async  = true;
+    var first  = document.getElementsByTagName('script')[0];
+    first.parentNode.insertBefore(tag, first);
+
+    /* Shared state */
+    window.esPlayer       = null;
+    window.esQueue        = [];
+    window.esCurrentIndex = -1;
+    window.esEnded        = false;
+    window.esAPIReady     = false;
+
+    /* Called by YouTube API when ready */
+    window.onYouTubeIframeAPIReady = function () {
+        window.esAPIReady = true;
+        if (window.esQueue.length) createPlayer();
+    };
+
+    function createPlayer() {
+        window.esPlayer = new YT.Player('yt-player', {
+            width:  '100%',
+            height: '100%',
+            playerVars: {
+                autoplay:       0,
+                controls:       1,
+                rel:            0,
+                modestbranding: 1,
+                fs:             1,
+                enablejsapi:    1
+            },
+            events: {
+                onReady: function () {
+                    /* Hide loading indicator */
+                    var loading = document.getElementById('player-loading');
+                    if (loading) loading.classList.add('is-hidden');
+
+                    /* Cue first track */
+                    if (window.esQueue.length) {
+                        window.esPlayer.cueVideoById(window.esQueue[0].id);
+                        window.esCurrentIndex = 0;
+                        setActiveCard(0);
+                    }
+                },
+                onStateChange: function (event) {
+                    /* Auto-advance on end */
+                    if (event.data === YT.PlayerState.ENDED && !window.esEnded) {
+                        window.esEnded = true;
+                        playTrack(window.esCurrentIndex + 1);
+                    }
+                    /* Sync play/pause icon */
+                    updatePlayIcon(event.data);
+                    /* Start progress tracker on first play */
+                    if (event.data === YT.PlayerState.PLAYING) {
+                        if (typeof window.esStartProgressTracker === 'function') {
+                            window.esStartProgressTracker();
+                        }
+                    }
+                }
             }
-            return response.json();
+        });
+    }
+
+    /* Expose createPlayer so track loader can call it after tracks are ready */
+    window.esCreatePlayer = createPlayer;
+
+    window.esQueue = [];
+
+}());
+
+
+/* ============================================================
+   TRACK LOADER
+   ============================================================ */
+(function () {
+    fetch('tracks.json')
+        .then(function (r) {
+            if (!r.ok) throw new Error('tracks.json failed: ' + r.status);
+            return r.json();
         })
-        .then(function(tracks) {
+        .then(function (tracks) {
             var grid = document.getElementById('video-grid');
 
-            tracks.forEach(function(track) {
-                var thumbUrl = 'https://img.youtube.com/vi/' + track.id + '/maxresdefault.jpg';
-
+            tracks.forEach(function (track) {
                 var card = document.createElement('div');
                 card.className = 'video';
                 card.setAttribute('data-id', track.id);
                 card.setAttribute('data-title', track.title);
 
-                card.innerHTML =
-                    '<div class="thumb-container" style="background-image: url(\'' + thumbUrl + '\');"></div>' +
-                    '<div class="video-label">' + track.title + '</div>' +
-                    '<div class="overlay-btn">&gt; ACTIVATE &lt;</div>' +
-                    '<button class="fav-heart-btn" data-id="' + track.id + '" data-title="' + track.title.replace(/"/g, '&quot;') + '" aria-label="Add to favourites">' +
-                        '<svg class="fav-heart-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-                            '<path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="#00FFE6" stroke-width="1.5" fill="none" class="fav-heart-path"/>' +
-                        '</svg>' +
-                    '</button>';
+                var thumb = document.createElement('div');
+                thumb.className = 'thumb-container';
+                thumb.style.backgroundImage = 'url(https://img.youtube.com/vi/' + track.id + '/maxresdefault.jpg)';
+
+                /* sddefault fallback only — blank preferred over low quality */
+                var img = new Image();
+                img.src = thumb.style.backgroundImage.slice(5, -2);
+                img.onerror = function () {
+                    thumb.style.backgroundImage = 'url(https://img.youtube.com/vi/' + track.id + '/sddefault.jpg)';
+                };
+
+                var label = document.createElement('div');
+                label.className = 'video-label';
+                label.textContent = track.title;
+
+                var overlay = document.createElement('div');
+                overlay.className = 'overlay-btn';
+                overlay.textContent = '▶  Play';
+
+                card.appendChild(thumb);
+                card.appendChild(label);
+                card.appendChild(overlay);
+
+                /* FAV-HEART */
+                var heart = document.createElement('button');
+                heart.className = 'fav-heart-btn';
+                heart.setAttribute('data-id', track.id);
+                heart.setAttribute('data-title', track.title);
+                heart.setAttribute('aria-label', 'Add to favourites');
+                heart.innerHTML =
+                    '<svg class="fav-heart-svg" viewBox="0 0 24 24" fill="none">' +
+                    '<path class="fav-heart-path" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="#00FFE6" stroke-width="1.5"/>' +
+                    '</svg>';
+                card.appendChild(heart);
 
                 grid.appendChild(card);
+
+                card.addEventListener('click', function () {
+                    buildQueue();
+                    var idx = window.esQueue.findIndex(function (t) { return t.el === card; });
+                    if (idx !== -1) playTrack(idx);
+                });
             });
 
             buildQueue();
-            attachCardClicks();
             initFavourites();
 
-            if (window.youtubeAPIReady) {
-                createPlayer();
+            if (window.esAPIReady) {
+                window.esCreatePlayer();
             }
         })
-        .catch(function(err) {
-            console.error('Electroscape: Failed to load tracks.json —', err);
+        .catch(function (err) {
+            console.error('Electroscape: ' + err);
         });
-}
+}());
 
 
-/* ============================================================ */
-/* SECTION 4B: QUEUE BUILDER                                    */
-/* ============================================================ */
-var queue             = [];
-var currentIndex      = -1;
-var isFavPlaylistMode = false;
-var player;
-var ended             = false;
-var hudTrackerInterval;
-
-function buildQueue() {
-    isFavPlaylistMode = false;
-    queue = [];
-    document.querySelectorAll('#video-grid .video').forEach(function(el) {
-        queue.push({
-            id:    el.getAttribute('data-id'),
-            title: el.getAttribute('data-title'),
-            el:    el
-        });
-    });
-}
-
-function buildFavQueue(favs) {
-    isFavPlaylistMode = true;
-    queue = [];
-    favs.forEach(function(f) {
-        var el = document.querySelector('#video-grid .video[data-id="' + f.id + '"]');
-        if (el) {
-            queue.push({ id: f.id, title: f.title, el: el });
-        }
-    });
-}
-
-
-/* ============================================================ */
-/* SECTION 4C: ACTIVE CARD HIGHLIGHTER & NOW-PLAYING CLICK      */
-/* ============================================================ */
-function setActiveCard(index) {
-    document.querySelectorAll('#video-grid .video').forEach(function(el) {
-        el.classList.remove('is-playing');
-    });
-    if (queue[index]) {
-        queue[index].el.classList.add('is-playing');
-    }
-}
-
-function revealActiveCard(index) {
-    if (!queue[index] || !queue[index].el) return;
-
-    // Hybrid behaviour:
-    // - Side layout keeps the fixed player and reveals the active card inside the scrolling grid.
-    // - Vertical layout behaves like the original page: tile click returns to the main player.
-    if (document.body.classList.contains('side-layout')) {
-        queue[index].el.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'nearest'
-        });
-    } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-}
-
-/* ============================================================ */
-/* SECTION 4D: PLAY TRACK                                       */
-/* ============================================================ */
-function playTrack(index) {
-    if (!queue.length) return;
-
-    currentIndex = ((index % queue.length) + queue.length) % queue.length;
-    var track = queue[currentIndex];
-
-    document.getElementById('hud-progress-bar').style.width = '0%';
-
-    if (player && typeof player.loadVideoById === 'function') {
-        ended = false;
-        player.loadVideoById(track.id);
-    }
-
-    setActiveCard(currentIndex);
-    revealActiveCard(currentIndex);
-}
-
-
-/* ============================================================ */
-/* SECTION 4E: YOUTUBE IFRAME API READY                         */
-/* ============================================================ */
-window.youtubeAPIReady = false;
-
-window.onYouTubeIframeAPIReady = function() {
-    window.youtubeAPIReady = true;
-    if (queue.length) {
-        createPlayer();
-    }
-};
-
-function createPlayer() {
-    player = new YT.Player('yt-player', {
-        width: '100%',
-        height: '100%',
-        playerVars: {
-            autoplay:       0,
-            controls:       1,
-            rel:            0,
-            modestbranding: 1,
-            fs:             1,
-            enablejsapi:    1
-        },
-        events: {
-            onReady: function() {
-                if (queue.length) {
-                    player.cueVideoById(queue[0].id);
-                    currentIndex = 0;
-                    setActiveCard(0);
-                }
-                startHudTracker();
-                setupHudSeeking();
-                attachHudControls();
-            },
-            onStateChange: function(event) {
-                if (event.data === YT.PlayerState.ENDED && !ended) {
-                    ended = true;
-                    playTrack(currentIndex + 1);
-                }
-                updateHudPlayPauseIcon(event.data);
-                if (event.data === YT.PlayerState.PLAYING || event.data === YT.PlayerState.CUED) {
-                    document.getElementById('hud-dock').classList.add('hud-active');
-                }
-            }
-        }
-    });
-}
-
-
-/* ============================================================ */
-/* SECTION 4F: CARD CLICK EVENT                                 */
-/* ============================================================ */
-function attachCardClicks() {
-    document.querySelectorAll('#video-grid .video').forEach(function(el) {
-        el.addEventListener('mouseenter', function() {
-            el.classList.add('is-hover-preview');
-        });
-        el.addEventListener('mouseleave', function() {
-            el.classList.remove('is-hover-preview');
-        });
-        el.addEventListener('click', function() {
-            el.classList.remove('is-hover-preview');
-            if (isFavPlaylistMode) {
-                buildQueue();
-            }
-            var idx = queue.findIndex(function(t) { return t.el === el; });
-            if (idx !== -1) playTrack(idx);
-        });
-    });
-}
-
-
-/* ============================================================ */
-/* SECTION 4G: PREV BUTTON                                      */
-/* ============================================================ */
-document.getElementById('prev-btn').addEventListener('click', function() {
-    if (!queue.length) buildQueue();
-    playTrack(currentIndex - 1);
-    this.blur();
-});
-
-
-/* ============================================================ */
-/* SECTION 4H: NEXT BUTTON                                      */
-/* ============================================================ */
-document.getElementById('next-btn').addEventListener('click', function() {
-    if (!queue.length) buildQueue();
-    playTrack(currentIndex + 1);
-    this.blur();
-});
-
-
-/* ============================================================ */
-/* SECTION 4I: SHUFFLE BUTTON                                   */
-/* ============================================================ */
-document.getElementById('shuffle-btn').addEventListener('click', function() {
-    var grid  = document.getElementById('video-grid');
-    var cards = Array.from(grid.querySelectorAll('.video'));
-
-    for (var i = cards.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        grid.appendChild(cards[j]);
-        var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp;
-    }
-
-    buildQueue();
-
-    var stillPlaying = queue.findIndex(function(t) {
-        return t.el.classList.contains('is-playing');
-    });
-
-    if (stillPlaying !== -1) {
-        currentIndex = stillPlaying;
-    } else {
-        currentIndex = 0;
-        if (player && typeof player.cueVideoById === 'function') {
-            player.cueVideoById(queue[0].id);
-        }
-    }
-
-    this.blur();
-});
-
-
-/* ============================================================ */
-/* SECTION 4L: HUD PROGRESS TRACKER                             */
-/* ============================================================ */
-function startHudTracker() {
-    if (hudTrackerInterval) clearInterval(hudTrackerInterval);
-
-    hudTrackerInterval = setInterval(function() {
-        if (!player || typeof player.getPlayerState !== 'function') return;
-        if (player.getPlayerState() === 1) {
-            var current = player.getCurrentTime();
-            var total   = player.getDuration();
-            if (total > 0) {
-                var pct = (current / total) * 100;
-                document.getElementById('hud-progress-bar').style.width = pct + '%';
-            }
-        }
-    }, 500);
-}
-
-/* ============================================================ */
-/* SECTION 4M: HUD SEEK                                         */
-/* ============================================================ */
-function setupHudSeeking() {
-    var hudDock      = document.getElementById('hud-dock');
-    var barContainer = document.getElementById('hud-progress-container');
-    var visualBar    = document.getElementById('hud-progress-bar');
-    var isSeeking    = false;
-
-    if (!hudDock || !barContainer) return;
-    if (window.electroscapeHudSeekingAttached) return;
-    window.electroscapeHudSeekingAttached = true;
-
-    function getSeekPosition(clientX) {
-        var rect = barContainer.getBoundingClientRect();
-        var pos  = (clientX - rect.left) / rect.width;
-        return Math.max(0, Math.min(1, pos));
-    }
-
-    function applySeek(clientX) {
-        if (!player || typeof player.getDuration !== 'function') return;
-        var duration = player.getDuration();
-        if (!duration || duration <= 0) return;
-
-        var pos = getSeekPosition(clientX);
-
-        if (visualBar) {
-            visualBar.style.width = (pos * 100) + '%';
-        }
-
-        player.seekTo(pos * duration, true);
-    }
-
-    barContainer.addEventListener('pointerdown', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        isSeeking = true;
-        barContainer.setPointerCapture && barContainer.setPointerCapture(e.pointerId);
-        applySeek(e.clientX);
-    });
-
-    barContainer.addEventListener('pointermove', function(e) {
-        if (!isSeeking) return;
-        e.preventDefault();
-        e.stopPropagation();
-        applySeek(e.clientX);
-    });
-
-    function endSeek(e) {
-        if (!isSeeking) return;
-        e.preventDefault();
-        e.stopPropagation();
-        isSeeking = false;
-        barContainer.releasePointerCapture && barContainer.releasePointerCapture(e.pointerId);
-    }
-
-    barContainer.addEventListener('pointerup', endSeek);
-    barContainer.addEventListener('pointercancel', endSeek);
-
-    barContainer.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        applySeek(e.clientX);
-    });
-}
-
-
-/* ============================================================ */
-/* SECTION 4N: HUD CONTROLS                                     */
-/* ============================================================ */
-function attachHudControls() {
-    if (window.electroscapeHudControlsAttached) return;
-    window.electroscapeHudControlsAttached = true;
-
-    function stopHudPointer(e) {
-        e.stopPropagation();
-    }
-
-    function togglePlayback() {
-        if (!player || typeof player.getPlayerState !== 'function') return;
-        var state = player.getPlayerState();
-        if (state === YT.PlayerState.PLAYING) {
-            player.pauseVideo();
-        } else if (
-            state === YT.PlayerState.PAUSED ||
-            state === YT.PlayerState.CUED ||
-            state === YT.PlayerState.UNSTARTED ||
-            state === -1
-        ) {
-            if (currentIndex === -1) {
-                playTrack(0);
-            } else {
-                player.playVideo();
-            }
-        }
-    }
-
-    var hudPrev = document.getElementById('hud-prev');
-    var hudPlay = document.getElementById('hud-playpause');
-    var hudNext = document.getElementById('hud-next');
-    var cmdPlay = document.getElementById('playpause-btn');
-
-    [hudPrev, hudPlay, hudNext].forEach(function(btn) {
-        if (!btn) return;
-        btn.addEventListener('pointerdown', stopHudPointer);
-        btn.addEventListener('pointerup', stopHudPointer);
-    });
-
-    if (cmdPlay) {
-        cmdPlay.addEventListener('pointerdown', stopHudPointer);
-        cmdPlay.addEventListener('pointerup', stopHudPointer);
-    }
-
-    hudPrev && hudPrev.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!queue.length) buildQueue();
-        playTrack(currentIndex - 1);
-    });
-
-    hudPlay && hudPlay.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        togglePlayback();
-    });
-
-    cmdPlay && cmdPlay.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        triggerPlayRipple();
-        togglePlayback();
-    });
-
-    hudNext && hudNext.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!queue.length) buildQueue();
-        playTrack(currentIndex + 1);
-    });
-}
-
-function triggerPlayRipple() {
-    var btn = document.getElementById('playpause-btn');
-    if (!btn) return;
-    btn.classList.remove('ripple-active');
-    void btn.offsetWidth;
-    btn.classList.add('ripple-active');
-    btn.addEventListener('animationend', function handler() {
-        btn.classList.remove('ripple-active');
-        btn.removeEventListener('animationend', handler);
-    });
-}
-
-function updateHudPlayPauseIcon(state) {
-    var hudBtn = document.getElementById('hud-playpause');
-    if (hudBtn) hudBtn.innerHTML = (state === 1) ? '&#10074;&#10074;' : '&#9654;';
-
-    var cmdBtn = document.getElementById('playpause-btn');
-    if (cmdBtn) {
-        if (state === 1) {
-            cmdBtn.classList.add('is-playing');
-        } else {
-            cmdBtn.classList.remove('is-playing');
-        }
-    }
-}
-
-
-/* ============================================================ */
-/* SECTION 4O: GRID VIEW CONTROLS                               */
-/* ============================================================ */
-function initGridControls() {
-    var grid      = document.getElementById('video-grid');
-    var savedSize = localStorage.getItem('electroscape_grid_size') || 'default';
-
-    function applyGridSize(size) {
-        grid.classList.remove('view-dense', 'view-max');
-        if (size !== 'default') {
-            grid.classList.add('view-' + size);
-        }
-        localStorage.setItem('electroscape_grid_size', size);
-        return size;
-    }
-
-    var buttons = document.querySelectorAll('.grid-btn');
-
-    function updateBareActive(size) {
-        buttons.forEach(function(b) {
-            b.classList.toggle('grid-btn-active', b.getAttribute('data-size') === size);
-        });
-    }
-
-    applyGridSize(savedSize);
-    updateBareActive(savedSize);
-
-    buttons.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var size = this.getAttribute('data-size');
-            applyGridSize(size);
-            updateBareActive(size);
-        });
-    });
-}
-
-
-/* ============================================================ */
-/* SECTION 4P: FAVOURITES SIDEBAR                               */
-/* ============================================================ */
+/* ============================================================
+   FAV-SIDEBAR JS
+   ============================================================ */
 function initFavourites() {
+    var KEY = 'es_favourites';
 
-    var STORAGE_KEY = 'electroscape_favourites';
+    function load()  { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e) { return []; } }
+    function save(f) { try { localStorage.setItem(KEY, JSON.stringify(f)); } catch(e) {} }
+    function isFav(id, favs) { return favs.some(function(f) { return f.id === id; }); }
 
-    function loadFavs() {
-        try {
-            var raw = localStorage.getItem(STORAGE_KEY);
-            return raw ? JSON.parse(raw) : [];
-        } catch(e) { return []; }
-    }
-
-    function saveFavs(favs) {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(favs)); }
-        catch(e) { /* storage full — silently skip */ }
-    }
-
-    function isFav(id, favs) {
-        return favs.some(function(f) { return f.id === id; });
-    }
-
-    function updateHeartBtn(btn, active) {
+    function setHeart(btn, active) {
         var path = btn.querySelector('.fav-heart-path');
         if (!path) return;
-        if (active) {
-            path.setAttribute('fill', '#00FFE6');
-            path.setAttribute('stroke', '#00FFE6');
-            btn.classList.add('fav-heart-active');
-        } else {
-            path.setAttribute('fill', 'none');
-            path.setAttribute('stroke', '#00FFE6');
-            btn.classList.remove('fav-heart-active');
-        }
+        path.setAttribute('fill', active ? '#00FFE6' : 'none');
+        btn.classList.toggle('is-active', active);
     }
 
-    function updateToggleIcon(open) {
-        var icon = document.getElementById('fav-toggle-icon');
-        if (!icon) return;
-        var path = icon.querySelector('path');
-        if (!path) return;
-        if (open) {
-            path.setAttribute('fill', '#00FFE6');
-            path.setAttribute('stroke', '#00FFE6');
-        } else {
-            path.setAttribute('fill', 'none');
-            path.setAttribute('stroke', '#00FFE6');
-        }
-    }
-
-    function syncAllHearts(favs) {
+    function syncHearts(favs) {
         document.querySelectorAll('.fav-heart-btn').forEach(function(btn) {
-            updateHeartBtn(btn, isFav(btn.getAttribute('data-id'), favs));
+            setHeart(btn, isFav(btn.getAttribute('data-id'), favs));
         });
     }
 
-    var dragSrcIndex = null;
-    var touchDragSrc = null;
-    var touchClone   = null;
-    var touchOffsetY = 0;
-
-    function shiftFav(fromIndex, delta) {
-        var favs = loadFavs();
-        var toIndex = fromIndex + delta;
-        if (toIndex < 0 || toIndex >= favs.length) return;
-        var moved = favs.splice(fromIndex, 1)[0];
-        favs.splice(toIndex, 0, moved);
-        saveFavs(favs);
-        renderFavList();
+    function setToggleIcon(open) {
+        var icon = document.getElementById('fav-toggle-icon');
+        if (!icon) return;
+        icon.setAttribute('fill', open ? '#00FFE6' : '#00FFE6');
+        icon.style.opacity = open ? '1' : '0.75';
     }
 
-    function renderFavList() {
-        var favs   = loadFavs();
+    /* ---- render ---- */
+    function render() {
+        var favs   = load();
         var list   = document.getElementById('fav-list');
         var empty  = document.getElementById('fav-empty');
         var footer = document.getElementById('fav-footer');
+        var actions = document.getElementById('fav-actions');
 
         list.innerHTML = '';
+        var hasItems = favs.length > 0;
+        empty.style.display   = hasItems ? 'none' : 'flex';
+        footer.style.display  = hasItems ? 'flex' : 'none';
+        if (actions) actions.style.display = hasItems ? 'flex' : 'none';
+        if (!hasItems) return;
 
-        if (!favs.length) {
-            empty.style.display  = 'flex';
-            footer.style.display = 'none';
-            var actions = document.getElementById('fav-actions');
-            if (actions) actions.style.display = 'none';
-            return;
-        }
-
-        empty.style.display  = 'none';
-        footer.style.display = 'flex';
-        var actions = document.getElementById('fav-actions');
-        if (actions) actions.style.display = 'flex';
+        var dragSrcIdx = null;
 
         favs.forEach(function(fav, idx) {
             var li = document.createElement('li');
             li.className = 'fav-row';
             li.setAttribute('draggable', 'true');
             li.setAttribute('data-idx', idx);
-            li.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); return false; };
+
+            var handle = document.createElement('div');
+            handle.className = 'fav-drag-handle';
+            handle.innerHTML =
+                '<svg viewBox="0 0 8 14" fill="none">' +
+                '<circle cx="2" cy="2"  r="1.2" fill="#555"/><circle cx="6" cy="2"  r="1.2" fill="#555"/>' +
+                '<circle cx="2" cy="7"  r="1.2" fill="#555"/><circle cx="6" cy="7"  r="1.2" fill="#555"/>' +
+                '<circle cx="2" cy="12" r="1.2" fill="#555"/><circle cx="6" cy="12" r="1.2" fill="#555"/>' +
+                '</svg>';
 
             var thumb = document.createElement('div');
             thumb.className = 'fav-row-thumb';
-            thumb.style.backgroundImage = 'url(https://img.youtube.com/vi/' + fav.id + '/mqdefault.jpg)';
+            thumb.style.backgroundImage = 'url(https://img.youtube.com/vi/' + fav.id + '/maxresdefault.jpg)';
 
             var title = document.createElement('span');
             title.className = 'fav-row-title';
@@ -3745,484 +1806,359 @@ function initFavourites() {
 
             var upBtn = document.createElement('button');
             upBtn.className = 'fav-row-btn fav-move-btn';
-            upBtn.setAttribute('aria-label', 'Move Up');
             upBtn.innerHTML = '&#9650;';
             if (idx === 0) upBtn.style.opacity = '0.2';
 
             var downBtn = document.createElement('button');
             downBtn.className = 'fav-row-btn fav-move-btn';
-            downBtn.setAttribute('aria-label', 'Move Down');
             downBtn.innerHTML = '&#9660;';
             if (idx === favs.length - 1) downBtn.style.opacity = '0.2';
 
             var playBtn = document.createElement('button');
             playBtn.className = 'fav-row-btn fav-play-btn';
-            playBtn.setAttribute('aria-label', 'Play ' + fav.title);
-            playBtn.innerHTML =
-                '<svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-                '<polygon points="2,1 10,6 2,11" fill="#00FFE6"/>' +
-                '</svg>';
+            playBtn.innerHTML = '<svg viewBox="0 0 12 12" fill="none"><polygon points="2,1 10,6 2,11" fill="#00FFE6"/></svg>';
 
             var removeBtn = document.createElement('button');
             removeBtn.className = 'fav-row-btn fav-remove-btn';
-            removeBtn.setAttribute('aria-label', 'Remove ' + fav.title);
             removeBtn.innerHTML = '&#x2715;';
-
-            var handle = document.createElement('div');
-            handle.className = 'fav-drag-handle';
-            handle.setAttribute('oncontextmenu', 'return false;');
-            handle.innerHTML =
-                '<svg viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-                '<circle cx="2" cy="2"  r="1.2" fill="#555"/>' +
-                '<circle cx="6" cy="2"  r="1.2" fill="#555"/>' +
-                '<circle cx="2" cy="7"  r="1.2" fill="#555"/>' +
-                '<circle cx="6" cy="7"  r="1.2" fill="#555"/>' +
-                '<circle cx="2" cy="12" r="1.2" fill="#555"/>' +
-                '<circle cx="6" cy="12" r="1.2" fill="#555"/>' +
-                '</svg>';
 
             controls.appendChild(upBtn);
             controls.appendChild(downBtn);
             controls.appendChild(playBtn);
             controls.appendChild(removeBtn);
-
             li.appendChild(handle);
             li.appendChild(thumb);
             li.appendChild(title);
             li.appendChild(controls);
             list.appendChild(li);
 
+            /* button events */
             upBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                if (idx > 0) shiftFav(idx, -1);
+                if (idx === 0) return;
+                var f = load(); var m = f.splice(idx,1)[0]; f.splice(idx-1,0,m); save(f); render();
             });
             downBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                if (idx < favs.length - 1) shiftFav(idx, 1);
+                var f = load(); if (idx >= f.length-1) return; var m = f.splice(idx,1)[0]; f.splice(idx+1,0,m); save(f); render();
             });
-
             playBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                var qIdx = queue.findIndex(function(t) { return t.id === fav.id; });
-                if (qIdx !== -1) playTrack(qIdx);
+                var qi = window.esQueue.findIndex(function(t){ return t.id === fav.id; });
+                if (qi !== -1) playTrack(qi);
             });
-
             removeBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                var current = loadFavs();
-                current = current.filter(function(f) { return f.id !== fav.id; });
-                saveFavs(current);
-                syncAllHearts(current);
-                renderFavList();
+                var f = load().filter(function(x){ return x.id !== fav.id; });
+                save(f); syncHearts(f); render();
             });
 
+            /* drag reorder */
             li.addEventListener('dragstart', function(e) {
-                dragSrcIndex = idx;
-                li.classList.add('fav-row-dragging');
+                dragSrcIdx = idx; li.classList.add('fav-row-dragging');
                 e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', idx);
             });
-
             li.addEventListener('dragend', function() {
                 li.classList.remove('fav-row-dragging');
-                document.querySelectorAll('.fav-row-over').forEach(function(el) {
-                    el.classList.remove('fav-row-over');
-                });
+                list.querySelectorAll('.fav-row-over').forEach(function(el){ el.classList.remove('fav-row-over'); });
             });
-
             li.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                li.classList.add('fav-row-over');
+                e.preventDefault(); li.classList.add('fav-row-over');
             });
-
-            li.addEventListener('dragleave', function() {
-                li.classList.remove('fav-row-over');
-            });
-
+            li.addEventListener('dragleave', function() { li.classList.remove('fav-row-over'); });
             li.addEventListener('drop', function(e) {
-                e.preventDefault();
-                li.classList.remove('fav-row-over');
-                if (dragSrcIndex === null || dragSrcIndex === idx) return;
-                var current = loadFavs();
-                var moved   = current.splice(dragSrcIndex, 1)[0];
-                current.splice(idx, 0, moved);
-                saveFavs(current);
-                renderFavList();
-                dragSrcIndex = null;
-            });
-
-            handle.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-
-            handle.addEventListener('pointerdown', function(e) {
-                if (e.pointerType === 'mouse') return;
-                e.preventDefault();
-                handle.setPointerCapture(e.pointerId);
-
-                var rect     = li.getBoundingClientRect();
-                touchOffsetY = e.clientY - rect.top;
-                touchDragSrc = li;
-                dragSrcIndex = idx;
-                li.classList.add('fav-row-dragging');
-
-                touchClone = li.cloneNode(true);
-                touchClone.style.cssText =
-                    'position:fixed; left:' + rect.left + 'px; top:' + rect.top + 'px;' +
-                    'width:' + rect.width + 'px; opacity:0.85; pointer-events:none;' +
-                    'z-index:9999; background:#1a1a1a; border:1px solid #00FFE633; border-radius:6px;';
-                document.body.appendChild(touchClone);
-            });
-
-            handle.addEventListener('pointermove', function(e) {
-                if (e.pointerType === 'mouse' || !touchClone) return;
-                e.preventDefault();
-                touchClone.style.top = (e.clientY - touchOffsetY) + 'px';
-                document.querySelectorAll('.fav-row-over').forEach(function(el) {
-                    el.classList.remove('fav-row-over');
-                });
-                touchClone.style.display = 'none';
-                var target = document.elementFromPoint(e.clientX, e.clientY);
-                touchClone.style.display = '';
-                var targetRow = target && target.closest('.fav-row');
-                if (targetRow && targetRow !== touchDragSrc) {
-                    targetRow.classList.add('fav-row-over');
-                }
-            });
-
-            handle.addEventListener('pointerup', function(e) {
-                if (e.pointerType === 'mouse') return;
-                if (touchClone) { touchClone.remove(); touchClone = null; }
-                if (!touchDragSrc) return;
-                touchDragSrc.classList.remove('fav-row-dragging');
-                document.querySelectorAll('.fav-row-over').forEach(function(el) {
-                    el.classList.remove('fav-row-over');
-                });
-                var target    = document.elementFromPoint(e.clientX, e.clientY);
-                var targetRow = target && target.closest('.fav-row');
-                if (targetRow && targetRow !== touchDragSrc) {
-                    var destIdx = parseInt(targetRow.getAttribute('data-idx'), 10);
-                    if (!isNaN(destIdx) && destIdx !== dragSrcIndex) {
-                        var current = loadFavs();
-                        var moved   = current.splice(dragSrcIndex, 1)[0];
-                        current.splice(destIdx, 0, moved);
-                        saveFavs(current);
-                        renderFavList();
-                    }
-                }
-                touchDragSrc = null;
-                dragSrcIndex = null;
-            });
-
-            handle.addEventListener('pointercancel', function() {
-                if (touchClone) { touchClone.remove(); touchClone = null; }
-                if (touchDragSrc) touchDragSrc.classList.remove('fav-row-dragging');
-                document.querySelectorAll('.fav-row-over').forEach(function(el) {
-                    el.classList.remove('fav-row-over');
-                });
-                touchDragSrc = null;
-                dragSrcIndex = null;
+                e.preventDefault(); li.classList.remove('fav-row-over');
+                if (dragSrcIdx === null || dragSrcIdx === idx) return;
+                var f = load(); var m = f.splice(dragSrcIdx,1)[0]; f.splice(idx,0,m); save(f); render();
+                dragSrcIdx = null;
             });
         });
     }
 
-    function openSidebar() {
-        document.getElementById('fav-sidebar').classList.add('fav-sidebar-open');
-        document.getElementById('fav-backdrop').classList.add('fav-backdrop-visible');
-        updateToggleIcon(true);
-        renderFavList();
+    /* ---- open / close ---- */
+    function open() {
+        document.getElementById('fav-sidebar').classList.add('is-open');
+        document.getElementById('fav-backdrop').classList.add('is-visible');
+        setToggleIcon(true);
+        render();
     }
-
-    function closeSidebar() {
-        document.getElementById('fav-sidebar').classList.remove('fav-sidebar-open');
-        document.getElementById('fav-backdrop').classList.remove('fav-backdrop-visible');
-        updateToggleIcon(false);
+    function close() {
+        document.getElementById('fav-sidebar').classList.remove('is-open');
+        document.getElementById('fav-backdrop').classList.remove('is-visible');
+        setToggleIcon(false);
     }
 
     document.getElementById('fav-toggle-btn').addEventListener('click', function() {
-        var sidebar = document.getElementById('fav-sidebar');
-        if (sidebar.classList.contains('fav-sidebar-open')) {
-            closeSidebar();
-        } else {
-            openSidebar();
-        }
+        document.getElementById('fav-sidebar').classList.contains('is-open') ? close() : open();
         this.blur();
     });
+    document.getElementById('fav-backdrop').addEventListener('click', close);
+    document.getElementById('fav-close-btn').addEventListener('click', close);
 
-    document.getElementById('fav-backdrop').addEventListener('click', closeSidebar);
-    document.getElementById('fav-close-btn').addEventListener('click', closeSidebar);
-
-    var playAllBtn = document.getElementById('fav-play-all-btn');
-    if (playAllBtn) {
-        playAllBtn.addEventListener('click', function() {
-            var favs = loadFavs();
-            if (favs.length > 0) {
-                buildFavQueue(favs);
-                playTrack(0);
-                closeSidebar();
-            }
+    document.getElementById('fav-play-all-btn').addEventListener('click', function() {
+        var favs = load();
+        if (!favs.length) return;
+        /* Build queue from favourites */
+        window.esQueue = [];
+        favs.forEach(function(fav) {
+            var el = document.querySelector('#video-grid .video[data-id="' + fav.id + '"]');
+            if (el) window.esQueue.push({ id: fav.id, title: fav.title, el: el });
         });
-    }
-
-    document.getElementById('fav-clear-btn').addEventListener('click', function() {
-        saveFavs([]);
-        syncAllHearts([]);
-        renderFavList();
+        playTrack(0);
+        close();
     });
 
+    document.getElementById('fav-clear-btn').addEventListener('click', function() {
+        save([]); syncHearts([]); render();
+    });
+
+    /* ---- heart buttons on cards ---- */
     document.querySelectorAll('.fav-heart-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            var id    = btn.getAttribute('data-id');
+            var id = btn.getAttribute('data-id');
             var title = btn.getAttribute('data-title');
-            var favs  = loadFavs();
-
+            var favs = load();
             if (isFav(id, favs)) {
-                favs = favs.filter(function(f) { return f.id !== id; });
+                favs = favs.filter(function(f){ return f.id !== id; });
             } else {
                 favs.push({ id: id, title: title });
             }
-
-            saveFavs(favs);
-            updateHeartBtn(btn, isFav(id, favs));
-
-            var sidebar = document.getElementById('fav-sidebar');
-            if (sidebar.classList.contains('fav-sidebar-open')) {
-                renderFavList();
-            }
+            save(favs);
+            setHeart(btn, isFav(id, favs));
+            if (document.getElementById('fav-sidebar').classList.contains('is-open')) render();
         });
     });
 
-    syncAllHearts(loadFavs());
+    syncHearts(load());
 }
 
 
-/* ============================================================ */
-/* SECTION 4R-1: CINEMA MODE                                    */
-/* ============================================================ */
-function initCinemaMode() {
-    var btn = document.getElementById('cinema-mode-btn');
-    var layoutBtn = document.getElementById('layout-mode-btn');
+/* ============================================================
+   QUEUE & PLAYBACK
+   ============================================================ */
+function buildQueue() {
+    window.esQueue = [];
+    document.querySelectorAll('#video-grid .video').forEach(function (el) {
+        window.esQueue.push({
+            id:    el.getAttribute('data-id'),
+            title: el.getAttribute('data-title'),
+            el:    el
+        });
+    });
+}
+
+function setActiveCard(index) {
+    document.querySelectorAll('#video-grid .video').forEach(function (el) {
+        el.classList.remove('is-playing');
+    });
+    if (window.esQueue[index]) {
+        window.esQueue[index].el.classList.add('is-playing');
+    }
+}
+
+function playTrack(index) {
+    var q = window.esQueue;
+    if (!q.length) return;
+    window.esCurrentIndex = ((index % q.length) + q.length) % q.length;
+    window.esEnded = false;
+    var track = q[window.esCurrentIndex];
+    if (window.esPlayer && typeof window.esPlayer.loadVideoById === 'function') {
+        window.esPlayer.loadVideoById(track.id);
+    }
+    setActiveCard(window.esCurrentIndex);
+    /* Scroll to top so player is visible — target both window and body/html for tablet compat */
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+    document.body.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updatePlayIcon(state) {
+    var btn = document.getElementById('playpause-btn');
     if (!btn) return;
-
-    btn.setAttribute('aria-pressed', 'false');
-
-    btn.addEventListener('click', function() {
-        var active = document.body.classList.toggle('cinema-mode');
-        if (active) {
-            document.body.classList.remove('side-layout');
-            if (layoutBtn) {
-                layoutBtn.classList.remove('is-active');
-                layoutBtn.setAttribute('aria-pressed', 'false');
-            }
-        }
-        btn.classList.toggle('is-active', active);
-        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-    });
+    if (state === 1) {
+        btn.classList.add('is-playing');
+    } else {
+        btn.classList.remove('is-playing');
+    }
 }
 
 
-/* ============================================================ */
-/* SECTION 4R-1B: SIDE / VERTICAL LAYOUT MODE                   */
-/* ============================================================ */
-function initLayoutMode() {
-    var btn = document.getElementById('layout-mode-btn');
-    var cinemaBtn = document.getElementById('cinema-mode-btn');
-    if (!btn) return;
+/* ============================================================
+   PLAYER-CONTROLS JS
+   ============================================================ */
+(function () {
 
-    btn.setAttribute('aria-pressed', 'false');
-
-    btn.addEventListener('click', function() {
-        var active;
-        if (document.body.classList.contains('cinema-mode')) {
-            document.body.classList.remove('cinema-mode');
-            if (cinemaBtn) {
-                cinemaBtn.classList.remove('is-active');
-                cinemaBtn.setAttribute('aria-pressed', 'false');
-            }
-        }
-
-        active = document.body.classList.toggle('side-layout');
-        if (active) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        btn.classList.toggle('is-active', active);
-        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-    });
-}
-
-
-/* ============================================================ */
-/* SECTION 4R-1C: GRID COLLAPSE                                 */
-/* ============================================================ */
-function initGridCollapse() {
-    var btn = document.getElementById('grid-collapse-btn');
-    if (!btn) return;
-
-    function syncButton() {
-        var collapsed = document.body.classList.contains('grid-collapsed');
-        btn.classList.toggle('grid-btn-active', collapsed);
-        btn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
-        btn.setAttribute('aria-label', collapsed ? 'Expand grid' : 'Collapse grid');
-        btn.setAttribute('title', collapsed ? 'Expand grid' : 'Collapse grid');
-    }
-
-    btn.setAttribute('aria-pressed', 'false');
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        document.body.classList.toggle('grid-collapsed');
-        syncButton();
-        btn.blur();
-    });
-    syncButton();
-}
-
-
-/* ============================================================ */
-/* SECTION 4R-2: TOP CHROME AUTO-HIDE                           */
-/* ============================================================ */
-function initTopChromeAutoHide() {
-    var revealCue = document.getElementById('top-reveal-cue');
-    var hideTimer;
-    var initialHideDone = false;
-    var INITIAL_HIDE_DELAY = 5000;
-    var REHIDE_DELAY = 3000;
-
-    function hideTopChrome() {
-        document.body.classList.add('top-chrome-hidden');
-        initialHideDone = true;
-    }
-
-    function showTopChrome() {
-        document.body.classList.remove('top-chrome-hidden');
-    }
-
-    function scheduleHide(delay) {
-        clearTimeout(hideTimer);
-        hideTimer = setTimeout(hideTopChrome, delay || REHIDE_DELAY);
-    }
-
-    function wakeTopChrome() {
-        showTopChrome();
-        scheduleHide(REHIDE_DELAY);
-    }
-
-    if (revealCue) {
-        revealCue.addEventListener('mouseenter', wakeTopChrome);
-        revealCue.addEventListener('focus', wakeTopChrome);
-        revealCue.addEventListener('pointerdown', wakeTopChrome);
-        revealCue.addEventListener('touchstart', wakeTopChrome, { passive: true });
-    }
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            showTopChrome();
-            scheduleHide(REHIDE_DELAY);
-        }
+    /* PREV */
+    document.getElementById('prev-btn').addEventListener('click', function () {
+        if (!window.esQueue.length) return;
+        playTrack(window.esCurrentIndex - 1);
+        this.blur();
     });
 
-    window.addEventListener('load', function() {
-        if (!initialHideDone) scheduleHide(INITIAL_HIDE_DELAY);
+    /* NEXT */
+    document.getElementById('next-btn').addEventListener('click', function () {
+        if (!window.esQueue.length) return;
+        playTrack(window.esCurrentIndex + 1);
+        this.blur();
     });
-    scheduleHide(INITIAL_HIDE_DELAY);
-}
 
-
-/* ============================================================ */
-/* SECTION 4S: MUSIC / PLAYER SECTION TOGGLE                    */
-/* Switches between the video player and the music directory    */
-/* without a page reload. Updates nav active state.             */
-/* ============================================================ */
-function initSectionToggle() {
-    var musicLink     = document.getElementById('nav-music-link');
-    var playerSection = document.getElementById('player-section');
-    var musicSection  = document.getElementById('music-section');
-    var musicCloseBtn = document.getElementById('music-close-btn');
-    var musicModalBox = musicSection ? musicSection.querySelector('.music-modal-box') : null;
-
-    function showPlayer() {
-        playerSection.classList.remove('hidden');
-        musicSection.classList.remove('active');
-        musicSection.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('music-modal-open');
-        musicLink.style.color = '';
-    }
-
-    function showMusic() {
-        playerSection.classList.remove('hidden');
-        musicSection.classList.add('active');
-        musicSection.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('music-modal-open');
-        musicLink.style.color = '#00FFE6';
-        if (musicModalBox) musicModalBox.scrollTo({ top: 0, behavior: 'smooth' });
-        if (musicCloseBtn) musicCloseBtn.focus({ preventScroll: true });
-    }
-
-    musicLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (musicSection.classList.contains('active')) {
-            showPlayer();
+    /* PLAY / PAUSE */
+    document.getElementById('playpause-btn').addEventListener('click', function () {
+        var p = window.esPlayer;
+        if (!p) return;
+        var state = p.getPlayerState();
+        if (state === 1) {
+            p.pauseVideo();
+        } else if (state === 2 || state === 5) {
+            p.playVideo();
+        } else if (window.esCurrentIndex === -1 && window.esQueue.length) {
+            playTrack(0);
         } else {
-            showMusic();
+            p.playVideo();
         }
+        /* Ripple */
+        var btn = this;
+        btn.classList.remove('ripple-active');
+        void btn.offsetWidth;
+        btn.classList.add('ripple-active');
+        setTimeout(function () { btn.classList.remove('ripple-active'); }, 400);
+        this.blur();
     });
 
-    if (musicCloseBtn) {
-        musicCloseBtn.addEventListener('click', showPlayer);
-    }
-
-    if (musicSection) {
-        musicSection.addEventListener('click', function(e) {
-            if (e.target === musicSection) {
-                showPlayer();
-            }
+    /* SHUFFLE */
+    document.getElementById('shuffle-btn').addEventListener('click', function () {
+        var grid  = document.getElementById('video-grid');
+        if (!grid) return;
+        var cards = Array.from(grid.querySelectorAll('.video'));
+        for (var i = cards.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            grid.appendChild(cards[j]);
+            var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp;
+        }
+        buildQueue();
+        var stillPlaying = window.esQueue.findIndex(function (t) {
+            return t.el && t.el.classList.contains('is-playing');
         });
-    }
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && musicSection.classList.contains('active')) {
-            showPlayer();
-        }
+        window.esCurrentIndex = stillPlaying !== -1 ? stillPlaying : 0;
+        this.blur();
     });
 
-    /* ELECTROSCAPE title click always returns to player */
-    document.querySelector('.fly-in-title').addEventListener('click', showPlayer);
-}
+    /* GRID DIM TOGGLE — 3 states: full / dim / near-hidden */
+    (function () {
+        var btn  = document.getElementById('grid-toggle-btn');
+        var icon = document.getElementById('grid-toggle-icon');
+        var grid = document.getElementById('video-grid');
+        var controls = document.getElementById('player-controls');
+        var state = 0; /* 0=full 1=dim 2=near-hidden */
 
+        /* Vertical burger SVGs — bars removed to show dim level */
+        var svgs = [
+            /* state 0 — full: 3 vertical bars */
+            '<line x1="5"  y1="2" x2="5"  y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>' +
+            '<line x1="9"  y1="2" x2="9"  y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>' +
+            '<line x1="13" y1="2" x2="13" y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>',
+            /* state 1 — dim: 2 bars */
+            '<line x1="6"  y1="2" x2="6"  y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>' +
+            '<line x1="12" y1="2" x2="12" y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>',
+            /* state 2 — near hidden: 1 bar */
+            '<line x1="9" y1="2" x2="9" y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>'
+        ];
 
-/* ============================================================ */
-/* SECTION 4J: INITIALISATION                                   */
-/* ============================================================ */
-loadTracks();
-initGridControls();
-initSectionToggle();
-initCinemaMode();
-initLayoutMode();
-initGridCollapse();
-initTopChromeAutoHide();
-
-/* ============================================================ */
-/* MOBILE SAFETY NET — auto-exit side-layout on small screens   */
-/* ============================================================ */
-(function() {
-    var MOBILE_BP = 1199;
-    function isMobile() {
-        return window.innerWidth <= MOBILE_BP ||
-               (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-    }
-    function resetSideLayout() {
-        if (isMobile() && document.body.classList.contains('side-layout')) {
-            document.body.classList.remove('side-layout');
-            var btn = document.getElementById('layout-mode-btn');
-            if (btn) { btn.classList.remove('is-active'); btn.setAttribute('aria-pressed', 'false'); }
+        function apply() {
+            grid.classList.remove('is-dim-1', 'is-dim-2');
+            controls.classList.remove('is-dim-1', 'is-dim-2');
+            if (state === 1) grid.classList.add('is-dim-1');
+            if (state === 2) grid.classList.add('is-dim-2');
+            if (state === 1) controls.classList.add('is-dim-1');
+            if (state === 2) controls.classList.add('is-dim-2');
+            icon.innerHTML = svgs[state];
+            btn.classList.toggle('is-active', state > 0);
         }
-    }
-    window.addEventListener('resize', resetSideLayout);
-    resetSideLayout();
-})();
-    </script>
 
-    <script src="https://www.youtube.com/iframe_api" async></script>
+        btn.addEventListener('click', function () {
+            state = (state + 1) % 3;
+            apply();
+            this.blur();
+        });
+
+        apply();
+    }());
+
+    /* FAV toggle — placeholder until FAV-SIDEBAR is built */
+    document.getElementById('fav-toggle-btn').addEventListener('click', function () {
+        /* wired up when FAV-SIDEBAR is built */
+        this.blur();
+    });
+
+}());
+
+
+/* ============================================================
+   PROGRESS-BAR — tracker + seek
+   ============================================================ */
+(function () {
+    var track    = document.getElementById('progress-bar-track');
+    var fill     = document.getElementById('progress-bar-fill');
+    var interval = null;
+    var seeking  = false;
+
+    /* Update fill width from player position */
+    function updateFill() {
+        var p = window.esPlayer;
+        if (!p || typeof p.getDuration !== 'function') return;
+        var duration = p.getDuration();
+        if (!duration) return;
+        var pct = (p.getCurrentTime() / duration) * 100;
+        fill.style.width = pct + '%';
+    }
+
+    /* Start polling every 250ms */
+    window.esStartProgressTracker = function () {
+        if (interval) clearInterval(interval);
+        interval = setInterval(function () {
+            if (!seeking) updateFill();
+        }, 250);
+    };
+
+    /* Seek to position based on click/drag x offset */
+    function seekFromEvent(e) {
+        var p = window.esPlayer;
+        if (!p || typeof p.getDuration !== 'function') return;
+        var rect     = track.getBoundingClientRect();
+        var clientX  = e.touches ? e.touches[0].clientX : e.clientX;
+        var pct      = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        var duration = p.getDuration();
+        if (!duration) return;
+        fill.style.width = (pct * 100) + '%';
+        p.seekTo(pct * duration, true);
+    }
+
+    /* Pointer events — mouse + touch unified */
+    track.addEventListener('pointerdown', function (e) {
+        seeking = true;
+        track.setPointerCapture(e.pointerId);
+        seekFromEvent(e);
+    });
+
+    track.addEventListener('pointermove', function (e) {
+        if (!seeking) return;
+        seekFromEvent(e);
+    });
+
+    track.addEventListener('pointerup', function (e) {
+        if (!seeking) return;
+        seeking = false;
+        seekFromEvent(e);
+        track.releasePointerCapture(e.pointerId);
+    });
+
+    track.addEventListener('pointercancel', function () {
+        seeking = false;
+    });
+
+}());
+    </script>
 
 </body>
 </html>
