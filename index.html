@@ -228,7 +228,7 @@ body.glass-dark .music-card {
     justify-content: center;
     padding: 18px 28px;
     font-family: 'Michroma', sans-serif;
-    font-size: 13px;
+    font-size: 9.375px;
     font-weight: 400;
     letter-spacing: 6px;
     text-transform: uppercase;
@@ -306,6 +306,12 @@ body.glass-dark .music-card {
 #nav-logo h1 span:nth-child(11) { animation-delay: 2.1s; }
 #nav-logo h1 span:nth-child(12) { animation-delay: 2.3s; }
 
+@media (max-width: 620px) {
+    #nav-logo {
+        display: none;
+    }
+}
+
 /* Exact original keyframes */
 @keyframes elasticAssemble {
     0%   { opacity: 0; transform: translateX(-100vw); }
@@ -362,20 +368,20 @@ body.glass-dark .music-card {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 16px 24px 20px;
+    gap: 8px;
+    padding: 12px 18px 14px;
     position: relative;
 }
 
 /* Dim button active state */
 #grid-toggle-btn.is-active {
     opacity: 0.4;
-    border-color: rgba(0,255,230,0.25);
+    border-color: rgba(0,255,230,0.15);
 }
 
 .ctrl-btn {
     background: transparent;
-    border: 1px solid rgba(0,255,230,0.5);
+    border: 1px solid rgba(0,255,230,0.3);
     color: rgba(0,255,230,0.6);
     font-family: 'Orbitron', sans-serif;
     font-size: 10px;
@@ -394,37 +400,38 @@ body.glass-dark .music-card {
 .ctrl-btn:focus { border-color: rgba(0,255,230,0.25); }
 
 .cmd-arrow-btn {
-    border: 2px solid rgba(0,255,230,0.6);
+    border: 2px solid rgba(0,255,230,0.36);
     border-radius: 6px;
-    width: 56px;
-    height: 44px;
+    width: 39px;
+    height: 31px;
     padding: 0;
     flex-shrink: 0;
 }
 .cmd-arrow-btn:hover { border-color: #00FFE6; }
+.cmd-arrow-btn svg { width: 7px; height: 7px; }
 
 .cmd-play-btn {
     position: relative;
     background: transparent;
-    border: 2px solid rgba(0,255,230,0.6);
+    border: 2px solid rgba(0,255,230,0.36);
     border-radius: 6px;
     outline: none;
     cursor: pointer;
-    width: 56px;
-    height: 44px;
+    width: 39px;
+    height: 31px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     padding: 0;
-    filter: drop-shadow(0 0 4px rgba(0,255,230,0.2));
-    transition: filter 0.2s ease-out, transform 0.15s ease-out, border-color 0.4s;
+    filter: none;
+    transition: transform 0.15s ease-out, border-color 0.4s;
 }
-.cmd-play-btn:hover  { transform: scale(1.05); filter: drop-shadow(0 0 10px rgba(0,255,230,0.55)); border-color: #00FFE6; }
+.cmd-play-btn:hover  { transform: scale(1.05); border-color: #00FFE6; }
 .cmd-play-btn:active { transform: scale(0.97); }
-.cmd-play-btn.is-playing { filter: drop-shadow(0 0 8px rgba(0,255,230,0.38)); border-color: #00FFE6; }
+.cmd-play-btn.is-playing { border-color: #00FFE6; }
 
-.play-icon { width: 26px; height: 26px; overflow: visible; flex-shrink: 0; }
+.play-icon { width: 18px; height: 18px; overflow: visible; flex-shrink: 0; }
 
 .play-bar-left {
     fill: rgba(0,255,230,0.85);
@@ -447,18 +454,49 @@ body.glass-dark .music-card {
 .cmd-play-btn.ripple-active .play-ripple { animation: rippleOut 0.35s ease-out forwards; }
 
 .icon-only-btn {
-    width: 44px;
-    height: 44px;
+    width: 31px;
+    height: 31px;
     padding: 0;
     border-width: 2px;
 }
-.icon-only-btn svg { width: 20px; height: 20px; stroke: currentColor; }
+.icon-only-btn svg { width: 14px; height: 14px; stroke: currentColor; }
 
 .control-spacer {
-    width: 44px;
-    height: 44px;
-    flex: 0 0 44px;
+    width: 31px;
+    height: 31px;
+    flex: 0 0 31px;
     pointer-events: none;
+}
+
+@media (max-width: 620px) {
+    #player-controls {
+        gap: 6px;
+        padding: 12px 10px 16px;
+    }
+
+    .icon-only-btn,
+    .control-spacer {
+        width: 30px;
+        height: 30px;
+        flex-basis: 30px;
+    }
+
+    .cmd-arrow-btn,
+    .cmd-play-btn {
+        width: 36px;
+        height: 30px;
+        flex-basis: 36px;
+    }
+
+    .icon-only-btn svg {
+        width: 13px;
+        height: 13px;
+    }
+
+    .cmd-arrow-btn svg {
+        width: 6px;
+        height: 6px;
+    }
 }
 
 .video:hover .fav-heart-btn,
@@ -851,7 +889,7 @@ body.glass-dark .music-card {
 
 #progress-bar-track {
     width: 100%;
-    height: 3px;
+    height: 1px;
     background: rgba(255,255,255,0.06);
     border-radius: 999px;
     cursor: pointer;
@@ -873,7 +911,7 @@ body.glass-dark .music-card {
     border-radius: 999px;
     pointer-events: none;
     transition: width 0.15s linear;
-    box-shadow: 0 0 6px rgba(0,255,230,0.5), 0 0 14px rgba(0,255,230,0.2);
+    box-shadow: 0 0 3px rgba(0,255,230,0.45), 0 0 8px rgba(0,255,230,0.18);
     position: relative;
 }
 
@@ -884,11 +922,11 @@ body.glass-dark .music-card {
     right: -1px;
     top: 50%;
     transform: translateY(-50%);
-    width: 3px;
-    height: 3px;
+    width: 1px;
+    height: 1px;
     border-radius: 50%;
     background: rgba(220,255,252,0.9);
-    box-shadow: 0 0 3px 1px rgba(0,255,230,0.4);
+    box-shadow: 0 0 2px 1px rgba(0,255,230,0.3);
     opacity: 0.8;
 }
 
@@ -1276,7 +1314,7 @@ body.glass-dark .music-card {
         <div id="video-grid"></div>
 
         <!-- VERSION FOOTER -->
-        <div id="version-footer">1.1.0</div>
+        <div id="version-footer">1.7.0</div>
 
     </div><!-- end #player-section -->
 
@@ -1626,7 +1664,7 @@ body.glass-dark .music-card {
                     if (window.esQueue.length) {
                         window.esPlayer.cueVideoById(window.esQueue[0].id);
                         window.esCurrentIndex = 0;
-                        setActiveCard(0);
+                        clearActiveCards();
                     }
                 },
                 onStateChange: function (event) {
@@ -1637,6 +1675,11 @@ body.glass-dark .music-card {
                     }
                     /* Sync play/pause icon */
                     updatePlayIcon(event.data);
+                    if (event.data === YT.PlayerState.PLAYING) {
+                        setActiveCard(window.esCurrentIndex);
+                    } else {
+                        clearActiveCards();
+                    }
                     /* Start progress tracker on first play */
                     if (event.data === YT.PlayerState.PLAYING) {
                         if (typeof window.esStartProgressTracker === 'function') {
@@ -1949,12 +1992,16 @@ function buildQueue() {
 }
 
 function setActiveCard(index) {
-    document.querySelectorAll('#video-grid .video').forEach(function (el) {
-        el.classList.remove('is-playing');
-    });
+    clearActiveCards();
     if (window.esQueue[index]) {
         window.esQueue[index].el.classList.add('is-playing');
     }
+}
+
+function clearActiveCards() {
+    document.querySelectorAll('#video-grid .video').forEach(function (el) {
+        el.classList.remove('is-playing');
+    });
 }
 
 function playTrack(index) {
@@ -1966,7 +2013,7 @@ function playTrack(index) {
     if (window.esPlayer && typeof window.esPlayer.loadVideoById === 'function') {
         window.esPlayer.loadVideoById(track.id);
     }
-    setActiveCard(window.esCurrentIndex);
+    clearActiveCards();
     /* Scroll to top so player is visible — target both window and body/html for tablet compat */
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
