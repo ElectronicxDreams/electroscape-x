@@ -104,7 +104,8 @@ body {
     padding: 0;
 }
 
-.nav-links a {
+.nav-links a,
+.nav-links button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -122,14 +123,53 @@ body {
     text-align: center;
 }
 
-.nav-links a:last-child {
+.nav-links button {
+    background: transparent;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    cursor: pointer;
+}
+
+.nav-links a:last-child,
+.nav-links button:last-child {
     border-bottom: none;
 }
 
 .nav-links a:hover,
-.nav-links a.active {
+.nav-links button:hover {
     color: #00FFE6;
     background: rgba(0,255,230,0.06);
+}
+
+#soon-overlay {
+    position: fixed;
+    top: calc(26% - 50px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(16px) saturate(125%);
+    -webkit-backdrop-filter: blur(16px) saturate(125%);
+    color: #00FFE6;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border: 1px solid rgba(0,255,230,0.25);
+    border-radius: 3px;
+    padding: 10px 18px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 10020;
+}
+
+#soon-overlay.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* ============================================================ */
@@ -295,14 +335,14 @@ body {
             <div class="dropdown-content" id="nav-content">
                 <div class="nav-links">
                     <a href="https://electroscapex.com" target="_blank">ELECTROSCAPE</a>
-                    <a href="tv.html" class="active">TV</a>
-                    <a href="imagevault.html">IMAGE VAULT</a>
+                    <button type="button" id="imagevault-soon-btn">IMAGE VAULT</button>
                     <a href="https://www.themoviedb.org/list/8264050-tv-shows-recommended?language=en-gb&sort_by=primary_release_date.desc&view=grid" target="_blank">MORE TV SHOWS</a>
                     <a href="https://www.themoviedb.org/list/8512181-movies?language=en-gb&view=grid&sort_by=primary_release_date.desc&show_me" target="_blank">MOVIES</a>
                 </div>
             </div>
         </div>
     </div>
+    <div id="soon-overlay" aria-live="polite" role="status">COMING SOON</div>
 
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3B: TV GRID                                      -->
@@ -463,6 +503,9 @@ document.addEventListener('keydown', (e) => {
 function initNav() {
     const toggle  = document.getElementById('nav-toggle');
     const content = document.getElementById('nav-content');
+    const imageSoonBtn = document.getElementById('imagevault-soon-btn');
+    const soonOverlay = document.getElementById('soon-overlay');
+    let soonTimer = null;
     if (!toggle || !content) return;
 
     function openNav() {
@@ -473,6 +516,15 @@ function initNav() {
     function closeNav() {
         content.classList.remove('open');
         toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function showSoon() {
+        if (!soonOverlay) return;
+        clearTimeout(soonTimer);
+        soonOverlay.classList.add('show');
+        soonTimer = setTimeout(() => {
+            soonOverlay.classList.remove('show');
+        }, 5000);
     }
 
     toggle.addEventListener('click', (e) => {
@@ -491,6 +543,15 @@ function initNav() {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeNav();
     });
+
+    if (imageSoonBtn) {
+        imageSoonBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeNav();
+            showSoon();
+        });
+    }
 }
 
 /* ── INIT - runs immediately since script is at end of body ── */
