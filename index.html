@@ -1488,7 +1488,7 @@ body.glass-dark .music-card {
    Target: mobile1.html
    ============================================================ */
 (function () {
-    if (window.innerWidth <= 1024) {
+    if (window.innerWidth <= 1024 && !window.location.search.includes('view=desktop')) {
         window.location.replace('mobile1.html');
     }
 }());
