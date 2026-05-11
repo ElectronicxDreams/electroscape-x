@@ -155,15 +155,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(5, 8, 13, 0.72);
-            border: 1px solid rgba(0,255,230,0.22);
-            border-radius: 0 0 8px 8px;
+            background: transparent;
+            border: none;
             color: var(--cyan);
             z-index: 9100;
             opacity: 0;
             pointer-events: none;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             transition: opacity 0.3s ease, transform 0.3s ease;
             cursor: pointer;
         }
@@ -172,7 +169,7 @@
             pointer-events: auto;
             transform: translateX(-50%) translateY(0);
         }
-        #nav-reveal-cue:hover { opacity: 1; border-color: var(--cyan-dim); }
+        #nav-reveal-cue:hover { opacity: 1; }
         #nav-reveal-cue svg { width: 14px; height: 9px; stroke: currentColor; fill: none; }
 
         #nav-popup {
