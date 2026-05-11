@@ -1,6 +1,5 @@
-<!-- P1-M1.html | Electroscape Mobile | Project 1 | v[P1-M1] 3.2 -->
-<!-- Design source: mobile3.html | Code source: index.html | Output: P1-M1.html -->
-<!-- v3.2: MUSIC-SECTION ported from index.html, nav-music-btn wired -->
+<!-- P1-M1.html | Electroscape Mobile | Project 1 | v[P1-M1] 3.3 -->
+<!-- v3.3: VERSION-STRIP removed, plain scroll footer added, Desktop link bypass fix -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,37 +96,17 @@
             transition: width 0.15s linear;
         }
 
-        /* ============================================================
-           VERSION FOOTER — fixed black strip across the bottom
-           Dev-stage element. Spec/styling may evolve; see handoff doc.
-           ============================================================ */
+        /* VERSION FOOTER — plain in-flow, scroll to see */
         #version-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0; right: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 8px 14px;
-            background: #000;
-            border-top: 1px solid #1a1a1a;
+            text-align: center;
+            padding: 24px 0 32px;
             color: var(--cyan);
             font-family: 'Orbitron', sans-serif;
             font-size: 9px;
             letter-spacing: 3px;
             text-transform: uppercase;
-            z-index: 9000;
-            pointer-events: auto;
+            opacity: 0.45;
         }
-        #version-footer .v-num {
-            text-align: center;
-            color: var(--cyan);
-            text-shadow: 0 0 8px rgba(0,255,230,0.35);
-            white-space: nowrap;
-        }
-        /* Push page content above the fixed strip so last row isn't covered */
-        body { padding-bottom: 44px; }
 
         /* ============================================================
            NAV-HEADER — LINKS button + WORDMARK area
@@ -1036,10 +1015,8 @@
         </div>
     </div>
 
-    <!-- VERSION FOOTER — fixed bottom strip: [P1-M1] [3.2] -->
-    <div id="version-footer">
-        <span class="v-num" id="v-num">[P1-M1] [3.2]</span>
-    </div>
+    <!-- VERSION FOOTER — plain scroll footer -->
+    <div id="version-footer">[M1] 3.3</div>
 
 <script>
 /* ============================================================
