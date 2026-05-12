@@ -328,16 +328,16 @@ body.glass-dark .music-card {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(5, 8, 13, 0.56);
-    border: 1px solid var(--color-border-accent);
-    border-radius: 0 0 7px 7px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
     color: var(--color-accent);
     z-index: 1450;
     opacity: 0;
     pointer-events: none;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
     cursor: pointer;
 }
 
@@ -349,7 +349,6 @@ body.glass-dark .music-card {
 
 #nav-reveal-cue:hover {
     opacity: 1;
-    border-color: var(--color-accent-dim);
 }
 
 #nav-reveal-cue svg {
@@ -502,8 +501,7 @@ body.glass-dark .music-card {
 .fav-heart-btn:hover { background: rgba(0,0,0,0.7); border-color: #00FFE6; }
 .fav-heart-svg { width: 14px; height: 14px; display: block; }
 
-@media (max-width: 1024px) { #fav-sidebar { width: 360px; } }
-@media (max-width: 500px)  { #fav-sidebar { width: 60vw; max-width: 60vw; min-width: 280px; } }
+/* fav-sidebar removed — replaced by bottom sheet in hybrid overrides below */
 
 #fav-backdrop {
     display: none;
@@ -1239,6 +1237,367 @@ body.glass-dark .music-card {
 .music-card.deezer:hover .card-arrow   { color: #a238ff; }
 .music-card.youtube:hover .card-arrow  { color: #ff0000; }
 
+/* ============================================================
+   INDEX2 HYBRID OVERRIDES
+   Desktop nav + fixed player width from index
+   Mobile control/fav behaviour merged onto index grid
+   ============================================================ */
+#player-controls.m-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 18px 14px;
+}
+#player-controls.m-controls .m-transport {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    padding: 4px 8px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+#player-controls.m-controls .m-btn-prev,
+#player-controls.m-controls .m-btn-next {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: #00FFE6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: color 0.2s, transform 0.15s;
+}
+#player-controls.m-controls .m-btn-prev:hover,
+#player-controls.m-controls .m-btn-next:hover { transform: scale(1.1); }
+#player-controls.m-controls .m-btn-prev svg,
+#player-controls.m-controls .m-btn-next svg { width: 18px; height: 18px; }
+#player-controls.m-controls .m-btn-play {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: #00FFE6;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin: 0 4px;
+    transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 0 20px rgba(0,255,230,0.3);
+    flex-shrink: 0;
+}
+#player-controls.m-controls .m-btn-play:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 30px rgba(0,255,230,0.5);
+}
+#player-controls.m-controls .m-btn-play:active { transform: scale(0.95); }
+#player-controls.m-controls .m-btn-play svg { width: 20px; height: 20px; }
+#player-controls.m-controls .m-btn-play.is-playing { box-shadow: 0 0 40px rgba(0,255,230,0.6); }
+#player-controls.m-controls .m-btn-ghost {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #00FFE6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.15s;
+}
+#player-controls.m-controls .m-btn-ghost:hover,
+#player-controls.m-controls .m-btn-ghost.is-active { transform: scale(1.15); }
+#player-controls.m-controls .m-btn-ghost svg { width: 18px; height: 18px; }
+#m1-shuffle svg { width: 20px; height: 20px; }
+#m1-fav .fav-heart-path {
+    fill: none;
+    transition: fill 0.2s ease;
+}
+#m1-fav.is-active .fav-heart-path { fill: currentColor; }
+
+.m-section-label {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 20px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    font-size: 7px;
+    letter-spacing: 5px;
+    color: #00FFE6;
+    text-transform: uppercase;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+#ctrl-hide-toggle,
+.m-dim-toggle,
+.m-sheet-toggle {
+    width: 28px;
+    height: 24px;
+    border: 1px solid rgba(0,255,230,0.22);
+    border-radius: 4px;
+    background: rgba(0,255,230,0.03);
+    color: #00FFE6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+#ctrl-hide-toggle:hover,
+#ctrl-hide-toggle.is-active,
+.m-dim-toggle:hover,
+.m-dim-toggle.is-active,
+.m-sheet-toggle:hover,
+.m-sheet-toggle.is-active {
+    border-color: rgba(0,255,230,0.55);
+    background: rgba(0,255,230,0.07);
+}
+#ctrl-hide-toggle.is-active,
+.m-dim-toggle.is-active,
+.m-sheet-toggle.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
+#ctrl-hide-toggle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
+.m-dim-toggle svg { width: 20px; height: 16px; display: block; }
+.m-sheet-toggle svg { width: 16px; height: 16px; display: block; }
+.m-dim-toggle .dim-zone {
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+body.playlist-dim-medium #video-grid {
+    opacity: 0.30;
+    transition: opacity 0.28s ease;
+}
+body.playlist-dim-heavy #video-grid {
+    opacity: 0.09;
+    transition: opacity 0.28s ease;
+}
+body.ctrl-hidden #progress-bar-wrap,
+body.ctrl-hidden #player-controls {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease;
+}
+body.ctrl-hidden #nav-reveal-cue {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+#fav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1180;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.24s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: block;
+}
+#fav-backdrop.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+#fav-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: min(64dvh, 560px);
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    background: rgba(0,0,0,0.88);
+    border-top: 1px solid rgba(0,255,230,0.22);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -24px 70px rgba(0,0,0,0.74), inset 0 1px 0 rgba(255,255,255,0.05);
+    transform: translateY(108%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(18px) saturate(90%);
+    -webkit-backdrop-filter: blur(18px) saturate(90%);
+    overflow: hidden;
+}
+#fav-sheet.is-open { transform: translateY(0); }
+.fav-sheet-handle {
+    width: 42px;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(0,255,230,0.35);
+    margin: 10px auto 12px;
+    flex-shrink: 0;
+}
+#fav-header {
+    display: grid;
+    grid-template-columns: 1fr 32px;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+#fav-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #00FFE6;
+}
+#fav-close-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: #00FFE6;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+}
+#fav-close-btn:hover { background: rgba(0,255,230,0.06); }
+#fav-actions {
+    display: none;
+    padding: 11px 16px 8px;
+    flex-shrink: 0;
+}
+#fav-play-all-btn,
+#fav-clear-btn {
+    border: 1px solid rgba(0,255,230,0.28);
+    border-radius: 4px;
+    background: rgba(0,255,230,0.06);
+    color: #00FFE6;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+#fav-play-all-btn { width: 100%; padding: 10px 12px; }
+#fav-empty {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 22px;
+    color: #00FFE6;
+    font-size: 8px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-align: center;
+}
+#fav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,255,230,0.28) transparent;
+}
+#fav-list::-webkit-scrollbar { width: 4px; }
+#fav-list::-webkit-scrollbar-thumb { background: rgba(0,255,230,0.28); border-radius: 999px; }
+.fav-row {
+    min-height: 96px;
+    display: grid;
+    grid-template-columns: 72px minmax(104px, 132px) minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+.fav-row:hover { background: rgba(255,255,255,0.04); }
+.fav-row-thumb {
+    width: min(132px, 34vw);
+    aspect-ratio: 16 / 9;
+    border-radius: 4px;
+    background-color: #111;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(0,255,230,0.1);
+}
+.fav-row-main { min-width: 0; }
+.fav-row-title {
+    color: #fff;
+    font-size: 8.5px;
+    letter-spacing: 1px;
+    line-height: 1.3;
+    text-transform: uppercase;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.fav-row-controls {
+    display: grid;
+    grid-template-columns: repeat(2, 30px);
+    grid-auto-rows: 26px;
+    gap: 6px;
+    justify-content: start;
+}
+.fav-row-btn {
+    width: 30px;
+    height: 26px;
+    border: 1px solid rgba(0,255,230,0.22);
+    border-radius: 4px;
+    background: rgba(0,255,230,0.04);
+    color: #00FFE6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+}
+.fav-row-btn:hover:not(:disabled) {
+    border-color: rgba(0,255,230,0.62);
+    background: rgba(0,255,230,0.08);
+}
+.fav-row-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+.fav-row-btn svg {
+    width: 13px;
+    height: 13px;
+    display: block;
+}
+.fav-remove-btn {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1;
+}
+#fav-footer {
+    display: none;
+    justify-content: center;
+    padding: 12px 16px 14px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    flex-shrink: 0;
+}
+#fav-clear-btn {
+    padding: 8px 18px;
+    color: #00FFE6;
+    border-color: rgba(0,255,230,0.32);
+    background: transparent;
+}
+#fav-clear-btn:hover {
+    border-color: #00FFE6;
+    background: rgba(0,255,230,0.06);
+}
+body.fav-open { overflow: hidden; }
+
     </style>
 </head>
 <body class="glass-dark">
@@ -1284,98 +1643,86 @@ body.glass-dark .music-card {
             </div>
         </div>
 
-        <!-- PLAYER-CONTROLS -->
-        <div id="player-controls">
-
-            <!-- Grid toggle -->
-            <button class="ctrl-btn icon-only-btn" id="grid-toggle-btn" aria-label="Toggle grid density" title="Toggle grid density">
-                <svg id="grid-toggle-icon" width="20" height="20" viewBox="0 0 18 18" fill="none">
-                    <line x1="5"  y1="2" x2="5"  y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="9"  y1="2" x2="9"  y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="13" y1="2" x2="13" y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-            </button>
-
-            <!-- Shuffle -->
-            <button class="ctrl-btn icon-only-btn" id="shuffle-btn" aria-label="Shuffle">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#00FFE6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="16 3 21 3 21 8"/>
-                    <line x1="4" y1="20" x2="21" y2="3"/>
-                    <polyline points="21 16 21 21 16 21"/>
-                    <line x1="15" y1="15" x2="21" y2="21"/>
-                </svg>
-            </button>
-
-            <!-- Favourites -->
-            <button class="ctrl-btn icon-only-btn" id="fav-toggle-btn" aria-label="Favourites">
-                <svg id="fav-toggle-icon" viewBox="0 0 24 24" fill="#00FFE6" stroke="#00FFE6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-            </button>
-
-            <span class="control-spacer" aria-hidden="true"></span>
-
-            <!-- Prev -->
-            <button class="ctrl-btn cmd-arrow-btn" id="prev-btn" aria-label="Previous">
-                <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
-                    <polygon points="3,6 9,1 9,11" fill="rgba(0,255,230,0.75)"/>
-                </svg>
-            </button>
-
-            <!-- Play / Pause -->
-            <button class="cmd-play-btn" id="playpause-btn" aria-label="Play / Pause">
-                <svg class="play-icon" viewBox="0 0 24 24">
-                    <path class="play-bar-left"/>
-                    <path class="play-bar-right"/>
-                </svg>
-                <span class="play-ripple"></span>
-            </button>
-
-            <!-- Next -->
-            <button class="ctrl-btn cmd-arrow-btn" id="next-btn" aria-label="Next">
-                <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
-                    <polygon points="9,6 3,1 3,11" fill="rgba(0,255,230,0.75)"/>
-                </svg>
-            </button>
-
-        </div><!-- end #player-controls -->
-
         <!-- PROGRESS-BAR -->
-        <div id="progress-bar-wrap">
+        <div id="progress-bar-wrap" class="m-progress-wrap">
             <div id="progress-bar-track">
                 <div id="progress-bar-fill"></div>
             </div>
+        </div>
+
+        <!-- PLAYER-CONTROLS -->
+        <div id="player-controls" class="m-controls">
+            <button class="m-btn-ghost" id="m1-shuffle" aria-label="Shuffle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 7h3.4c2 0 3.2 1 4.4 2.8l2.4 3.4C14.4 15 15.6 16 17.6 16H19"/>
+                    <path d="M3 17h3.4c2 0 3.2-1 4.4-2.8l2.4-3.4C14.4 9 15.6 8 17.6 8H19"/>
+                    <path d="M18 5l3 3-3 3" fill="none"/>
+                    <path d="M18 13l3 3-3 3" fill="none"/>
+                </svg>
+            </button>
+            <div class="m-transport">
+                <button class="m-btn-prev" id="m1-prev" aria-label="Previous">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+                </button>
+                <button class="m-btn-play" id="m1-play" aria-label="Play">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <button class="m-btn-next" id="m1-next" aria-label="Next">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 6v12l8.5-6z"/></svg>
+                </button>
+            </div>
+            <button class="m-btn-ghost" id="m1-fav" aria-label="Add current track to favourites" aria-pressed="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path class="fav-heart-path" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+            </button>
+        </div><!-- end #player-controls -->
+
+        <!-- GRID CONTROL STRIP -->
+        <div class="m-section-label">
+            <button id="ctrl-hide-toggle" type="button" aria-label="Hide playback controls" aria-pressed="false">
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M4 2v4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 14v-4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <button class="m-dim-toggle" id="m1-dim-toggle" type="button" aria-label="Dim grid">
+                <svg class="m-dim-icon" viewBox="0 0 24 18" fill="none" aria-hidden="true"></svg>
+            </button>
+            <button class="m-sheet-toggle" id="m1-fav-sheet-toggle" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
+                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M3 3h4v4H3zM9 3h4v4H9zM3 9h4v4H3zM9 9h4v4H9z" stroke="currentColor" stroke-width="1.3"/>
+                </svg>
+            </button>
         </div>
 
         <!-- VIDEO-GRID -->
         <div id="video-grid"></div>
 
         <!-- VERSION FOOTER -->
-        <div id="version-footer">1.8</div>
+        <div id="version-footer">[INDEX2] 1.2</div>
 
     </div><!-- end #player-section -->
 
     <!-- FAV-BACKDROP -->
     <div id="fav-backdrop"></div>
 
-    <!-- FAV-SIDEBAR -->
-    <div id="fav-sidebar">
+    <!-- FAVOURITES SHEET -->
+    <section id="fav-sheet" role="dialog" aria-modal="true" aria-label="Favourites">
+        <div class="fav-sheet-handle" aria-hidden="true"></div>
         <div id="fav-header">
             <span id="fav-title">Favourites</span>
-            <button id="fav-close-btn" aria-label="Close">&times;</button>
+            <button id="fav-close-btn" type="button" aria-label="Close favourites">&times;</button>
         </div>
         <div id="fav-actions">
-            <button class="ctrl-btn" id="fav-play-all-btn">[ Play All ]</button>
+            <button id="fav-play-all-btn" type="button">Play All</button>
         </div>
-        <div id="fav-empty">
-            <span>No favourites yet.</span>
-            <span>Click the ♥ on any track.</span>
-        </div>
+        <div id="fav-empty">No favourites yet.</div>
         <ul id="fav-list"></ul>
         <div id="fav-footer">
-            <button class="ctrl-btn" id="fav-clear-btn">[ Clear All ]</button>
+            <button id="fav-clear-btn" type="button">Clear All</button>
         </div>
-    </div>
+    </section>
 
 
     <!-- =====================================================
@@ -1488,7 +1835,7 @@ body.glass-dark .music-card {
    Target: mobile1.html
    ============================================================ */
 (function () {
-    if (window.innerWidth <= 1024 && !window.location.search.includes('view=desktop')) {
+    if (window.innerWidth <= 620 && !window.location.search.includes('view=desktop')) {
         window.location.replace('mobile1.html');
     }
 }());
@@ -1547,6 +1894,7 @@ body.glass-dark .music-card {
     }
 
     function closePopup() {
+        if (!popup.classList.contains('is-open')) return;
         popup.classList.remove('is-open');
         btn.classList.remove('is-open');
         btn.setAttribute('aria-expanded', 'false');
@@ -1713,6 +2061,9 @@ body.glass-dark .music-card {
                         window.esPlayer.cueVideoById(window.esQueue[0].id);
                         window.esCurrentIndex = 0;
                         clearActiveCards();
+                        if (typeof window.esSyncFavouriteButtons === 'function') {
+                            window.esSyncFavouriteButtons();
+                        }
                     }
                 },
                 onStateChange: function (event) {
@@ -1771,7 +2122,6 @@ body.glass-dark .music-card {
                 thumb.className = 'thumb-container';
                 thumb.style.backgroundImage = 'url(https://img.youtube.com/vi/' + track.id + '/maxresdefault.jpg)';
 
-                /* sddefault fallback only — blank preferred over low quality */
                 var img = new Image();
                 img.src = thumb.style.backgroundImage.slice(5, -2);
                 img.onerror = function () {
@@ -1790,7 +2140,6 @@ body.glass-dark .music-card {
                 card.appendChild(label);
                 card.appendChild(overlay);
 
-                /* FAV-HEART */
                 var heart = document.createElement('button');
                 heart.className = 'fav-heart-btn';
                 heart.setAttribute('data-id', track.id);
@@ -1800,6 +2149,16 @@ body.glass-dark .music-card {
                     '<svg class="fav-heart-svg" viewBox="0 0 24 24" fill="none">' +
                     '<path class="fav-heart-path" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="#00FFE6" stroke-width="1.5"/>' +
                     '</svg>';
+                heart.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    if (typeof window.esToggleFavourite === 'function') {
+                        window.esToggleFavourite({
+                            id: heart.getAttribute('data-id'),
+                            title: heart.getAttribute('data-title')
+                        });
+                    }
+                    heart.blur && heart.blur();
+                });
                 card.appendChild(heart);
 
                 grid.appendChild(card);
@@ -1812,7 +2171,9 @@ body.glass-dark .music-card {
             });
 
             buildQueue();
-            initFavourites();
+            if (typeof window.esSyncFavouriteButtons === 'function') {
+                window.esSyncFavouriteButtons();
+            }
 
             if (window.esAPIReady) {
                 window.esCreatePlayer();
@@ -1825,70 +2186,131 @@ body.glass-dark .music-card {
 
 
 /* ============================================================
-   FAV-SIDEBAR JS
+   CSS ESCAPE
    ============================================================ */
-function initFavourites() {
-    var KEY = 'es_favourites';
+function cssEscape(s) {
+    if (window.CSS && window.CSS.escape) return CSS.escape(s);
+    return String(s).replace(/[^a-zA-Z0-9_-]/g, function (c) {
+        return '\\' + c;
+    });
+}
 
-    function load()  { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e) { return []; } }
-    function save(f) { try { localStorage.setItem(KEY, JSON.stringify(f)); } catch(e) {} }
-    function isFav(id, favs) { return favs.some(function(f) { return f.id === id; }); }
+
+/* ============================================================
+   FAVOURITES SHEET
+   ============================================================ */
+(function () {
+    var KEY = 'es_favourites';
+    var sheet = document.getElementById('fav-sheet');
+    var backdrop = document.getElementById('fav-backdrop');
+    var list = document.getElementById('fav-list');
+    var empty = document.getElementById('fav-empty');
+    var footer = document.getElementById('fav-footer');
+    var actions = document.getElementById('fav-actions');
+    var currentFavBtn = document.getElementById('m1-fav');
+    var openBtns = [document.getElementById('m1-fav-sheet-toggle')].filter(Boolean);
+
+    function load() {
+        try {
+            var favs = JSON.parse(localStorage.getItem(KEY)) || [];
+            return favs.filter(function (fav) {
+                return fav && fav.id && fav.title;
+            });
+        } catch (err) {
+            return [];
+        }
+    }
+
+    function save(favs) {
+        try { localStorage.setItem(KEY, JSON.stringify(favs)); } catch (err) {}
+    }
+
+    function thumbUrl(id) {
+        return 'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg';
+    }
+
+    function isFavourite(id, favs) {
+        return favs.some(function (fav) { return fav.id === id; });
+    }
 
     function setHeart(btn, active) {
         var path = btn.querySelector('.fav-heart-path');
-        if (!path) return;
-        path.setAttribute('fill', active ? '#00FFE6' : 'none');
         btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-label', active ? 'Remove from favourites' : 'Add to favourites');
+        if (path) path.setAttribute('fill', active ? '#00FFE6' : 'none');
+    }
+
+    function getCurrentTrack() {
+        var queue = window.esQueue || [];
+        var track = queue[window.esCurrentIndex];
+        if (!track || !track.id) return null;
+        return { id: track.id, title: track.title || track.id };
+    }
+
+    function syncCurrentHeart(favs) {
+        if (!currentFavBtn) return;
+        var track = getCurrentTrack();
+        var active = !!(track && isFavourite(track.id, favs));
+        setHeart(currentFavBtn, active);
+        currentFavBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        currentFavBtn.setAttribute('aria-label', active ? 'Remove current track from favourites' : 'Add current track to favourites');
     }
 
     function syncHearts(favs) {
-        document.querySelectorAll('.fav-heart-btn').forEach(function(btn) {
-            setHeart(btn, isFav(btn.getAttribute('data-id'), favs));
+        favs = favs || load();
+        document.querySelectorAll('.fav-heart-btn').forEach(function (btn) {
+            setHeart(btn, isFavourite(btn.getAttribute('data-id'), favs));
         });
+        syncCurrentHeart(favs);
     }
 
-    function setToggleIcon(open) {
-        var icon = document.getElementById('fav-toggle-icon');
-        if (!icon) return;
-        icon.setAttribute('fill', open ? '#00FFE6' : '#00FFE6');
-        icon.style.opacity = open ? '1' : '0.75';
+    function queueFromFavourites(favs) {
+        return favs.map(function (fav) {
+            var el = document.querySelector('#video-grid .video[data-id="' + cssEscape(fav.id) + '"]');
+            return el ? { id: fav.id, title: fav.title, el: el } : null;
+        }).filter(Boolean);
     }
 
-    /* ---- render ---- */
+    function playFavouriteAt(index) {
+        var favs = load();
+        var queue = queueFromFavourites(favs);
+        if (!queue.length) return;
+        window.esQueue = queue;
+        playTrack(index);
+        close();
+    }
+
+    function moveFavouriteBy(fromIndex, delta) {
+        var favs = load();
+        if (fromIndex < 0 || fromIndex >= favs.length) return;
+        var toIndex = fromIndex + delta;
+        if (toIndex < 0 || toIndex >= favs.length) return;
+        var moved = favs.splice(fromIndex, 1)[0];
+        favs.splice(toIndex, 0, moved);
+        save(favs);
+        render();
+    }
+
     function render() {
-        var favs   = load();
-        var list   = document.getElementById('fav-list');
-        var empty  = document.getElementById('fav-empty');
-        var footer = document.getElementById('fav-footer');
-        var actions = document.getElementById('fav-actions');
+        var favs = load();
+        var hasItems = favs.length > 0;
 
         list.innerHTML = '';
-        var hasItems = favs.length > 0;
-        empty.style.display   = hasItems ? 'none' : 'flex';
-        footer.style.display  = hasItems ? 'flex' : 'none';
-        if (actions) actions.style.display = hasItems ? 'flex' : 'none';
-        if (!hasItems) return;
+        empty.style.display = hasItems ? 'none' : 'flex';
+        footer.style.display = hasItems ? 'flex' : 'none';
+        actions.style.display = hasItems ? 'block' : 'none';
 
-        var dragSrcIdx = null;
-
-        favs.forEach(function(fav, idx) {
-            var li = document.createElement('li');
-            li.className = 'fav-row';
-            li.setAttribute('draggable', 'true');
-            li.setAttribute('data-idx', idx);
-
-            var handle = document.createElement('div');
-            handle.className = 'fav-drag-handle';
-            handle.innerHTML =
-                '<svg viewBox="0 0 8 14" fill="none">' +
-                '<circle cx="2" cy="2"  r="1.2" fill="#555"/><circle cx="6" cy="2"  r="1.2" fill="#555"/>' +
-                '<circle cx="2" cy="7"  r="1.2" fill="#555"/><circle cx="6" cy="7"  r="1.2" fill="#555"/>' +
-                '<circle cx="2" cy="12" r="1.2" fill="#555"/><circle cx="6" cy="12" r="1.2" fill="#555"/>' +
-                '</svg>';
+        favs.forEach(function (fav, idx) {
+            var row = document.createElement('li');
+            row.className = 'fav-row';
+            row.setAttribute('data-idx', idx);
 
             var thumb = document.createElement('div');
             thumb.className = 'fav-row-thumb';
-            thumb.style.backgroundImage = 'url(https://img.youtube.com/vi/' + fav.id + '/maxresdefault.jpg)';
+            thumb.style.backgroundImage = 'url(' + thumbUrl(fav.id) + ')';
+
+            var main = document.createElement('div');
+            main.className = 'fav-row-main';
 
             var title = document.createElement('span');
             title.className = 'fav-row-title';
@@ -1897,134 +2319,147 @@ function initFavourites() {
             var controls = document.createElement('div');
             controls.className = 'fav-row-controls';
 
-            var upBtn = document.createElement('button');
-            upBtn.className = 'fav-row-btn fav-move-btn';
-            upBtn.innerHTML = '&#9650;';
-            if (idx === 0) upBtn.style.opacity = '0.2';
+            var play = document.createElement('button');
+            play.className = 'fav-row-btn fav-play-btn';
+            play.type = 'button';
+            play.setAttribute('aria-label', 'Play favourite');
+            play.innerHTML =
+                '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">' +
+                '<path d="M5 3.5v9l7-4.5-7-4.5z"/>' +
+                '</svg>';
 
-            var downBtn = document.createElement('button');
-            downBtn.className = 'fav-row-btn fav-move-btn';
-            downBtn.innerHTML = '&#9660;';
-            if (idx === favs.length - 1) downBtn.style.opacity = '0.2';
+            var up = document.createElement('button');
+            up.className = 'fav-row-btn fav-move-btn';
+            up.type = 'button';
+            up.disabled = idx === 0;
+            up.setAttribute('aria-label', 'Move favourite up');
+            up.innerHTML =
+                '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true">' +
+                '<path d="M4 10l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>' +
+                '</svg>';
 
-            var playBtn = document.createElement('button');
-            playBtn.className = 'fav-row-btn fav-play-btn';
-            playBtn.innerHTML = '<svg viewBox="0 0 12 12" fill="none"><polygon points="2,1 10,6 2,11" fill="#00FFE6"/></svg>';
+            var down = document.createElement('button');
+            down.className = 'fav-row-btn fav-move-btn';
+            down.type = 'button';
+            down.disabled = idx === favs.length - 1;
+            down.setAttribute('aria-label', 'Move favourite down');
+            down.innerHTML =
+                '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true">' +
+                '<path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>' +
+                '</svg>';
 
-            var removeBtn = document.createElement('button');
-            removeBtn.className = 'fav-row-btn fav-remove-btn';
-            removeBtn.innerHTML = '&#x2715;';
+            var remove = document.createElement('button');
+            remove.className = 'fav-row-btn fav-remove-btn';
+            remove.type = 'button';
+            remove.setAttribute('aria-label', 'Remove from favourites');
+            remove.innerHTML = '&times;';
 
-            controls.appendChild(upBtn);
-            controls.appendChild(downBtn);
-            controls.appendChild(playBtn);
-            controls.appendChild(removeBtn);
-            li.appendChild(handle);
-            li.appendChild(thumb);
-            li.appendChild(title);
-            li.appendChild(controls);
-            list.appendChild(li);
+            controls.appendChild(play);
+            controls.appendChild(remove);
+            controls.appendChild(up);
+            controls.appendChild(down);
+            main.appendChild(title);
 
-            /* button events */
-            upBtn.addEventListener('click', function(e) {
+            row.appendChild(controls);
+            row.appendChild(thumb);
+            row.appendChild(main);
+            list.appendChild(row);
+
+            row.addEventListener('click', function () {
+                playFavouriteAt(idx);
+            });
+            play.addEventListener('click', function (e) {
                 e.stopPropagation();
-                if (idx === 0) return;
-                var f = load(); var m = f.splice(idx,1)[0]; f.splice(idx-1,0,m); save(f); render();
+                playFavouriteAt(idx);
             });
-            downBtn.addEventListener('click', function(e) {
+            up.addEventListener('click', function (e) {
                 e.stopPropagation();
-                var f = load(); if (idx >= f.length-1) return; var m = f.splice(idx,1)[0]; f.splice(idx+1,0,m); save(f); render();
+                moveFavouriteBy(idx, -1);
             });
-            playBtn.addEventListener('click', function(e) {
+            down.addEventListener('click', function (e) {
                 e.stopPropagation();
-                var qi = window.esQueue.findIndex(function(t){ return t.id === fav.id; });
-                if (qi !== -1) playTrack(qi);
+                moveFavouriteBy(idx, 1);
             });
-            removeBtn.addEventListener('click', function(e) {
+            remove.addEventListener('click', function (e) {
                 e.stopPropagation();
-                var f = load().filter(function(x){ return x.id !== fav.id; });
-                save(f); syncHearts(f); render();
-            });
-
-            /* drag reorder */
-            li.addEventListener('dragstart', function(e) {
-                dragSrcIdx = idx; li.classList.add('fav-row-dragging');
-                e.dataTransfer.effectAllowed = 'move';
-            });
-            li.addEventListener('dragend', function() {
-                li.classList.remove('fav-row-dragging');
-                list.querySelectorAll('.fav-row-over').forEach(function(el){ el.classList.remove('fav-row-over'); });
-            });
-            li.addEventListener('dragover', function(e) {
-                e.preventDefault(); li.classList.add('fav-row-over');
-            });
-            li.addEventListener('dragleave', function() { li.classList.remove('fav-row-over'); });
-            li.addEventListener('drop', function(e) {
-                e.preventDefault(); li.classList.remove('fav-row-over');
-                if (dragSrcIdx === null || dragSrcIdx === idx) return;
-                var f = load(); var m = f.splice(dragSrcIdx,1)[0]; f.splice(idx,0,m); save(f); render();
-                dragSrcIdx = null;
+                var next = load().filter(function (item) { return item.id !== fav.id; });
+                save(next);
+                syncHearts(next);
+                render();
             });
         });
     }
 
-    /* ---- open / close ---- */
     function open() {
-        document.getElementById('fav-sidebar').classList.add('is-open');
-        document.getElementById('fav-backdrop').classList.add('is-visible');
-        setToggleIcon(true);
         render();
+        sheet.classList.add('is-open');
+        backdrop.classList.add('is-visible');
+        document.body.classList.add('fav-open');
+        openBtns.forEach(function (btn) {
+            btn.classList.add('is-active');
+            btn.setAttribute('aria-expanded', 'true');
+        });
     }
+
     function close() {
-        document.getElementById('fav-sidebar').classList.remove('is-open');
-        document.getElementById('fav-backdrop').classList.remove('is-visible');
-        setToggleIcon(false);
+        sheet.classList.remove('is-open');
+        backdrop.classList.remove('is-visible');
+        document.body.classList.remove('fav-open');
+        openBtns.forEach(function (btn) {
+            btn.classList.remove('is-active');
+            btn.setAttribute('aria-expanded', 'false');
+        });
     }
 
-    document.getElementById('fav-toggle-btn').addEventListener('click', function() {
-        document.getElementById('fav-sidebar').classList.contains('is-open') ? close() : open();
-        this.blur();
-    });
-    document.getElementById('fav-backdrop').addEventListener('click', close);
-    document.getElementById('fav-close-btn').addEventListener('click', close);
-
-    document.getElementById('fav-play-all-btn').addEventListener('click', function() {
+    window.esToggleFavourite = function (track) {
+        if (!track || !track.id) return;
         var favs = load();
-        if (!favs.length) return;
-        /* Build queue from favourites */
-        window.esQueue = [];
-        favs.forEach(function(fav) {
-            var el = document.querySelector('#video-grid .video[data-id="' + fav.id + '"]');
-            if (el) window.esQueue.push({ id: fav.id, title: fav.title, el: el });
-        });
-        playTrack(0);
-        close();
-    });
+        if (isFavourite(track.id, favs)) {
+            favs = favs.filter(function (fav) { return fav.id !== track.id; });
+        } else {
+            favs.push({ id: track.id, title: track.title || track.id });
+        }
+        save(favs);
+        syncHearts(favs);
+        if (sheet.classList.contains('is-open')) render();
+    };
 
-    document.getElementById('fav-clear-btn').addEventListener('click', function() {
-        save([]); syncHearts([]); render();
-    });
+    window.esSyncFavouriteButtons = function () {
+        syncHearts(load());
+    };
 
-    /* ---- heart buttons on cards ---- */
-    document.querySelectorAll('.fav-heart-btn').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            var id = btn.getAttribute('data-id');
-            var title = btn.getAttribute('data-title');
-            var favs = load();
-            if (isFav(id, favs)) {
-                favs = favs.filter(function(f){ return f.id !== id; });
-            } else {
-                favs.push({ id: id, title: title });
+    if (currentFavBtn) {
+        currentFavBtn.addEventListener('click', function () {
+            var track = getCurrentTrack();
+            if (track && typeof window.esToggleFavourite === 'function') {
+                window.esToggleFavourite(track);
             }
-            save(favs);
-            setHeart(btn, isFav(id, favs));
-            if (document.getElementById('fav-sidebar').classList.contains('is-open')) render();
+            currentFavBtn.blur && currentFavBtn.blur();
         });
+    }
+
+    openBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            sheet.classList.contains('is-open') ? close() : open();
+            btn.blur && btn.blur();
+        });
+    });
+    backdrop.addEventListener('click', close);
+    document.getElementById('fav-close-btn').addEventListener('click', close);
+    document.getElementById('fav-play-all-btn').addEventListener('click', function () {
+        playFavouriteAt(0);
+    });
+    document.getElementById('fav-clear-btn').addEventListener('click', function () {
+        save([]);
+        syncHearts([]);
+        render();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && sheet.classList.contains('is-open')) close();
     });
 
     syncHearts(load());
-}
+}());
 
 
 /* ============================================================
@@ -2034,9 +2469,9 @@ function buildQueue() {
     window.esQueue = [];
     document.querySelectorAll('#video-grid .video').forEach(function (el) {
         window.esQueue.push({
-            id:    el.getAttribute('data-id'),
+            id: el.getAttribute('data-id'),
             title: el.getAttribute('data-title'),
-            el:    el
+            el: el
         });
     });
 }
@@ -2045,17 +2480,10 @@ function setActiveCard(index) {
     clearActiveCards();
     if (window.esQueue[index]) {
         window.esQueue[index].el.classList.add('is-playing');
-        window.esActiveCardTimer = setTimeout(function () {
-            clearActiveCards();
-        }, 650);
     }
 }
 
 function clearActiveCards() {
-    if (window.esActiveCardTimer) {
-        clearTimeout(window.esActiveCardTimer);
-        window.esActiveCardTimer = null;
-    }
     document.querySelectorAll('#video-grid .video').forEach(function (el) {
         el.classList.remove('is-playing');
     });
@@ -2071,44 +2499,31 @@ function playTrack(index) {
         window.esPlayer.loadVideoById(track.id);
     }
     setActiveCard(window.esCurrentIndex);
-    /* Scroll to top so player is visible — target both window and body/html for tablet compat */
+    if (typeof window.esSyncFavouriteButtons === 'function') {
+        window.esSyncFavouriteButtons();
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
     document.body.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function updatePlayIcon(state) {
-    var btn = document.getElementById('playpause-btn');
-    if (!btn) return;
-    if (state === 1) {
-        btn.classList.add('is-playing');
-    } else {
-        btn.classList.remove('is-playing');
+    var playing = (state === 1);
+    var pauseSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+    var playSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    var btn = document.getElementById('m1-play');
+    if (btn) {
+        btn.classList.toggle('is-playing', playing);
+        btn.innerHTML = playing ? pauseSvg : playSvg;
     }
 }
 
 
 /* ============================================================
-   PLAYER-CONTROLS JS
+   TRANSPORT CONTROLS
    ============================================================ */
 (function () {
-
-    /* PREV */
-    document.getElementById('prev-btn').addEventListener('click', function () {
-        if (!window.esQueue.length) return;
-        playTrack(window.esCurrentIndex - 1);
-        this.blur();
-    });
-
-    /* NEXT */
-    document.getElementById('next-btn').addEventListener('click', function () {
-        if (!window.esQueue.length) return;
-        playTrack(window.esCurrentIndex + 1);
-        this.blur();
-    });
-
-    /* PLAY / PAUSE */
-    document.getElementById('playpause-btn').addEventListener('click', function () {
+    function playPauseClick() {
         var p = window.esPlayer;
         if (!p) return;
         var state = p.getPlayerState();
@@ -2121,93 +2536,152 @@ function updatePlayIcon(state) {
         } else {
             p.playVideo();
         }
-        /* Ripple */
-        var btn = this;
-        btn.classList.remove('ripple-active');
-        void btn.offsetWidth;
-        btn.classList.add('ripple-active');
-        setTimeout(function () { btn.classList.remove('ripple-active'); }, 400);
-        this.blur();
-    });
+        this.blur && this.blur();
+    }
 
-    /* SHUFFLE */
-    document.getElementById('shuffle-btn').addEventListener('click', function () {
-        var grid  = document.getElementById('video-grid');
+    function prevClick() {
+        if (!window.esQueue.length) return;
+        playTrack(window.esCurrentIndex - 1);
+        this.blur && this.blur();
+    }
+
+    function nextClick() {
+        if (!window.esQueue.length) return;
+        playTrack(window.esCurrentIndex + 1);
+        this.blur && this.blur();
+    }
+
+    function shuffleClick() {
+        var grid = document.getElementById('video-grid');
         if (!grid) return;
+        var current = window.esQueue[window.esCurrentIndex];
+        var currentId = current ? current.id : null;
         var cards = Array.from(grid.querySelectorAll('.video'));
         for (var i = cards.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
-            grid.appendChild(cards[j]);
             var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp;
         }
+        cards.forEach(function (card) { grid.appendChild(card); });
         buildQueue();
-        var stillPlaying = window.esQueue.findIndex(function (t) {
-            return t.el && t.el.classList.contains('is-playing');
-        });
-        window.esCurrentIndex = stillPlaying !== -1 ? stillPlaying : 0;
-        this.blur();
-    });
-
-    /* GRID DIM TOGGLE — 3 states: full / dim / near-hidden */
-    (function () {
-        var btn  = document.getElementById('grid-toggle-btn');
-        var icon = document.getElementById('grid-toggle-icon');
-        var grid = document.getElementById('video-grid');
-        var controls = document.getElementById('player-controls');
-        var state = 0; /* 0=full 1=dim 2=near-hidden */
-
-        /* Vertical burger SVGs — bars removed to show dim level */
-        var svgs = [
-            /* state 0 — full: 3 vertical bars */
-            '<line x1="5"  y1="2" x2="5"  y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>' +
-            '<line x1="9"  y1="2" x2="9"  y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>' +
-            '<line x1="13" y1="2" x2="13" y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>',
-            /* state 1 — dim: 2 bars */
-            '<line x1="6"  y1="2" x2="6"  y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>' +
-            '<line x1="12" y1="2" x2="12" y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>',
-            /* state 2 — near hidden: 1 bar */
-            '<line x1="9" y1="2" x2="9" y2="16" stroke="#00FFE6" stroke-width="2" stroke-linecap="round"/>'
-        ];
-
-        function apply() {
-            grid.classList.remove('is-dim-1', 'is-dim-2');
-            controls.classList.remove('is-dim-1', 'is-dim-2');
-            if (state === 1) grid.classList.add('is-dim-1');
-            if (state === 2) grid.classList.add('is-dim-2');
-            if (state === 1) controls.classList.add('is-dim-1');
-            if (state === 2) controls.classList.add('is-dim-2');
-            icon.innerHTML = svgs[state];
-            btn.classList.toggle('is-active', state > 0);
+        if (currentId) {
+            var stillPlaying = window.esQueue.findIndex(function (t) { return t.id === currentId; });
+            window.esCurrentIndex = stillPlaying !== -1 ? stillPlaying : 0;
+        } else {
+            window.esCurrentIndex = window.esQueue.length ? 0 : -1;
         }
+        this.blur && this.blur();
+    }
 
-        btn.addEventListener('click', function () {
-            state = (state + 1) % 3;
-            apply();
-            this.blur();
-        });
-
-        apply();
-    }());
-
-    /* FAV toggle — placeholder until FAV-SIDEBAR is built */
-    document.getElementById('fav-toggle-btn').addEventListener('click', function () {
-        /* wired up when FAV-SIDEBAR is built */
-        this.blur();
+    ['m1-play'].forEach(function (id) {
+        var el = document.getElementById(id); if (el) el.addEventListener('click', playPauseClick);
     });
-
+    ['m1-prev'].forEach(function (id) {
+        var el = document.getElementById(id); if (el) el.addEventListener('click', prevClick);
+    });
+    ['m1-next'].forEach(function (id) {
+        var el = document.getElementById(id); if (el) el.addEventListener('click', nextClick);
+    });
+    ['m1-shuffle'].forEach(function (id) {
+        var el = document.getElementById(id); if (el) el.addEventListener('click', shuffleClick);
+    });
 }());
 
 
 /* ============================================================
-   PROGRESS-BAR — tracker + seek
+   GRID DIM TOGGLE
    ============================================================ */
 (function () {
-    var track    = document.getElementById('progress-bar-track');
-    var fill     = document.getElementById('progress-bar-fill');
-    var interval = null;
-    var seeking  = false;
+    var body = document.body;
+    var buttons = Array.from(document.querySelectorAll('.m-dim-toggle'));
+    var KEY = 'es_mobile_dim_state';
+    var state = 0;
+    var states = [
+        { playlistClass: '', label: 'Grid dim: full light', iconBars: 3 },
+        { playlistClass: 'playlist-dim-medium', label: 'Grid dim: medium', iconBars: 2 },
+        { playlistClass: 'playlist-dim-heavy', label: 'Grid dim: dark', iconBars: 1 }
+    ];
 
-    /* Update fill width from player position */
+    if (!buttons.length) return;
+
+    function iconSvg(config) {
+        var xs = config.iconBars === 1 ? [12] : (config.iconBars === 2 ? [8, 16] : [6, 12, 18]);
+        return xs.map(function (x) {
+            return '<line class="dim-zone" x1="' + x + '" y1="4" x2="' + x + '" y2="14"/>';
+        }).join('');
+    }
+
+    function applyDimState() {
+        var config = states[state];
+        body.classList.remove('playlist-dim-medium', 'playlist-dim-heavy');
+        if (config.playlistClass) body.classList.add(config.playlistClass);
+        buttons.forEach(function (btn) {
+            var icon = btn.querySelector('.m-dim-icon');
+            btn.classList.toggle('is-active', state > 0);
+            btn.setAttribute('aria-pressed', state > 0 ? 'true' : 'false');
+            btn.setAttribute('aria-label', config.label);
+            if (icon) icon.innerHTML = iconSvg(config);
+        });
+        try { localStorage.setItem(KEY, String(state)); } catch (e) {}
+    }
+
+    buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            state = (state + 1) % states.length;
+            applyDimState();
+            btn.blur && btn.blur();
+        });
+    });
+
+    try {
+        var saved = parseInt(localStorage.getItem(KEY), 10);
+        if (saved >= 0 && saved < states.length) state = saved;
+    } catch (e) {}
+
+    applyDimState();
+}());
+
+
+/* ============================================================
+   CTRL-HIDE TOGGLE
+   ============================================================ */
+(function () {
+    var body = document.body;
+    var btn = document.getElementById('ctrl-hide-toggle');
+    var KEY = 'es_ctrl_hidden';
+    var hidden = false;
+
+    if (!btn) return;
+
+    function apply() {
+        body.classList.toggle('ctrl-hidden', hidden);
+        btn.classList.toggle('is-active', hidden);
+        btn.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+        btn.setAttribute('aria-label', hidden ? 'Show playback controls' : 'Hide playback controls');
+        try { localStorage.setItem(KEY, hidden ? '1' : '0'); } catch (e) {}
+    }
+
+    btn.addEventListener('click', function () {
+        hidden = !hidden;
+        apply();
+        btn.blur && btn.blur();
+    });
+
+    try {
+        if (localStorage.getItem(KEY) === '1') hidden = true;
+    } catch (e) {}
+    apply();
+}());
+
+
+/* ============================================================
+   PROGRESS BAR — tracker + seek
+   ============================================================ */
+(function () {
+    var track = document.getElementById('progress-bar-track');
+    var fill = document.getElementById('progress-bar-fill');
+    var interval = null;
+    var seeking = false;
+
     function updateFill() {
         var p = window.esPlayer;
         if (!p || typeof p.getDuration !== 'function') return;
@@ -2217,7 +2691,6 @@ function updatePlayIcon(state) {
         fill.style.width = pct + '%';
     }
 
-    /* Start polling every 250ms */
     window.esStartProgressTracker = function () {
         if (interval) clearInterval(interval);
         interval = setInterval(function () {
@@ -2225,20 +2698,18 @@ function updatePlayIcon(state) {
         }, 250);
     };
 
-    /* Seek to position based on click/drag x offset */
     function seekFromEvent(e) {
         var p = window.esPlayer;
         if (!p || typeof p.getDuration !== 'function') return;
-        var rect     = track.getBoundingClientRect();
-        var clientX  = e.touches ? e.touches[0].clientX : e.clientX;
-        var pct      = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        var rect = track.getBoundingClientRect();
+        var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        var pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
         var duration = p.getDuration();
         if (!duration) return;
         fill.style.width = (pct * 100) + '%';
         p.seekTo(pct * duration, true);
     }
 
-    /* Pointer events — mouse + touch unified */
     track.addEventListener('pointerdown', function (e) {
         seeking = true;
         track.setPointerCapture(e.pointerId);
