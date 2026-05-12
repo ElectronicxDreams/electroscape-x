@@ -1,5 +1,5 @@
-<!-- P1-M1.html | Electroscape Mobile | Project 1 | v[P1-M1] 4.2 -->
-<!-- v4.2: Ctrl-hide toggle added next to dim toggle -->
+<!-- P1-M1.html | Electroscape Mobile | Project 1 | v[P1-M1] 4.5 -->
+<!-- v4.5: Changed fav sheet opener to collection grid icon -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -245,14 +245,14 @@
         }
         body.theme-m1 .m-wordmark {
             font-family: 'Michroma', sans-serif;
-            font-size: 11px;
-            letter-spacing: 14px;
-            text-indent: 14px;
+            font-size: clamp(8px, 2.2vw, 11px);
+            letter-spacing: clamp(3px, 1.6vw, 14px);
+            text-indent: clamp(3px, 1.6vw, 14px);
             color: var(--cyan);
             text-transform: uppercase;
             display: flex;
             justify-content: center;
-            overflow: hidden;
+            overflow: visible;
         }
         body.theme-m1 .m-wordmark span {
             display: inline-block;
@@ -349,6 +349,11 @@
         body.theme-m1 .m-btn-ghost svg { width: 18px; height: 18px; }
         body.theme-m1 #m1-shuffle svg { width: 20px; height: 20px; }
         body.theme-m1 #m1-fav { color: var(--cyan); }
+        body.theme-m1 #m1-fav .fav-heart-path {
+            fill: none;
+            transition: fill 0.2s ease;
+        }
+        body.theme-m1 #m1-fav.is-active .fav-heart-path { fill: currentColor; }
 
         /* M1 Section label + track list */
         body.theme-m1 .m-section-label {
@@ -481,7 +486,8 @@
             pointer-events: none !important;
         }
 
-        .m-dim-toggle {
+        .m-dim-toggle,
+        .m-sheet-toggle {
             width: 28px;
             height: 24px;
             border: 1px solid rgba(0,255,230,0.22);
@@ -497,13 +503,21 @@
             transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
         }
         .m-dim-toggle:hover,
-        .m-dim-toggle.is-active {
+        .m-dim-toggle.is-active,
+        .m-sheet-toggle:hover,
+        .m-sheet-toggle.is-active {
             border-color: rgba(0,255,230,0.55);
             background: rgba(0,255,230,0.07);
         }
-        .m-dim-toggle.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
+        .m-dim-toggle.is-active,
+        .m-sheet-toggle.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
         .m-dim-toggle svg {
             width: 20px;
+            height: 16px;
+            display: block;
+        }
+        .m-sheet-toggle svg {
+            width: 16px;
             height: 16px;
             display: block;
         }
@@ -520,35 +534,10 @@
             opacity: 0.09;
             transition: opacity 0.28s ease;
         }
-        body.playback-dim-light .m-controls {
-            opacity: 0.50;
-            transition: opacity 0.28s ease;
-        }
-        body.playback-dim-light .m-progress-wrap {
-            opacity: 0.50;
-            transition: opacity 0.28s ease;
-        }
-        body.playback-dim-light .m-dim-toggle {
-            opacity: 0.50;
-            transition: opacity 0.28s ease, border-color 0.2s, background 0.2s, box-shadow 0.2s;
-        }
-        body.playback-dim-light #nav-reveal-cue.is-visible {
-            opacity: 0.50;
-        }
-        body.playback-dim-medium .m-controls {
-            opacity: 0.20;
-            transition: opacity 0.28s ease;
-        }
-        body.playback-dim-medium .m-progress-wrap {
-            opacity: 0.20;
-            transition: opacity 0.28s ease;
-        }
-        body.playback-dim-medium .m-dim-toggle {
-            opacity: 0.25;
-            transition: opacity 0.28s ease, border-color 0.2s, background 0.2s, box-shadow 0.2s;
-        }
-        body.playback-dim-medium #nav-reveal-cue.is-visible {
-            opacity: 0.12;
+        body.ctrl-hidden .m-progress-wrap,
+        body.ctrl-hidden .m-controls {
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
         /* ============================================================
@@ -981,9 +970,9 @@
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 6v12l8.5-6z"/></svg>
             </button>
         </div>
-        <button class="m-btn-ghost" id="m1-fav" aria-label="Open favourites">
-            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        <button class="m-btn-ghost" id="m1-fav" aria-label="Add current track to favourites" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path class="fav-heart-path" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
         </button>
     </div>
@@ -996,8 +985,13 @@
                 <path d="M12 14v-4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </button>
-        <button class="m-dim-toggle" id="m1-dim-toggle" type="button" aria-label="Dim playlist and playback controls">
+        <button class="m-dim-toggle" id="m1-dim-toggle" type="button" aria-label="Dim playlist">
             <svg class="m-dim-icon" viewBox="0 0 24 18" fill="none" aria-hidden="true"></svg>
+        </button>
+        <button class="m-sheet-toggle" id="m1-fav-sheet-toggle" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 3h4v4H3zM9 3h4v4H9zM3 9h4v4H3zM9 9h4v4H9z" stroke="currentColor" stroke-width="1.3"/>
+            </svg>
         </button>
     </div>
     <div class="m-track-list" id="m-track-list"></div>
@@ -1084,7 +1078,7 @@
     </div>
 
     <!-- VERSION FOOTER — plain scroll footer -->
-    <div id="version-footer">[M1] 4.2</div>
+    <div id="version-footer">[M1] 4.5</div>
 
 <script>
 /* ============================================================
@@ -1253,6 +1247,9 @@
                     if (window.esQueue.length) {
                         window.esPlayer.cueVideoById(window.esQueue[0].id);
                         window.esCurrentIndex = 0;
+                        if (typeof window.esSyncFavouriteButtons === 'function') {
+                            window.esSyncFavouriteButtons();
+                        }
                     }
                 },
                 onStateChange: function (event) {
@@ -1405,6 +1402,9 @@ function playTrack(index) {
         window.esPlayer.loadVideoById(track.id);
     }
     setActiveRow(window.esCurrentIndex);
+    if (typeof window.esSyncFavouriteButtons === 'function') {
+        window.esSyncFavouriteButtons();
+    }
     /* Scroll to top — triple target for tablet/desktop compat */
     window.scrollTo({ top: 0, behavior: 'smooth' });
     document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1499,7 +1499,7 @@ function cssEscape(s) {
 
 
 /* ============================================================
-   PLAYLIST / PLAYBACK DIM TOGGLE
+   PLAYLIST DIM TOGGLE
    ============================================================ */
 (function () {
     var body = document.body;
@@ -1509,20 +1509,17 @@ function cssEscape(s) {
     var states = [
         {
             playlistClass: '',
-            playbackClass: '',
-            label: 'Dim mode: full light',
+            label: 'Playlist dim: full light',
             iconBars: 3
         },
         {
             playlistClass: 'playlist-dim-medium',
-            playbackClass: 'playback-dim-light',
-            label: 'Dim mode: medium',
+            label: 'Playlist dim: medium',
             iconBars: 2
         },
         {
             playlistClass: 'playlist-dim-heavy',
-            playbackClass: 'playback-dim-medium',
-            label: 'Dim mode: dark',
+            label: 'Playlist dim: dark',
             iconBars: 1
         }
     ];
@@ -1540,7 +1537,6 @@ function cssEscape(s) {
         var config = states[state];
         body.classList.remove('playlist-dim-medium', 'playlist-dim-heavy', 'playback-dim-light', 'playback-dim-medium');
         if (config.playlistClass) body.classList.add(config.playlistClass);
-        if (config.playbackClass) body.classList.add(config.playbackClass);
         buttons.forEach(function (btn) {
             var icon = btn.querySelector('.m-dim-icon');
             btn.classList.toggle('is-active', state > 0);
@@ -1605,8 +1601,9 @@ function createFavouriteTrackButton(track) {
     var empty = document.getElementById('fav-empty');
     var footer = document.getElementById('fav-footer');
     var actions = document.getElementById('fav-actions');
+    var currentFavBtn = document.getElementById('m1-fav');
     var openBtns = [
-        document.getElementById('m1-fav')
+        document.getElementById('m1-fav-sheet-toggle')
     ].filter(Boolean);
 
     function load() {
@@ -1639,11 +1636,43 @@ function createFavouriteTrackButton(track) {
         if (path) path.setAttribute('fill', active ? 'currentColor' : 'none');
     }
 
+    function getCurrentTrack() {
+        var queue = window.esQueue || [];
+        var track = queue[window.esCurrentIndex];
+        if (track && track.id) {
+            return {
+                id: track.id,
+                title: track.title || track.id
+            };
+        }
+
+        var activeRow = document.querySelector('.m-track.active');
+        if (activeRow) {
+            return {
+                id: activeRow.getAttribute('data-id'),
+                title: activeRow.getAttribute('data-title') || activeRow.getAttribute('data-id')
+            };
+        }
+
+        return null;
+    }
+
+    function syncCurrentHeart(favs) {
+        if (!currentFavBtn) return;
+        var track = getCurrentTrack();
+        var active = !!(track && isFavourite(track.id, favs));
+        setHeart(currentFavBtn, active);
+        currentFavBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        currentFavBtn.setAttribute('aria-label', active ? 'Remove current track from favourites' : 'Add current track to favourites');
+        currentFavBtn.classList.toggle('has-current-track', !!track);
+    }
+
     function syncHearts(favs) {
         favs = favs || load();
         document.querySelectorAll('.m-track-fav').forEach(function (btn) {
             setHeart(btn, isFavourite(btn.getAttribute('data-id'), favs));
         });
+        syncCurrentHeart(favs);
     }
 
     function queueFromFavourites(favs) {
@@ -1778,7 +1807,10 @@ function createFavouriteTrackButton(track) {
         backdrop.classList.add('is-visible');
         backdrop.setAttribute('aria-hidden', 'false');
         document.body.classList.add('fav-open');
-        openBtns.forEach(function (btn) { btn.classList.add('is-active'); });
+        openBtns.forEach(function (btn) {
+            btn.classList.add('is-active');
+            btn.setAttribute('aria-expanded', 'true');
+        });
     }
 
     function close() {
@@ -1786,7 +1818,10 @@ function createFavouriteTrackButton(track) {
         backdrop.classList.remove('is-visible');
         backdrop.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('fav-open');
-        openBtns.forEach(function (btn) { btn.classList.remove('is-active'); });
+        openBtns.forEach(function (btn) {
+            btn.classList.remove('is-active');
+            btn.setAttribute('aria-expanded', 'false');
+        });
     }
 
     window.esToggleFavourite = function (track) {
@@ -1805,6 +1840,16 @@ function createFavouriteTrackButton(track) {
     window.esSyncFavouriteButtons = function () {
         syncHearts(load());
     };
+
+    if (currentFavBtn) {
+        currentFavBtn.addEventListener('click', function () {
+            var track = getCurrentTrack();
+            if (track && typeof window.esToggleFavourite === 'function') {
+                window.esToggleFavourite(track);
+            }
+            currentFavBtn.blur && currentFavBtn.blur();
+        });
+    }
 
     openBtns.forEach(function (btn) {
         btn.addEventListener('click', function () {
