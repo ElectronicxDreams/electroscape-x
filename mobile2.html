@@ -1,5 +1,5 @@
-<!-- P2-M3.html | Electroscape Mobile | Project 2 | Custom Build | [P2-M3] [2.7] -->
-<!-- v2.7: Burger always visible, wordmark fades out, fav heart removed from nav -->
+<!-- mobile2.html | Electroscape Mobile | [M2] 1.0 -->
+<!-- v1.0: Codex rebuild — app-shell grid, portrait+landscape, burger nav -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -649,7 +649,7 @@
     </section>
 
     <!-- VERSION STRIP -->
-    <div id="version-strip"><span>[P2-M3] [2.7]</span></div>
+    <div id="version-strip"><span>[M2] 1.0</span></div>
 
 <script>
 /* ============================================================
@@ -779,9 +779,8 @@ function playTrack(index) {
     if (window.esPlayer && typeof window.esPlayer.loadVideoById === 'function') window.esPlayer.loadVideoById(track.id);
     setActiveCard(window.esCurrentIndex);
     if (typeof window.esSyncFavouriteButtons === 'function') window.esSyncFavouriteButtons();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
-    document.body.scrollTo({ top: 0, behavior: 'smooth' });
+    var bz = document.getElementById('bottom-zone');
+    if (bz) bz.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function updatePlayIcon(state) {
