@@ -1,5 +1,5 @@
-<!-- P1-M1.html | Electroscape Mobile | Project 1 | v[P1-M1] 3.4 -->
-<!-- v3.4: Large playlist tiles, centered dim icon, darker one-bar playback dim -->
+<!-- P1-M1.html | Electroscape Mobile | Project 1 | v[P1-M1] 4.2 -->
+<!-- v4.2: Ctrl-hide toggle added next to dim toggle -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -105,7 +105,6 @@
             font-size: 9px;
             letter-spacing: 3px;
             text-transform: uppercase;
-            opacity: 0.45;
         }
 
         /* ============================================================
@@ -251,20 +250,37 @@
             text-indent: 14px;
             color: var(--cyan);
             text-transform: uppercase;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+        body.theme-m1 .m-wordmark span {
+            display: inline-block;
+            opacity: 0;
+            animation: elasticAssemble 2.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transform: translateX(-100vw);
+        }
+        body.theme-m1 .m-wordmark span:nth-child(1)  { animation-delay: 0.1s; }
+        body.theme-m1 .m-wordmark span:nth-child(2)  { animation-delay: 0.3s; }
+        body.theme-m1 .m-wordmark span:nth-child(3)  { animation-delay: 0.5s; }
+        body.theme-m1 .m-wordmark span:nth-child(4)  { animation-delay: 0.7s; }
+        body.theme-m1 .m-wordmark span:nth-child(5)  { animation-delay: 0.9s; }
+        body.theme-m1 .m-wordmark span:nth-child(6)  { animation-delay: 1.1s; }
+        body.theme-m1 .m-wordmark span:nth-child(7)  { animation-delay: 1.3s; }
+        body.theme-m1 .m-wordmark span:nth-child(8)  { animation-delay: 1.5s; }
+        body.theme-m1 .m-wordmark span:nth-child(9)  { animation-delay: 1.7s; }
+        body.theme-m1 .m-wordmark span:nth-child(10) { animation-delay: 1.9s; }
+        body.theme-m1 .m-wordmark span:nth-child(11) { animation-delay: 2.1s; }
+        body.theme-m1 .m-wordmark span:nth-child(12) { animation-delay: 2.3s; }
+        @keyframes elasticAssemble {
+            0%   { opacity: 0; transform: translateX(-100vw); }
+            30%  { opacity: 1; }
+            100% { opacity: 1; transform: translateX(0); }
         }
 
         /* M1 Progress */
         body.theme-m1 .m-progress-wrap { padding: 14px 20px 4px; }
-        body.theme-m1 .m-progress-fill::after {
-            content: '';
-            position: absolute;
-            right: -4px; top: 50%;
-            transform: translateY(-50%);
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: var(--cyan);
-            box-shadow: 0 0 6px var(--cyan);
-        }
+        /* progress dot removed v3.5 */
         body.theme-m1 .m-time-row {
             display: flex;
             justify-content: space-between;
@@ -423,6 +439,47 @@
             background: rgba(0,255,230,0.06);
         }
         body.theme-m1 .m-track-fav:active { transform: scale(0.94); }
+
+        /* ============================================================
+           CTRL-HIDE TOGGLE — hides progress + controls + nav chevron
+           ============================================================ */
+        #ctrl-hide-toggle {
+            width: 28px;
+            height: 24px;
+            border: 1px solid rgba(0,255,230,0.22);
+            border-radius: 4px;
+            background: rgba(0,255,230,0.03);
+            color: var(--cyan);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            flex-shrink: 0;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        #ctrl-hide-toggle:hover,
+        #ctrl-hide-toggle.is-active {
+            border-color: rgba(0,255,230,0.55);
+            background: rgba(0,255,230,0.07);
+        }
+        #ctrl-hide-toggle.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
+        #ctrl-hide-toggle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
+
+        body.ctrl-hidden .m-progress-wrap {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        body.ctrl-hidden .m-controls {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        body.ctrl-hidden #nav-reveal-cue {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
 
         .m-dim-toggle {
             width: 28px;
@@ -881,7 +938,9 @@
 
     <!-- HEADER -->
     <header class="m-header">
-        <div class="m-wordmark">Electroscape</div>
+        <div class="m-wordmark" aria-label="Electroscape">
+            <span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span>
+        </div>
     </header>
 
     <!-- PLAYER -->
@@ -931,6 +990,12 @@
 
     <!-- TRACK LIST (M1) -->
     <div class="m-section-label">
+        <button id="ctrl-hide-toggle" type="button" aria-label="Hide playback controls" aria-pressed="false">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4 2v4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 14v-4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
         <button class="m-dim-toggle" id="m1-dim-toggle" type="button" aria-label="Dim playlist and playback controls">
             <svg class="m-dim-icon" viewBox="0 0 24 18" fill="none" aria-hidden="true"></svg>
         </button>
@@ -1019,7 +1084,7 @@
     </div>
 
     <!-- VERSION FOOTER — plain scroll footer -->
-    <div id="version-footer">[M1] 3.4</div>
+    <div id="version-footer">[M1] 4.2</div>
 
 <script>
 /* ============================================================
@@ -1836,6 +1901,35 @@ function createFavouriteTrackButton(track) {
     }
 
     wireSeek(trackM1);
+}());
+
+/* ============================================================
+   CTRL-HIDE TOGGLE
+   ============================================================ */
+(function () {
+    var body = document.body;
+    var btn  = document.getElementById('ctrl-hide-toggle');
+    var KEY  = 'es_ctrl_hidden';
+    var hidden = false;
+
+    function apply() {
+        body.classList.toggle('ctrl-hidden', hidden);
+        btn.classList.toggle('is-active', hidden);
+        btn.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+        btn.setAttribute('aria-label', hidden ? 'Show playback controls' : 'Hide playback controls');
+        try { localStorage.setItem(KEY, hidden ? '1' : '0'); } catch (e) {}
+    }
+
+    btn.addEventListener('click', function () {
+        hidden = !hidden;
+        apply();
+        btn.blur && btn.blur();
+    });
+
+    try {
+        if (localStorage.getItem(KEY) === '1') { hidden = true; }
+    } catch (e) {}
+    apply();
 }());
 
 </script>
