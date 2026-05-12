@@ -1,0 +1,1048 @@
+<!-- P2-M3.html | Electroscape Mobile | Project 2 | Custom Build | [P2-M3] [2.7] -->
+<!-- v2.7: Burger always visible, wordmark fades out, fav heart removed from nav -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Electroscape — Mobile P2 Custom</title>
+    <link rel="icon" href="data:,">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Michroma&family=Exo+2:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --cyan:         #00FFE6;
+            --cyan-dim:     rgba(0,255,230,0.35);
+            --cyan-faint:   rgba(0,255,230,0.06);
+            --cyan-glow:    0 0 12px rgba(0,255,230,0.5);
+            --bg:           #000;
+            --text:         #fff;
+            --text-dim:     rgba(0,255,230,0.72);
+            --panel:        #080b0e;
+            --panel-border: #1a2228;
+            --border-soft:  rgba(255,255,255,0.08);
+            /* ACCENT — user switchable */
+            --accent:       #00FFE6;
+            --accent-rgb:   0,255,230;
+        }
+
+        html, body {
+            background: var(--bg); color: var(--text);
+            font-family: 'Orbitron', sans-serif;
+            height: 100%; min-height: 100%;
+            overflow: hidden;
+            padding-bottom: 0;
+            overscroll-behavior: none;
+        }
+
+        #app-shell {
+            width: 100%;
+            height: calc(100dvh - 44px);
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr);
+            overflow: hidden;
+            background: #000;
+        }
+
+        #top-zone {
+            min-height: 0;
+            background: #000;
+            z-index: 2;
+        }
+
+        #bottom-zone {
+            min-height: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: #000;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0,255,230,0.28) transparent;
+        }
+
+        #bottom-zone::-webkit-scrollbar { width: 4px; }
+        #bottom-zone::-webkit-scrollbar-thumb { background: rgba(0,255,230,0.28); border-radius: 999px; }
+
+        /* ============================================================
+           NAV-REVEAL
+           ============================================================ */
+        #nav-reveal-cue {
+            position: fixed; top: 0; left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            width: 40px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            background: transparent; border: none; color: var(--cyan);
+            z-index: 9100; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s; cursor: pointer;
+        }
+        #nav-reveal-cue.is-visible { opacity: 0.85; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+        #nav-reveal-cue svg { width: 14px; height: 9px; stroke: currentColor; fill: none; }
+
+        /* ============================================================
+           NAV-POPUP
+           ============================================================ */
+        #nav-popup {
+            position: fixed; top: clamp(88px, 18dvh, 170px); left: 50%;
+            transform: translateX(-50%) translateY(-8px); z-index: 9500;
+            width: min(280px, 80vw);
+            background: linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.60));
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+            box-shadow: 0 28px 72px rgba(0,0,0,0.76), 0 0 40px rgba(0,255,230,0.08);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.22s, transform 0.22s;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        }
+        #nav-popup.is-open { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+        .nav-popup-item {
+            display: flex; align-items: center; justify-content: center; padding: 14px 20px;
+            font-family: 'Michroma', sans-serif; font-size: 8px; letter-spacing: 5px;
+            text-transform: uppercase; color: var(--text); text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.09);
+            transition: color 0.2s, background 0.2s; cursor: pointer;
+            background: transparent; width: 100%; text-align: center;
+            outline: none; border-left: none; border-right: none; border-top: none;
+        }
+        .nav-popup-item:last-child { border-bottom: none; }
+        .nav-popup-item:hover { color: var(--cyan); background: var(--cyan-faint); }
+
+        /* ============================================================
+           NAV-HEADER — 3-col: links | wordmark | fav
+           Auto-hides 10s
+           ============================================================ */
+        #nav-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px 5px;
+            background: rgba(0,0,0,0.92);
+            gap: 12px;
+        }
+
+        .m-wordmark {
+            flex: 1;
+            transition: opacity 1.5s ease;
+        }
+        .m-wordmark.is-hidden { opacity: 0; pointer-events: none; }
+
+        #nav-links-btn {
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1px solid rgba(0,255,230,0.22); background: rgba(0,255,230,0.06);
+            color: var(--cyan); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.2s, border-color 0.2s;
+            justify-self: start;
+        }
+        #nav-links-btn:hover { background: rgba(0,255,230,0.12); border-color: var(--cyan); }
+        #nav-links-btn svg { width: 16px; height: 16px; }
+
+        .m-wordmark {
+            font-family: 'Michroma', sans-serif;
+            font-size: clamp(6.4px, 1.76vw, 8.8px);
+            letter-spacing: clamp(3px, 1.4vw, 10px);
+            text-indent: clamp(3px, 1.4vw, 10px);
+            color: var(--cyan); text-transform: uppercase; text-align: center;
+            display: flex; justify-content: center; overflow: visible;
+        }
+        .m-wordmark span {
+            display: inline-block; opacity: 0;
+            animation: wordmarkFade 3s ease forwards;
+        }
+        .m-wordmark span:nth-child(1)  { animation-delay: 0.00s; }
+        .m-wordmark span:nth-child(2)  { animation-delay: 0.22s; }
+        .m-wordmark span:nth-child(3)  { animation-delay: 0.44s; }
+        .m-wordmark span:nth-child(4)  { animation-delay: 0.66s; }
+        .m-wordmark span:nth-child(5)  { animation-delay: 0.88s; }
+        .m-wordmark span:nth-child(6)  { animation-delay: 1.10s; }
+        .m-wordmark span:nth-child(7)  { animation-delay: 1.32s; }
+        .m-wordmark span:nth-child(8)  { animation-delay: 1.54s; }
+        .m-wordmark span:nth-child(9)  { animation-delay: 1.76s; }
+        .m-wordmark span:nth-child(10) { animation-delay: 1.98s; }
+        .m-wordmark span:nth-child(11) { animation-delay: 2.20s; }
+        .m-wordmark span:nth-child(12) { animation-delay: 2.42s; }
+        @keyframes wordmarkFade { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+        #nav-fav-btn { display: none; }
+
+        /* PLAYER PANEL — in-flow, no positioning needed */
+        #player-panel { background: #000; }
+
+        /* HERO-CARD */
+        #hero-card { border: none; border-radius: 0; background: #000; overflow: hidden; box-shadow: none; }
+
+        /* HERO-PLAYER — stable height, never collapses */
+        #hero-player {
+            width: 100%; aspect-ratio: 16/9;
+            position: relative; background: #000; overflow: hidden;
+            min-height: calc(56.25vw); /* 9/16 = 56.25% of viewport width */
+        }
+
+        #yt-player { position: absolute; inset: 0; width: 100%; height: 100%; }
+        #player-loading {
+            position: absolute; inset: 0; z-index: 2;
+            display: flex; align-items: center; justify-content: center;
+            background: #000; color: rgba(0,255,230,0.3);
+            font-family: 'Orbitron', sans-serif; font-size: 9px;
+            letter-spacing: 4px; text-transform: uppercase;
+            pointer-events: none; transition: opacity 0.4s;
+        }
+        #player-loading.is-hidden { opacity: 0; }
+
+        /* HERO-INFO removed */
+
+        /* HERO-PROGRESS — no top padding, flush under video */
+        #hero-progress-wrap { padding: 0 0 0; }
+        #progress-track-p2m3 { width: 100%; height: 2px; background: rgba(255,255,255,0.1); border-radius: 999px; position: relative; cursor: pointer; }
+        #progress-track-p2m3::after { content: ''; position: absolute; inset: -12px 0; }
+        @media (hover: none) { #progress-track-p2m3::after { inset: -20px 0; } }
+        #progress-fill-p2m3 { width: 0%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, rgba(0,180,160,0.7), var(--cyan)); position: relative; transition: width 0.15s linear; }
+        #progress-fill-p2m3::after { content: ''; position: absolute; right: -4px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+        .hero-time-row { display: flex; justify-content: space-between; padding: 4px 12px 0; font-size: 7px; letter-spacing: 1px; color: var(--cyan); }
+
+        /* ============================================================
+           CONTROLS ROW — all buttons uniform 33px (25% smaller)
+           ============================================================ */
+        #controls-row {
+            display: grid; grid-template-columns: repeat(5, 33px);
+            align-items: center; justify-content: center;
+            gap: 10px; padding: 8px 12px 10px;
+        }
+
+        .ctrl-round {
+            width: 33px; height: 33px; border-radius: 50%;
+            border: 1px solid rgba(0,255,230,0.25); background: rgba(0,255,230,0.06);
+            color: var(--cyan); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.15s;
+        }
+        .ctrl-round:hover { border-color: var(--cyan); background: rgba(0,255,230,0.12); transform: scale(1.08); }
+        .ctrl-round svg { width: 14px; height: 14px; }
+
+        #p2m3-play {
+            width: 33px; height: 33px; border-radius: 50%;
+            border: 1px solid rgba(0,255,230,0.25); background: var(--cyan); color: #000;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
+            box-shadow: 0 0 16px rgba(0,255,230,0.35);
+            transition: transform 0.15s, box-shadow 0.2s;
+        }
+        #p2m3-play:hover { transform: scale(1.08); box-shadow: 0 0 26px rgba(0,255,230,0.55); }
+        #p2m3-play:active { transform: scale(0.95); }
+        #p2m3-play svg { width: 14px; height: 14px; }
+        #p2m3-play.is-playing { box-shadow: 0 0 32px rgba(0,255,230,0.65); }
+
+        /* ============================================================
+           GRID SECTION HEADER — centred, [dim][fav]
+           ============================================================ */
+        #grid-head { display: flex; align-items: center; justify-content: center; padding: 8px 15px 10px; border-top: 1px solid var(--border-soft); gap: 10px; }
+
+        /* CTRL-HIDE TOGGLE — independent of dimmer */
+        #p2m3-ctrl-hide {
+            width: 28px; height: 24px;
+            border: 1px solid rgba(0,255,230,0.22); border-radius: 4px;
+            background: rgba(0,255,230,0.03); color: var(--cyan);
+            display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer; padding: 0; flex-shrink: 0;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        #p2m3-ctrl-hide:hover, #p2m3-ctrl-hide.is-active { border-color: rgba(0,255,230,0.55); background: rgba(0,255,230,0.07); }
+        #p2m3-ctrl-hide.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
+        #p2m3-ctrl-hide svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
+
+        body.p2m3-ctrl-hidden #hero-progress-wrap,
+        body.p2m3-ctrl-hidden #controls-row {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.3s ease;
+        }
+        body.p2m3-ctrl-hidden #nav-reveal-cue {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* FAV SHEET TOGGLE — same size/style as dim toggle */
+        .m-sheet-toggle {
+            width: 28px; height: 24px; border: 1px solid rgba(0,255,230,0.22); border-radius: 4px;
+            background: rgba(0,255,230,0.03); color: var(--cyan);
+            display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer; padding: 0; flex-shrink: 0;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        .m-sheet-toggle:hover, .m-sheet-toggle.is-active { border-color: rgba(0,255,230,0.55); background: rgba(0,255,230,0.07); }
+        .m-sheet-toggle.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
+        .m-sheet-toggle svg { width: 16px; height: 16px; display: block; }
+
+        /* DIM TOGGLE */
+        .m-dim-toggle {
+            width: 28px; height: 24px; border: 1px solid rgba(0,255,230,0.22); border-radius: 4px;
+            background: rgba(0,255,230,0.03); color: var(--cyan);
+            display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer; padding: 0; flex-shrink: 0;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        .m-dim-toggle:hover, .m-dim-toggle.is-active { border-color: rgba(0,255,230,0.55); background: rgba(0,255,230,0.07); }
+        .m-dim-toggle.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
+        .m-dim-toggle svg { width: 20px; height: 16px; display: block; }
+        .m-dim-toggle .dim-zone { stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+        /* Accent-aware overrides */
+        #hero-card { border-color: rgba(var(--accent-rgb),0.18); }
+        #hero-player::before, #hero-player::after { border-color: rgba(var(--accent-rgb),0.55); }
+        #hero-now-label { color: rgba(var(--accent-rgb),0.72); }
+        #progress-fill-p2m3 { background: linear-gradient(90deg, rgba(var(--accent-rgb),0.5), var(--accent)); }
+        #progress-fill-p2m3::after { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+        .hero-time-row { color: var(--accent); }
+        .ctrl-round:hover { border-color: var(--accent); color: var(--accent); }
+        #grid-head h2 { color: var(--accent); }
+        .m-dim-toggle { border-color: rgba(var(--accent-rgb),0.22); background: rgba(var(--accent-rgb),0.03); color: var(--accent); }
+        .m-dim-toggle:hover, .m-dim-toggle.is-active { border-color: rgba(var(--accent-rgb),0.55); background: rgba(var(--accent-rgb),0.07); }
+        .m-dim-toggle.is-active { box-shadow: 0 0 12px rgba(var(--accent-rgb),0.12); }
+        .v-card:hover { border-color: rgba(var(--accent-rgb),0.3); }
+        .v-card.active { border-color: var(--accent); box-shadow: 0 0 18px rgba(var(--accent-rgb),0.12), inset 0 0 0 1px rgba(var(--accent-rgb),0.06); }
+        .v-card.active .v-card-title { color: var(--accent); }
+        .v-card-num { color: rgba(var(--accent-rgb),0.72); }
+        .v-play-btn { background: var(--accent); box-shadow: 0 0 8px rgba(var(--accent-rgb),0.25); }
+        .v-play-btn:hover { box-shadow: 0 0 16px rgba(var(--accent-rgb),0.5); }
+        .v-fav-btn { border-color: rgba(var(--accent-rgb),0.2); color: var(--accent); }
+        .v-fav-btn.is-active { border-color: rgba(var(--accent-rgb),0.5); background: rgba(var(--accent-rgb),0.08); }
+        #dock { border-color: rgba(var(--accent-rgb),0.16); }
+        #dock-shuffle:hover { color: var(--accent); border-color: rgba(var(--accent-rgb),0.4); }
+        #dock-play { background: var(--accent); box-shadow: 0 0 24px rgba(var(--accent-rgb),0.35); }
+        #dock-play:hover { box-shadow: 0 0 38px rgba(var(--accent-rgb),0.55); }
+        #dock-play.is-playing { box-shadow: 0 0 44px rgba(var(--accent-rgb),0.65); }
+        #dock-fav:hover { color: var(--accent); border-color: rgba(var(--accent-rgb),0.4); }
+        #nav-links-btn { border-color: rgba(var(--accent-rgb),0.22); background: rgba(var(--accent-rgb),0.06); color: var(--accent); }
+        #nav-links-btn:hover { background: rgba(var(--accent-rgb),0.12); border-color: var(--accent); }
+        #nav-reveal-cue { color: var(--accent); }
+        .nav-popup-item:hover { color: var(--accent); background: rgba(var(--accent-rgb),0.06); }
+        .m-wordmark { color: var(--accent); }
+        #nav-fav-btn { border-color: rgba(var(--accent-rgb),0.22); background: rgba(var(--accent-rgb),0.06); color: var(--accent); }
+        #nav-fav-btn:hover { background: rgba(var(--accent-rgb),0.12); border-color: var(--accent); }
+        #fav-sheet { border-top-color: rgba(var(--accent-rgb),0.22); }
+        .fav-sheet-handle { background: rgba(var(--accent-rgb),0.35); }
+        #fav-title, #fav-close-btn, #fav-empty { color: var(--accent); }
+        #fav-play-all-btn, #fav-clear-btn { border-color: rgba(var(--accent-rgb),0.28); background: rgba(var(--accent-rgb),0.06); color: var(--accent); }
+        .fav-row-btn { border-color: rgba(var(--accent-rgb),0.22); background: rgba(var(--accent-rgb),0.04); color: var(--accent); }
+        .fav-row-btn:hover:not(:disabled) { border-color: rgba(var(--accent-rgb),0.62); background: rgba(var(--accent-rgb),0.08); }
+        #version-strip span { color: var(--accent); }
+
+        /* ============================================================
+           2-COLUMN VIDEO GRID — Entry 3 layout
+           ============================================================ */
+        #video-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 10px; padding: 0 14px 16px;
+        }
+
+        .v-card {
+            border: 1px solid rgba(255,255,255,0.07); border-radius: 12px;
+            background: rgba(255,255,255,0.035); overflow: hidden;
+            cursor: pointer; position: relative;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+        }
+        .v-card:hover { transform: scale(1.02); border-color: rgba(0,255,230,0.3); }
+        .v-card.active {
+            border-color: var(--cyan);
+            box-shadow: 0 0 18px rgba(0,255,230,0.12), inset 0 0 0 1px rgba(0,255,230,0.06);
+        }
+
+        .v-card-thumb { aspect-ratio: 16/9; background-size: cover; background-position: center; background-color: #111; }
+
+        .v-card-body { padding: 8px 9px 10px; }
+        .v-card-title {
+            font-size: 8px; line-height: 1.35; letter-spacing: 1px; text-transform: uppercase; color: #fff;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .v-card.active .v-card-title { color: var(--cyan); }
+
+        .v-card-actions { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .v-card-num { display: none; }
+
+        .v-play-btn {
+            width: 26px; height: 26px; border-radius: 50%; border: none;
+            background: var(--cyan); color: #000;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(0,255,230,0.25);
+            transition: transform 0.15s, box-shadow 0.2s;
+        }
+        .v-play-btn:hover { transform: scale(1.15); box-shadow: 0 0 16px rgba(0,255,230,0.5); }
+        .v-play-btn svg { width: 12px; height: 12px; }
+
+        .v-fav-btn {
+            position: absolute; top: 6px; right: 6px;
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 1px solid rgba(0,255,230,0.2); background: rgba(0,0,0,0.5);
+            color: var(--cyan); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; opacity: 0;
+            transition: opacity 0.2s, border-color 0.2s, background 0.2s;
+        }
+        .v-fav-btn svg { width: 11px; height: 11px; }
+        .v-card:hover .v-fav-btn, .v-fav-btn.is-active { opacity: 1; }
+        .v-fav-btn.is-active { border-color: rgba(0,255,230,0.5); background: rgba(0,255,230,0.08); }
+
+        /* v-card body centred; play button = cyan triangle overlay on thumb */
+        .v-card-body { padding: 8px 9px 10px; text-align: center; }
+        .v-card-actions { display: none; }
+        .v-play-btn {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: auto; height: auto; border: none;
+            background: transparent; box-shadow: none; color: var(--cyan);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; opacity: 0; transition: opacity 0.2s;
+        }
+        .v-play-btn svg { width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(0,255,230,0.8)); }
+        .v-card:hover .v-play-btn { opacity: 1; }
+
+        /* in-player heart = like toggle */
+        #p2m3-fav-open .fav-heart-path { fill: none; transition: fill 0.2s; }
+        #p2m3-fav-open.is-liked .fav-heart-path { fill: currentColor; }
+
+        /* dim states */
+        body.playlist-dim-medium #video-grid { opacity: 0.30; transition: opacity 0.28s; }
+        body.playlist-dim-heavy  #video-grid { opacity: 0.09; pointer-events: none; transition: opacity 0.28s; }
+
+        /* dock hidden — controls-row handles playback */
+        #dock { display: none; }
+
+        /* ============================================================
+           FAV-SHEET
+           ============================================================ */
+        #fav-backdrop { position: fixed; inset: 0; bottom: 44px; z-index: 8800; background: rgba(0,0,0,0.5); opacity: 0; pointer-events: none; transition: opacity 0.24s; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        #fav-backdrop.is-visible { opacity: 1; pointer-events: auto; }
+        #fav-sheet { position: fixed; left: 0; right: 0; bottom: 44px; height: min(64dvh, 560px); z-index: 9200; display: flex; flex-direction: column; background: rgba(0,0,0,0.88); border-top: 1px solid rgba(0,255,230,0.22); border-radius: 18px 18px 0 0; box-shadow: 0 -24px 70px rgba(0,0,0,0.74), inset 0 1px 0 rgba(255,255,255,0.05); transform: translateY(108%); transition: transform 0.28s cubic-bezier(0.4,0,0.2,1); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); overflow: hidden; }
+        #fav-sheet.is-open { transform: translateY(0); }
+        .fav-sheet-handle { width: 42px; height: 3px; border-radius: 999px; background: rgba(0,255,230,0.35); margin: 10px auto 12px; flex-shrink: 0; }
+        #fav-header { display: grid; grid-template-columns: 1fr 32px; align-items: center; gap: 10px; padding: 0 16px 10px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+        #fav-title { font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 5px; text-transform: uppercase; color: var(--cyan); }
+        #fav-close-btn { width: 32px; height: 32px; border: none; background: transparent; color: var(--cyan); font-size: 19px; font-weight: 700; line-height: 1; cursor: pointer; }
+        #fav-actions { display: none; padding: 11px 16px 8px; flex-shrink: 0; }
+        #fav-play-all-btn, #fav-clear-btn { border: 1px solid rgba(0,255,230,0.28); border-radius: 4px; background: rgba(0,255,230,0.06); color: var(--cyan); font-family: 'Orbitron', sans-serif; font-size: 8px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; }
+        #fav-play-all-btn { width: 100%; padding: 10px 12px; }
+        #fav-empty { display: flex; flex: 1; align-items: center; justify-content: center; padding: 28px; color: var(--cyan); font-size: 8px; letter-spacing: 3px; text-transform: uppercase; text-align: center; }
+        #fav-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: rgba(0,255,230,0.28) transparent; }
+        #fav-list::-webkit-scrollbar { width: 4px; }
+        #fav-list::-webkit-scrollbar-thumb { background: rgba(0,255,230,0.28); border-radius: 999px; }
+        .fav-row { min-height: 80px; display: grid; grid-template-columns: 72px minmax(104px,132px) minmax(0,1fr); align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: background 0.18s; }
+        .fav-row:hover { background: rgba(255,255,255,0.04); }
+        .fav-row-thumb { width: min(132px,34vw); aspect-ratio: 16/9; border-radius: 4px; background-color: #111; background-size: contain; background-position: center; background-repeat: no-repeat; box-shadow: inset 0 0 0 1px rgba(0,255,230,0.1); }
+        .fav-row-main { min-width: 0; }
+        .fav-row-title { color: #fff; font-size: 8.5px; letter-spacing: 1px; line-height: 1.3; text-transform: uppercase; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .fav-row-controls { display: grid; grid-template-columns: repeat(2,30px); grid-auto-rows: 26px; gap: 6px; justify-content: start; }
+        .fav-row-btn { width: 30px; height: 26px; border: 1px solid rgba(0,255,230,0.22); border-radius: 4px; background: rgba(0,255,230,0.04); color: var(--cyan); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: border-color 0.2s, background 0.2s, opacity 0.2s; }
+        .fav-row-btn:hover:not(:disabled) { border-color: rgba(0,255,230,0.62); background: rgba(0,255,230,0.08); }
+        .fav-row-btn:disabled { opacity: 0.3; cursor: default; }
+        .fav-row-btn svg { width: 13px; height: 13px; display: block; }
+        .fav-remove-btn { font-size: 17px; font-weight: 700; line-height: 1; }
+        #fav-footer { display: none; justify-content: center; padding: 12px 16px 14px; border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
+        #fav-clear-btn { padding: 8px 18px; }
+        body.fav-open { overflow: hidden; }
+
+        /* ============================================================
+           VERSION STRIP
+           ============================================================ */
+        #version-strip { position: fixed; bottom: 0; left: 0; right: 0; height: 44px; z-index: 9000; background: #000; border-top: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; }
+        #version-strip span { color: var(--cyan); font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; }
+
+        /* NAV SPACER — gap between nav and player */
+        #nav-spacer { width: 100%; height: 0; }
+
+        /* ============================================================
+           LANDSCAPE PLAYER-ONLY MODE
+           ============================================================ */
+        @media (orientation: landscape) {
+            #version-strip { display: none; }
+            #app-shell {
+                height: 100dvh;
+                grid-template-rows: minmax(0, 1fr);
+            }
+            #bottom-zone { display: none; }
+            #top-zone {
+                overflow: hidden;
+                display: grid;
+                grid-template-rows: auto auto auto auto;
+                align-content: start;
+            }
+
+            /* Force controls visible in landscape even if hidden-state was saved */
+            body.p2m3-ctrl-hidden #hero-progress-wrap,
+            body.p2m3-ctrl-hidden #controls-row {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
+
+            /* 
+               LANDSCAPE TUNING (tablet + phone validated):
+               - Keep player-only mode in landscape (bottom zone hidden).
+               - `132px` reserved vertical space keeps progress + control row visible on phones.
+               - Width formula maximizes video size on tablets without clipping controls.
+               If editing later, change this block carefully and test both tablet + phone.
+            */
+            #hero-card {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            #hero-player {
+                aspect-ratio: 16 / 9;
+                width: min(100%, calc((100dvh - 132px) * 16 / 9));
+                max-height: calc(100dvh - 132px);
+                height: auto;
+                min-height: 0;
+                margin: 0 auto;
+            }
+
+            #hero-progress-wrap { padding: 0 12px; }
+
+            /* Compact controls just enough for shorter phone landscape heights */
+            #controls-row {
+                grid-template-columns: repeat(5, clamp(27px, 3.3dvh, 33px));
+                gap: clamp(6px, 1dvh, 10px);
+                padding: 6px 12px 8px;
+            }
+            .ctrl-round, #p2m3-play { width: clamp(27px, 3.3dvh, 33px); height: clamp(27px, 3.3dvh, 33px); }
+            .ctrl-round svg, #p2m3-play svg { width: clamp(11px, 1.5dvh, 14px); height: clamp(11px, 1.5dvh, 14px); }
+            .hero-time-row { padding-top: 3px; }
+        }
+
+        /* ============================================================
+           TABLET (621px+)
+           ============================================================ */
+        /* LANDSCAPE — no longer needed, page scrolls naturally */
+        /* @media (orientation: landscape) and (max-height: 600px) { ... } */
+
+        @media (min-width: 621px) {
+            .m-wordmark { font-size: 13px; letter-spacing: 14px; text-indent: 14px; }
+            #video-grid { grid-template-columns: repeat(3, 1fr); padding: 0 28px 16px; }
+            #grid-head { padding: 8px 28px 10px; }
+        }
+
+        @media (hover: none) { button:focus { outline: none; } }
+    </style>
+</head>
+<body>
+
+    <!-- NAV-POPUP -->
+    <div id="nav-popup" role="dialog" aria-label="Navigation links">
+        <a class="nav-popup-item" href="https://links.electroscapex.com/" target="_blank" rel="noopener noreferrer">Weblinks</a>
+        <button class="nav-popup-item" id="nav-music-btn">Music Directory</button>
+        <a class="nav-popup-item" href="https://electroscapex.com/tv.html" target="_blank" rel="noopener noreferrer">TV</a>
+        <a class="nav-popup-item" href="index.html?view=desktop">Desktop</a>
+    </div>
+
+    <main id="app-shell">
+    <section id="top-zone" aria-label="Fixed player">
+
+    <!-- NAV-HEADER -->
+    <header id="nav-header">
+        <button id="nav-links-btn" aria-label="Links" aria-expanded="false" aria-controls="nav-popup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <div class="m-wordmark" aria-label="Electroscape"><span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span></div>
+        <button id="nav-fav-btn" aria-label="Open favourites">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+        </button>
+    </header>
+
+    <!-- NAV SPACER — sits below nav, holds space when nav hides so player stays put -->
+    <div id="nav-spacer"></div>
+
+    <!-- HERO-CARD -->
+    <section id="hero-card">
+        <div id="hero-player">
+            <div id="player-loading">Initialising player&hellip;</div>
+            <div id="yt-player"></div>
+        </div>
+    </section>
+
+    <!-- PROGRESS -->
+    <div id="hero-progress-wrap">
+        <div id="progress-track-p2m3"><div id="progress-fill-p2m3"></div></div>
+        <div class="hero-time-row">
+            <span id="time-current-p2m3">0:00</span>
+            <span id="time-total-p2m3">0:00</span>
+        </div>
+    </div>
+
+    <!-- CONTROLS ROW -->
+    <div id="controls-row">
+        <button class="ctrl-round" id="p2m3-shuffle" aria-label="Shuffle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7h3.4c2 0 3.2 1 4.4 2.8l2.4 3.4C14.4 15 15.6 16 17.6 16H19"/>
+                <path d="M3 17h3.4c2 0 3.2-1 4.4-2.8l2.4-3.4C14.4 9 15.6 8 17.6 8H19"/>
+                <path d="M18 5l3 3-3 3" fill="none"/><path d="M18 13l3 3-3 3" fill="none"/>
+            </svg>
+        </button>
+        <button class="ctrl-round" id="p2m3-prev" aria-label="Previous">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+        </button>
+        <button id="p2m3-play" aria-label="Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <button class="ctrl-round" id="p2m3-next" aria-label="Next">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm10-12h2v12h-2z"/></svg>
+        </button>
+        <button class="ctrl-round" id="p2m3-fav-open" aria-label="Like current track" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path class="fav-heart-path" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+        </button>
+    </div>
+
+    </section>
+    <section id="bottom-zone" aria-label="Scrollable playlist">
+
+    <!-- GRID HEADER -->
+    <div id="grid-head">
+        <button id="p2m3-ctrl-hide" type="button" aria-label="Hide playback controls" aria-pressed="false">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4 2v4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 14v-4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+        <button class="m-dim-toggle" id="p2m3-dim-toggle" type="button" aria-label="Dim grid">
+            <svg class="m-dim-icon" viewBox="0 0 24 18" fill="none"></svg>
+        </button>
+        <button class="m-sheet-toggle" id="p2m3-fav-sheet-btn" type="button" aria-label="Open favourites" aria-expanded="false">
+            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 3h4v4H3zM9 3h4v4H9zM3 9h4v4H3zM9 9h4v4H9z" stroke="currentColor" stroke-width="1.3"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- VIDEO GRID -->
+    <div id="video-grid"></div>
+
+    </section>
+    </main>
+
+    <!-- DOCK -->
+    <nav id="dock">
+        <div class="dock-side">
+            <button id="dock-shuffle" aria-label="Shuffle" style="display:none"></button>
+        </div>
+        <button id="dock-play" aria-label="Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="dock-side">
+            <button id="dock-fav" aria-label="Open favourites">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- FAV-SHEET -->
+    <div id="fav-backdrop" aria-hidden="true"></div>
+    <section id="fav-sheet" role="dialog" aria-modal="true" aria-label="Favourites">
+        <div class="fav-sheet-handle" aria-hidden="true"></div>
+        <div id="fav-header">
+            <span id="fav-title">Favourites</span>
+            <button id="fav-close-btn" type="button" aria-label="Close">&times;</button>
+        </div>
+        <div id="fav-actions"><button id="fav-play-all-btn" type="button">Play All</button></div>
+        <div id="fav-empty">No favourites yet.</div>
+        <ul id="fav-list"></ul>
+        <div id="fav-footer"><button id="fav-clear-btn" type="button">Clear All</button></div>
+    </section>
+
+    <!-- VERSION STRIP -->
+    <div id="version-strip"><span>[P2-M3] [2.7]</span></div>
+
+<script>
+/* ============================================================
+   P2-M3 — Custom Build
+   Entry 2 hero card + Entry 3 2-col grid + P1 FAV-SHEET + DIM
+   ============================================================ */
+
+/* --- NAV POPUP --- */
+(function () {
+    var btn   = document.getElementById('nav-links-btn');
+    var popup = document.getElementById('nav-popup');
+    var wordmark = document.querySelector('.m-wordmark');
+
+    /* Wordmark fades out after 6s */
+    setTimeout(function () {
+        if (wordmark) wordmark.classList.add('is-hidden');
+    }, 6000);
+
+    function openP() { popup.classList.add('is-open'); btn.setAttribute('aria-expanded','true'); }
+    function closeP() { popup.classList.remove('is-open'); btn.setAttribute('aria-expanded','false'); }
+
+    btn.addEventListener('click', function (e) { e.stopPropagation(); popup.classList.contains('is-open') ? closeP() : openP(); });
+    document.addEventListener('click', function (e) { if (!popup.contains(e.target) && e.target !== btn) closeP(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeP(); });
+    document.getElementById('nav-music-btn').addEventListener('click', function () { closeP(); });
+}());
+
+/* --- YOUTUBE API --- */
+(function () {
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api'; tag.async = true;
+    document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
+    window.esPlayer = null; window.esQueue = []; window.esCurrentIndex = -1;
+    window.esEnded = false; window.esAPIReady = false;
+
+    window.onYouTubeIframeAPIReady = function () { window.esAPIReady = true; if (window.esQueue.length) window.esCreatePlayer(); };
+
+    window.esCreatePlayer = function () {
+        window.esPlayer = new YT.Player('yt-player', {
+            width: '100%', height: '100%',
+            playerVars: { autoplay:0, controls:1, rel:0, modestbranding:1, fs:1, playsinline:1, enablejsapi:1 },
+            events: {
+                onReady: function () {
+                    var l = document.getElementById('player-loading'); if (l) l.classList.add('is-hidden');
+                    if (window.esQueue.length) {
+                        window.esPlayer.cueVideoById(window.esQueue[0].id);
+                        window.esCurrentIndex = 0;
+                        if (typeof window.esSyncFavouriteButtons === 'function') window.esSyncFavouriteButtons();
+                    }
+                },
+                onStateChange: function (ev) {
+                    if (ev.data === YT.PlayerState.ENDED && !window.esEnded) { window.esEnded = true; playTrack(window.esCurrentIndex + 1); }
+                    updatePlayIcon(ev.data);
+                    if (ev.data === YT.PlayerState.PLAYING && typeof window.esStartProgressTracker === 'function') window.esStartProgressTracker();
+                }
+            }
+        });
+    };
+}());
+
+/* --- TRACK LOADER --- */
+(function () {
+    fetch('tracks.json')
+        .then(function (r) { if (!r.ok) return fetch('../tracks.json').then(function(r2){ if(!r2.ok) throw new Error('tracks.json failed'); return r2.json(); }); return r.json(); })
+        .then(function (tracks) {
+            var grid = document.getElementById('video-grid');
+            tracks.forEach(function (track, idx) {
+                var card = document.createElement('div');
+                card.className = 'v-card';
+                card.setAttribute('data-id', track.id);
+                card.setAttribute('data-title', track.title);
+                card.setAttribute('data-idx', idx);
+
+                var thumb = document.createElement('div'); thumb.className = 'v-card-thumb'; applyThumb(thumb, track.id);
+                var body = document.createElement('div'); body.className = 'v-card-body';
+                var title = document.createElement('div'); title.className = 'v-card-title'; title.textContent = track.title;
+                var actions = document.createElement('div'); actions.className = 'v-card-actions';
+                var num = document.createElement('span'); num.className = 'v-card-num'; num.textContent = String(idx+1).padStart(2,'0');
+                var playBtn = document.createElement('button'); playBtn.className = 'v-play-btn'; playBtn.type = 'button';
+                playBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+                actions.appendChild(num); actions.appendChild(playBtn);
+                body.appendChild(title); body.appendChild(actions);
+                var fav = createFavButton(track);
+                card.appendChild(thumb); card.appendChild(body); card.appendChild(fav);
+                grid.appendChild(card);
+
+                card.addEventListener('click', function () { buildQueue(); playTrack(parseInt(card.getAttribute('data-idx'),10)); });
+                playBtn.addEventListener('click', function (e) { e.stopPropagation(); buildQueue(); playTrack(idx); });
+            });
+            buildQueue();
+            if (typeof window.esSyncFavouriteButtons === 'function') window.esSyncFavouriteButtons();
+            if (window.esAPIReady) window.esCreatePlayer();
+        })
+        .catch(function (err) { console.error('Electroscape: ' + err); });
+
+    function applyThumb(el, id) {
+        var url = 'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg';
+        el.style.backgroundImage = 'url(' + url + ')';
+        var img = new Image(); img.src = url;
+        img.onerror = function () { el.style.backgroundImage = 'url(https://img.youtube.com/vi/' + id + '/sddefault.jpg)'; };
+    }
+}());
+
+/* --- QUEUE & PLAYBACK --- */
+function buildQueue() {
+    window.esQueue = [];
+    document.querySelectorAll('#video-grid .v-card').forEach(function (el) {
+        window.esQueue.push({ id: el.getAttribute('data-id'), title: el.getAttribute('data-title'), el: el });
+    });
+}
+
+function setActiveCard(index) {
+    document.querySelectorAll('.v-card.active').forEach(function (el) { el.classList.remove('active'); });
+    if (window.esQueue[index]) {
+        var id = window.esQueue[index].id;
+        document.querySelectorAll('.v-card[data-id="' + cssEscape(id) + '"]').forEach(function (el) { el.classList.add('active'); });
+        var t = document.getElementById('hero-track-title');
+        if (t) t.textContent = window.esQueue[index].title;
+    }
+}
+
+function playTrack(index) {
+    var q = window.esQueue; if (!q.length) return;
+    window.esCurrentIndex = ((index % q.length) + q.length) % q.length;
+    window.esEnded = false;
+    var track = q[window.esCurrentIndex];
+    if (window.esPlayer && typeof window.esPlayer.loadVideoById === 'function') window.esPlayer.loadVideoById(track.id);
+    setActiveCard(window.esCurrentIndex);
+    if (typeof window.esSyncFavouriteButtons === 'function') window.esSyncFavouriteButtons();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+    document.body.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updatePlayIcon(state) {
+    var playing = (state === 1);
+    var pauseSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+    var playSvg  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    [document.getElementById('p2m3-play'), document.getElementById('dock-play')].forEach(function (b) {
+        if (b) { b.classList.toggle('is-playing', playing); b.innerHTML = playing ? pauseSvg : playSvg; }
+    });
+}
+
+function cssEscape(s) {
+    if (window.CSS && window.CSS.escape) return CSS.escape(s);
+    return String(s).replace(/[^a-zA-Z0-9_-]/g, function (c) { return '\\' + c; });
+}
+
+/* --- TRANSPORT --- */
+(function () {
+    function doPlay() {
+        var p = window.esPlayer; if (!p) return;
+        var s = p.getPlayerState();
+        if (s === 1) p.pauseVideo();
+        else if (s === 2 || s === 5) p.playVideo();
+        else if (window.esCurrentIndex === -1 && window.esQueue.length) playTrack(0);
+        else p.playVideo();
+    }
+    document.getElementById('p2m3-play').addEventListener('click', doPlay);
+    document.getElementById('dock-play').addEventListener('click', doPlay);
+    document.getElementById('p2m3-prev').addEventListener('click', function () { if (window.esQueue.length) playTrack(window.esCurrentIndex - 1); });
+    document.getElementById('p2m3-next').addEventListener('click', function () { if (window.esQueue.length) playTrack(window.esCurrentIndex + 1); });
+
+    function doShuffle() {
+        var grid = document.getElementById('video-grid');
+        var cards = Array.from(grid.querySelectorAll('.v-card'));
+        for (var i = cards.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); grid.appendChild(cards[j]); var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp; }
+        cards.forEach(function (c, ni) { c.setAttribute('data-idx', ni); });
+        buildQueue();
+        var still = window.esQueue.findIndex(function (t) { return t.el && t.el.classList.contains('active'); });
+        window.esCurrentIndex = still !== -1 ? still : 0;
+    }
+    document.getElementById('p2m3-shuffle').addEventListener('click', doShuffle);
+
+    /* fav sheet toggle from grid header */
+    [document.getElementById('p2m3-fav-sheet-btn'), document.getElementById('nav-fav-btn')].forEach(function (b) {
+        if (b) b.addEventListener('click', function () {
+            var sheet = document.getElementById('fav-sheet');
+            var opening = !sheet.classList.contains('is-open');
+            opening ? openFavSheet() : closeFavSheet();
+            var tog = document.getElementById('p2m3-fav-sheet-btn');
+            if (tog) tog.classList.toggle('is-active', opening);
+        });
+    });
+
+    /* heart = like/unlike current track only */
+    document.getElementById('p2m3-fav-open').addEventListener('click', function () {
+        var cur = window.esQueue && window.esQueue[window.esCurrentIndex];
+        if (cur && typeof window.esToggleFavourite === 'function') window.esToggleFavourite({ id: cur.id, title: cur.title });
+        this.blur && this.blur();
+    });
+}());
+
+/* --- DIM TOGGLE --- */
+(function () {
+    var body = document.body;
+    var btns = Array.from(document.querySelectorAll('.m-dim-toggle'));
+    var KEY = 'es_mobile_dim_state'; var state = 0;
+    var states = [
+        { cl: '', label: 'Dim: off', bars: 3 },
+        { cl: 'playlist-dim-medium', label: 'Dim: medium', bars: 2 },
+        { cl: 'playlist-dim-heavy', label: 'Dim: heavy', bars: 1 }
+    ];
+    function iconSvg(cfg) {
+        var xs = cfg.bars === 1 ? [12] : (cfg.bars === 2 ? [8,16] : [6,12,18]);
+        return xs.map(function(x){ return '<line class="dim-zone" x1="'+x+'" y1="4" x2="'+x+'" y2="14"/>'; }).join('');
+    }
+    function apply() {
+        var cfg = states[state];
+        body.classList.remove('playlist-dim-medium','playlist-dim-heavy');
+        if (cfg.cl) body.classList.add(cfg.cl);
+        btns.forEach(function(b){ var ic=b.querySelector('.m-dim-icon'); b.classList.toggle('is-active',state>0); b.setAttribute('aria-label',cfg.label); if(ic) ic.innerHTML=iconSvg(cfg); });
+        try { localStorage.setItem(KEY, String(state)); } catch(e) {}
+    }
+    btns.forEach(function(b){ b.addEventListener('click', function(){ state=(state+1)%states.length; apply(); }); });
+    try { var s=parseInt(localStorage.getItem(KEY),10); if(s>=0&&s<states.length) state=s; } catch(e) {}
+    apply();
+}());
+
+/* --- PROGRESS BAR --- */
+(function () {
+    var track = document.getElementById('progress-track-p2m3');
+    var fill  = document.getElementById('progress-fill-p2m3');
+    var timeCur = document.getElementById('time-current-p2m3');
+    var timeTot = document.getElementById('time-total-p2m3');
+    var interval = null, seeking = false;
+
+    function fmt(s) { s=Math.max(0,Math.floor(s||0)); return Math.floor(s/60)+':'+(s%60<10?'0':'')+(s%60); }
+
+    function updateFill() {
+        var p = window.esPlayer; if (!p || typeof p.getDuration !== 'function') return;
+        var dur = p.getDuration(); if (!dur) return;
+        var cur = p.getCurrentTime(); var pct = (cur/dur)*100;
+        if (fill) fill.style.width = pct + '%';
+        if (timeCur) timeCur.textContent = fmt(cur);
+        if (timeTot) timeTot.textContent = fmt(dur);
+    }
+
+    window.esStartProgressTracker = function () {
+        if (interval) clearInterval(interval);
+        interval = setInterval(function () { if (!seeking) updateFill(); }, 250);
+    };
+
+    function seekFrom(e) {
+        var p = window.esPlayer; if (!p || typeof p.getDuration !== 'function') return;
+        var rect = track.getBoundingClientRect();
+        var cx = e.touches ? e.touches[0].clientX : e.clientX;
+        var pct = Math.max(0, Math.min(1, (cx - rect.left) / rect.width));
+        var dur = p.getDuration(); if (!dur) return;
+        if (fill) fill.style.width = (pct*100) + '%';
+        p.seekTo(pct * dur, true);
+    }
+
+    track.addEventListener('pointerdown', function(e){ seeking=true; track.setPointerCapture(e.pointerId); seekFrom(e); });
+    track.addEventListener('pointermove', function(e){ if(seeking) seekFrom(e); });
+    track.addEventListener('pointerup', function(e){ if(!seeking) return; seeking=false; seekFrom(e); try{track.releasePointerCapture(e.pointerId);}catch(err){} });
+    track.addEventListener('pointercancel', function(){ seeking=false; });
+}());
+
+/* --- FAV BUTTON FACTORY --- */
+function createFavButton(track) {
+    var btn = document.createElement('button');
+    btn.className = 'v-fav-btn'; btn.type = 'button';
+    btn.setAttribute('data-id', track.id); btn.setAttribute('data-title', track.title);
+    btn.setAttribute('aria-label', 'Add to favourites');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path class="fav-heart-path" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+    btn.addEventListener('click', function(e){ e.stopPropagation(); if(typeof window.esToggleFavourite==='function') window.esToggleFavourite({id:btn.getAttribute('data-id'),title:btn.getAttribute('data-title')}); });
+    return btn;
+}
+
+/* --- FAV-SHEET --- */
+function openFavSheet() {
+    renderFavSheet();
+    document.getElementById('fav-sheet').classList.add('is-open');
+    document.getElementById('fav-backdrop').classList.add('is-visible');
+    document.body.classList.add('fav-open');
+}
+function closeFavSheet() {
+    document.getElementById('fav-sheet').classList.remove('is-open');
+    document.getElementById('fav-backdrop').classList.remove('is-visible');
+    document.body.classList.remove('fav-open');
+}
+
+(function () {
+    var KEY = 'es_favourites';
+    function load() { try { return (JSON.parse(localStorage.getItem(KEY))||[]).filter(function(f){return f&&f.id&&f.title;}); } catch(e){return [];} }
+    function save(f) { try { localStorage.setItem(KEY, JSON.stringify(f)); } catch(e){} }
+    function isFav(id, favs) { return favs.some(function(f){return f.id===id;}); }
+
+    function setHeart(btn, active) {
+        var path = btn.querySelector('.fav-heart-path');
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-label', active ? 'Remove from favourites' : 'Add to favourites');
+        if (path) path.setAttribute('fill', active ? 'currentColor' : 'none');
+    }
+    function syncHearts(favs) {
+        favs = favs || load();
+        document.querySelectorAll('.v-fav-btn').forEach(function(b){ setHeart(b, isFav(b.getAttribute('data-id'), favs)); });
+    }
+    function playFavAt(index) {
+        var favs = load();
+        var queue = favs.map(function(f){ var el=document.querySelector('.v-card[data-id="'+cssEscape(f.id)+'"]'); return el?{id:f.id,title:f.title,el:el}:null; }).filter(Boolean);
+        if (!queue.length) return;
+        window.esQueue = queue; playTrack(index); closeFavSheet();
+    }
+    function moveFavBy(from, delta) {
+        var favs=load(); var to=from+delta;
+        if(to<0||to>=favs.length) return;
+        var m=favs.splice(from,1)[0]; favs.splice(to,0,m); save(favs); renderFavSheet();
+    }
+
+    window.renderFavSheet = function () {
+        var favs=load(); var has=favs.length>0;
+        var list=document.getElementById('fav-list');
+        var empty=document.getElementById('fav-empty');
+        var footer=document.getElementById('fav-footer');
+        var actions=document.getElementById('fav-actions');
+        list.innerHTML='';
+        empty.style.display=has?'none':'flex';
+        footer.style.display=has?'flex':'none';
+        actions.style.display=has?'block':'none';
+        favs.forEach(function(fav,idx){
+            var row=document.createElement('li'); row.className='fav-row';
+            var thumb=document.createElement('div'); thumb.className='fav-row-thumb';
+            thumb.style.backgroundImage='url(https://img.youtube.com/vi/'+fav.id+'/maxresdefault.jpg)';
+            var main=document.createElement('div'); main.className='fav-row-main';
+            var title=document.createElement('span'); title.className='fav-row-title'; title.textContent=fav.title;
+            var controls=document.createElement('div'); controls.className='fav-row-controls';
+            var play=document.createElement('button'); play.className='fav-row-btn'; play.type='button';
+            play.innerHTML='<svg viewBox="0 0 16 16" fill="currentColor"><path d="M5 3.5v9l7-4.5-7-4.5z"/></svg>';
+            var up=document.createElement('button'); up.className='fav-row-btn'; up.type='button'; up.disabled=idx===0;
+            up.innerHTML='<svg viewBox="0 0 16 16" fill="none"><path d="M4 10l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+            var down=document.createElement('button'); down.className='fav-row-btn'; down.type='button'; down.disabled=idx===favs.length-1;
+            down.innerHTML='<svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+            var remove=document.createElement('button'); remove.className='fav-row-btn fav-remove-btn'; remove.type='button'; remove.innerHTML='&times;';
+            controls.appendChild(play); controls.appendChild(remove); controls.appendChild(up); controls.appendChild(down);
+            main.appendChild(title); row.appendChild(controls); row.appendChild(thumb); row.appendChild(main);
+            list.appendChild(row);
+            row.addEventListener('click',function(){playFavAt(idx);});
+            play.addEventListener('click',function(e){e.stopPropagation();playFavAt(idx);});
+            up.addEventListener('click',function(e){e.stopPropagation();moveFavBy(idx,-1);});
+            down.addEventListener('click',function(e){e.stopPropagation();moveFavBy(idx,1);});
+            remove.addEventListener('click',function(e){e.stopPropagation();var next=load().filter(function(i){return i.id!==fav.id;});save(next);syncHearts(next);renderFavSheet();});
+        });
+    };
+
+    window.esToggleFavourite = function(track) {
+        if(!track||!track.id) return;
+        var favs=load();
+        if(isFav(track.id,favs)) favs=favs.filter(function(f){return f.id!==track.id;});
+        else favs.push({id:track.id,title:track.title||track.id});
+        save(favs); syncHearts(favs); syncLikeHeart(favs);
+        if(document.getElementById('fav-sheet').classList.contains('is-open')) renderFavSheet();
+    };
+    window.esSyncFavouriteButtons = function(){ var f=load(); syncHearts(f); syncLikeHeart(f); };
+
+    function syncLikeHeart(favs) {
+        var cur = window.esQueue && window.esQueue[window.esCurrentIndex];
+        var btn = document.getElementById('p2m3-fav-open'); if (!btn) return;
+        var liked = !!(cur && isFav(cur.id, favs || load()));
+        btn.classList.toggle('is-liked', liked);
+        btn.setAttribute('aria-pressed', liked ? 'true' : 'false');
+        var path = btn.querySelector('.fav-heart-path');
+        if (path) path.setAttribute('fill', liked ? 'currentColor' : 'none');
+    }
+
+    document.getElementById('fav-backdrop').addEventListener('click', closeFavSheet);
+    document.getElementById('fav-close-btn').addEventListener('click', closeFavSheet);
+    document.getElementById('fav-play-all-btn').addEventListener('click', function(){playFavAt(0);});
+    document.getElementById('fav-clear-btn').addEventListener('click', function(){var f=[];save(f);syncHearts(f);syncLikeHeart(f);renderFavSheet();});
+    document.addEventListener('keydown', function(e){if(e.key==='Escape'&&document.getElementById('fav-sheet').classList.contains('is-open')) closeFavSheet();});
+    var _fi=load(); syncHearts(_fi); syncLikeHeart(_fi);
+}());
+/* --- CTRL-HIDE TOGGLE (independent of dimmer) --- */
+(function () {
+    var body = document.body;
+    var btn  = document.getElementById('p2m3-ctrl-hide');
+    var KEY  = 'es_p2m3_ctrl_hidden';
+    var hidden = false;
+
+    function apply() {
+        body.classList.toggle('p2m3-ctrl-hidden', hidden);
+        btn.classList.toggle('is-active', hidden);
+        btn.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+        btn.setAttribute('aria-label', hidden ? 'Show playback controls' : 'Hide playback controls');
+        try { localStorage.setItem(KEY, hidden ? '1' : '0'); } catch(e) {}
+    }
+
+    btn.addEventListener('click', function () { hidden = !hidden; apply(); btn.blur && btn.blur(); });
+
+    try { if (localStorage.getItem(KEY) === '1') hidden = true; } catch(e) {}
+    apply();
+}());
+
+</script>
+</body>
+</html>
