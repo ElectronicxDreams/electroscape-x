@@ -1831,13 +1831,18 @@ body.fav-open { overflow: hidden; }
 
     <script>
 /* ============================================================
-   MOBILE REDIRECT — phone-width only (≤620px)
-   No user-agent detection. Width-based per project rules.
-   Target: mobile1.html
+   DEVICE REDIRECT — width-based, no user-agent detection
+   ≤620px    → mobile1.html  (Samsung S25 Plus: 360px, all iPhones: 375–430px)
+   621–1034px → mobile2.html (Honor MagicPad2: 768px, all iPads: 768–1024px)
+   ?view=desktop bypasses all redirects
    ============================================================ */
 (function () {
-    if (window.innerWidth <= 620 && !window.location.search.includes('view=desktop')) {
+    if (window.location.search.includes('view=desktop')) return;
+    var w = window.innerWidth;
+    if (w <= 620) {
         window.location.replace('mobile1.html');
+    } else if (w <= 1034) {
+        window.location.replace('mobile2.html');
     }
 }());
 
