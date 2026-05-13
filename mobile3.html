@@ -7,7 +7,7 @@
           nav-dim-toggle rewired to fav-sheet opener, dim-toggle parked bottom-right overlay,
           #grid-head removed (freed space), ctrl-hide-toggle button removed from EQ panel -->
 <!-- v1.3: CTRL-PREV/NEXT subtle colour, Mobile V3 nav link added, NAV-FAV-BTN changed to chevron-left -->
-<!-- v2.6: EQ panel gets 3 animations (cycle on tap): dotbars/aurora/eq-blocks;
+<!-- v2.6: EQ panel visuals stripped (no EQ graphics active);
           EQ panel top margin +5px; DIM-TOGGLE moved to nav-header centre;
           nav-version repositioned between dim and fav button -->
 <!-- v1.6: CTRL-PREV/NEXT colour changed from cyan to soft light purple -->
@@ -196,8 +196,8 @@
         #player-loading.is-hidden { opacity: 0; }
 
         /* ============================================================
-           EQ PANEL — directly under hero, tap = ctrl-hide toggle
-           No side buttons. Centred dotbars only.
+           EQ PANEL — visuals stripped (blank state)
+           No side buttons. No EQ graphics rendered.
            ============================================================ */
         #eq-panel {
             position: relative; z-index: 2;
@@ -214,73 +214,254 @@
         #eq-panel:hover { opacity: 0.8; }
         body.p3m1-ctrl-hidden #eq-panel { opacity: 0.5; }
 
-        /* EQ animation containers — only active one shown */
-        .eq-anim { display: none; align-items: center; justify-content: center; pointer-events: none; width: 100%; }
-        .eq-anim.active { display: flex; }
-
-        /* --- EQ-0: original dotbars --- */
-        .eq-graphic {
-            display: flex; align-items: center; justify-content: center;
-            gap: 5px; height: 32px; width: 100%;
-        }
-        .dotbar {
-            width: 3px; height: 4px;
-            border-radius: 99px;
-            background: transparent;
-            transition: height 0.2s, background 0.2s;
-        }
-        body.playing .dotbar { background: rgba(255,255,255,.28); }
-        body.playing .dotbar { animation: eq-dance 1.05s infinite ease-in-out; }
-        body.playing .dotbar:nth-child(1) { animation-delay: .02s; }
-        body.playing .dotbar:nth-child(2) { animation-delay: .10s; }
-        body.playing .dotbar:nth-child(3) { animation-delay: .18s; }
-        body.playing .dotbar:nth-child(4) { animation-delay: .04s; }
-        body.playing .dotbar:nth-child(5) { animation-delay: .14s; }
-        body.playing .dotbar:nth-child(6) { animation-delay: .25s; }
-        body.playing .dotbar:nth-child(7) { animation-delay: .08s; }
-        body.playing .dotbar:nth-child(8) { animation-delay: .20s; }
-        body.playing .dotbar:nth-child(9) { animation-delay: .30s; }
-        @keyframes eq-dance {
-            0%,100% { height: 4px;  background: rgba(255,255,255,.28); box-shadow: none; }
-            35%     { height: 18px; background: var(--blue); box-shadow: 0 0 10px rgba(31,123,255,.7); }
-            62%     { height: 26px; background: var(--mag);  box-shadow: 0 0 12px rgba(255,67,247,.75); }
-        }
-
-        /* --- EQ-1: Aurora Pulse Dots — only animates when playing --- */
-        .aurora { display: flex; align-items: center; justify-content: center; gap: 6px; height: 36px; }
-        .aurora span { width: 6px; height: 6px; border-radius: 999px; background: transparent; }
-        body.playing .aurora span { animation: aurora 1.35s infinite ease-in-out; }
-        body.playing .aurora span:nth-child(1){animation-delay:0s} body.playing .aurora span:nth-child(2){animation-delay:.08s} body.playing .aurora span:nth-child(3){animation-delay:.16s} body.playing .aurora span:nth-child(4){animation-delay:.24s} body.playing .aurora span:nth-child(5){animation-delay:.32s} body.playing .aurora span:nth-child(6){animation-delay:.4s} body.playing .aurora span:nth-child(7){animation-delay:.48s} body.playing .aurora span:nth-child(8){animation-delay:.56s} body.playing .aurora span:nth-child(9){animation-delay:.64s} body.playing .aurora span:nth-child(10){animation-delay:.72s} body.playing .aurora span:nth-child(11){animation-delay:.8s}
-        @keyframes aurora {
-            0%,100% { height: 6px; background: rgba(255,255,255,.22); box-shadow: 0 0 0 transparent; transform: translateY(0) scale(.9); }
-            35%     { height: 14px; background: var(--blue); box-shadow: 0 0 8px rgba(31,123,255,.85); transform: translateY(-1px); }
-            68%     { height: 18px; background: var(--mag);  box-shadow: 0 0 10px rgba(255,67,247,.85); transform: translateY(1px) scale(1.02); }
-        }
-
-        /* --- EQ-2: Equalizer Blocks — only animates when playing --- */
-        .eq-box {
-            width: 90%; height: 32px;
-            display: flex; align-items: flex-end; justify-content: center;
-            gap: 5px; padding: 0 8px 0;
+        /* ============================================================
+           EQ BOX — invisible fixed container, same size for all anims
+           All animations are absolutely positioned inside, never stretch
+           ============================================================ */
+        #eq-box {
+            width: 100%;
+            height: 44px;
+            position: relative;
             overflow: hidden;
         }
-        .eq-box span {
-            flex: 1; max-width: 12px;
-            height: 6px; min-height: 6px;
+
+        .eq-anim {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .eq-anim.active { display: flex; }
+
+        /* Invisible when paused — all animations */
+        body:not(.playing) .eq-anim { opacity: 0; }
+        body.playing .eq-anim.active { opacity: 1; }
+
+        /* ---- EQ-1: Aurora Pulse Dots (X1-1) — dots only, no backgrounds ---- */
+        .aurora-dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 100%;
+            width: 100%;
+        }
+        .aurora-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 999px;
+            background: transparent;
+            flex-shrink: 0;
+        }
+        body.playing .aurora-dot {
+            background: rgba(255,255,255,.22);
+            animation: auroraDot 1.35s infinite ease-in-out;
+        }
+        body.playing .aurora-dot:nth-child(1)  { animation-delay: 0s; }
+        body.playing .aurora-dot:nth-child(2)  { animation-delay: .08s; }
+        body.playing .aurora-dot:nth-child(3)  { animation-delay: .16s; }
+        body.playing .aurora-dot:nth-child(4)  { animation-delay: .24s; }
+        body.playing .aurora-dot:nth-child(5)  { animation-delay: .32s; }
+        body.playing .aurora-dot:nth-child(6)  { animation-delay: .40s; }
+        body.playing .aurora-dot:nth-child(7)  { animation-delay: .48s; }
+        body.playing .aurora-dot:nth-child(8)  { animation-delay: .56s; }
+        body.playing .aurora-dot:nth-child(9)  { animation-delay: .64s; }
+        body.playing .aurora-dot:nth-child(10) { animation-delay: .72s; }
+        body.playing .aurora-dot:nth-child(11) { animation-delay: .80s; }
+        @keyframes auroraDot {
+            0%,100% { height: 5px;  background: rgba(255,255,255,.22); box-shadow: none;                           transform: scale(.9); }
+            35%     { height: 26px; background: var(--blue);           box-shadow: 0 0 4px rgba(31,123,255,.6);   transform: translateY(-2px); }
+            68%     { height: 35px; background: var(--mag);            box-shadow: 0 0 4px rgba(255,51,102,.6);   transform: translateY(2px) scale(1.04); }
+        }
+        /* ---- EQ-2: Neon Waveform (X1-2) — bars only, no backgrounds ---- */
+        .neon-wave {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            height: 100%;
+            width: 90%;
+        }
+        .nw-bar {
+            width: 3px;
+            border-radius: 999px;
+            height: 6px;
+            background: transparent;
+            flex-shrink: 0;
+        }
+        body.playing .nw-bar {
+            background: linear-gradient(180deg, var(--cyan), var(--mag));
+            box-shadow: 0 0 5px rgba(32,221,255,.4);
+            animation: neonWave 1.1s infinite ease-in-out;
+        }
+        body.playing .nw-bar:nth-child(odd)  { animation-delay: .08s; }
+        body.playing .nw-bar:nth-child(3n)   { animation-delay: .18s; }
+        body.playing .nw-bar:nth-child(4n)   { animation-delay: .28s; }
+        body.playing .nw-bar:nth-child(5n)   { animation-delay: .38s; }
+        @keyframes neonWave {
+            0%,100% { height: 4px;  opacity: .38; filter: hue-rotate(0deg); }
+            25%     { height: 36px; opacity: 1;   filter: hue-rotate(30deg); }
+            50%     { height: 14px; opacity: .72; filter: hue-rotate(80deg); }
+            75%     { height: 40px; opacity: 1;   filter: hue-rotate(130deg); }
+        }
+
+        /* ---- EQ-3: Frequency Spectrum Arc (R6) — bars only, no backgrounds ---- */
+        .spec-arc {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 4px;
+            height: 100%;
+            width: 92%;
+            padding-bottom: 2px;
+        }
+        /* Bar container — fixed arc height, always present as invisible scaffold */
+        .arc-bar {
+            flex: 1;
+            max-width: 13px;
             border-radius: 3px 3px 1px 1px;
+            position: relative;
+            height: var(--ah);
+            background: transparent;
+        }
+        /* Bar fill — grows from bottom, transparent at rest */
+        .arc-bar::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 0;
+            border-radius: inherit;
+            background: transparent;
+        }
+        /* White cap — transparent at rest */
+        .arc-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 2px;
+            border-radius: 999px;
+            background: transparent;
+            opacity: 0;
+        }
+        body.playing .arc-bar::before {
+            background: linear-gradient(180deg, var(--cyan), var(--violet) 45%, var(--mag));
+            box-shadow: 0 0 6px rgba(255,51,102,.45);
+            animation: arcFill 1.05s infinite ease-in-out;
+        }
+        body.playing .arc-bar::after {
+            background: rgba(255,255,255,.5);
+            box-shadow: 0 0 4px rgba(32,221,255,.7);
+            animation: arcCap 1.05s infinite ease-in-out;
+            opacity: 1;
+        }
+        body.playing .arc-bar:nth-child(1)  { animation-delay: .00s; }
+        body.playing .arc-bar:nth-child(2)  { animation-delay: .05s; }
+        body.playing .arc-bar:nth-child(3)  { animation-delay: .10s; }
+        body.playing .arc-bar:nth-child(4)  { animation-delay: .15s; }
+        body.playing .arc-bar:nth-child(5)  { animation-delay: .20s; }
+        body.playing .arc-bar:nth-child(6)  { animation-delay: .25s; }
+        body.playing .arc-bar:nth-child(7)  { animation-delay: .30s; }
+        body.playing .arc-bar:nth-child(8)  { animation-delay: .25s; }
+        body.playing .arc-bar:nth-child(9)  { animation-delay: .20s; }
+        body.playing .arc-bar:nth-child(10) { animation-delay: .15s; }
+        body.playing .arc-bar:nth-child(11) { animation-delay: .10s; }
+        body.playing .arc-bar:nth-child(12) { animation-delay: .05s; }
+        body.playing .arc-bar::before,
+        body.playing .arc-bar::after { animation-delay: inherit; }
+        @keyframes arcFill {
+            0%,100% { height: 25%; opacity: .6;  filter: hue-rotate(0deg); }
+            40%     { height: 100%; opacity: 1;  filter: hue-rotate(40deg); }
+            70%     { height: 55%; opacity: .8;  filter: hue-rotate(90deg); }
+        }
+        @keyframes arcCap {
+            0%,100% { top: 75%;  opacity: .4; }
+            40%     { top: 0%;   opacity: .8; }
+            70%     { top: 45%;  opacity: .6; }
+        }
+        /* ---- EQ-4: Cylon Scanner — thin red beam, no rail, no grey line ---- */
+        .cylon-scan {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+        /* Narrow hard beam */
+        .cylon-scan::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            width: 6%;
+            height: 1.5px;
+            border-radius: 999px;
+            background: transparent;
+            pointer-events: none;
+        }
+        /* Wide soft glow halo */
+        .cylon-scan::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            width: 11%;
+            height: 7px;
+            border-radius: 999px;
+            background: transparent;
+            pointer-events: none;
+        }
+        body.playing .cylon-scan::before {
+            background: #ff1a1a;
+            box-shadow:
+                0 0 2px 1px rgba(255,0,0,1),
+                0 0 5px 2px rgba(200,0,0,.8);
+            animation: cylonBeam 2.4s infinite cubic-bezier(0.37,0,0.63,1) alternate;
+        }
+        body.playing .cylon-scan::after {
+            background: radial-gradient(ellipse at center,
+                rgba(255,20,0,.22) 0%,
+                rgba(200,0,0,.08) 55%,
+                transparent 100%
+            );
+            animation: cylonBeam 2.4s infinite cubic-bezier(0.37,0,0.63,1) alternate;
+        }
+        @keyframes cylonBeam {
+            from { transform: translateX(-428%) translateY(-50%); }
+            to   { transform: translateX(246%) translateY(-50%); }
+        }
+
+        .eq-block {
+            flex: 1;
+            max-width: 14px;
+            height: 4px;
+            border-radius: 3px 3px 1px 1px;
+            /* transparent at rest — only visible when playing */
             background: transparent;
             box-shadow: none;
+            margin: 0 2px;
         }
-        body.playing .eq-box span {
+        body.playing .eq-block {
             background: linear-gradient(180deg, var(--mag), var(--violet) 55%, var(--blue));
-            box-shadow: 0 0 8px rgba(255,67,247,.5), inset 0 1px 0 rgba(255,255,255,.25);
+            box-shadow: 0 0 8px rgba(255,51,102,.5), inset 0 1px 0 rgba(255,255,255,.2);
             animation: eqBlocks 1.15s infinite ease-in-out;
         }
-        body.playing .eq-box span:nth-child(1){animation-delay:.00s} body.playing .eq-box span:nth-child(2){animation-delay:.08s} body.playing .eq-box span:nth-child(3){animation-delay:.16s} body.playing .eq-box span:nth-child(4){animation-delay:.24s} body.playing .eq-box span:nth-child(5){animation-delay:.32s} body.playing .eq-box span:nth-child(6){animation-delay:.40s} body.playing .eq-box span:nth-child(7){animation-delay:.48s} body.playing .eq-box span:nth-child(8){animation-delay:.56s} body.playing .eq-box span:nth-child(9){animation-delay:.64s} body.playing .eq-box span:nth-child(10){animation-delay:.72s} body.playing .eq-box span:nth-child(11){animation-delay:.80s}
+        body.playing .eq-block:nth-child(1)  { animation-delay: .00s; }
+        body.playing .eq-block:nth-child(2)  { animation-delay: .08s; }
+        body.playing .eq-block:nth-child(3)  { animation-delay: .16s; }
+        body.playing .eq-block:nth-child(4)  { animation-delay: .24s; }
+        body.playing .eq-block:nth-child(5)  { animation-delay: .32s; }
+        body.playing .eq-block:nth-child(6)  { animation-delay: .40s; }
+        body.playing .eq-block:nth-child(7)  { animation-delay: .48s; }
+        body.playing .eq-block:nth-child(8)  { animation-delay: .56s; }
+        body.playing .eq-block:nth-child(9)  { animation-delay: .64s; }
+        body.playing .eq-block:nth-child(10) { animation-delay: .72s; }
+        body.playing .eq-block:nth-child(11) { animation-delay: .80s; }
         @keyframes eqBlocks {
-            0%,100% { height: 6px;  filter: hue-rotate(0deg);  opacity: .75; }
-            40%     { height: 18px; filter: hue-rotate(20deg); opacity: 1; }
-            70%     { height: 12px; filter: hue-rotate(80deg); opacity: .9; }
+            0%,100% { height: 4px;  filter: hue-rotate(0deg);   opacity: .75; }
+            40%     { height: 36px; filter: hue-rotate(20deg);  opacity: 1;   }
+            70%     { height: 20px; filter: hue-rotate(80deg);  opacity: .9;  }
         }
 
         /* ============================================================
@@ -736,28 +917,66 @@
             </div>
         </section>
 
-        <!-- EQ PANEL — tap = cycle animation, ctrl-hide toggle on long-press handled via JS -->
-        <section id="eq-panel" role="button" aria-label="Cycle EQ animation" aria-pressed="false" tabindex="0">
-            <!-- EQ-0: dotbars (default) -->
-            <div class="eq-anim active" id="eq-anim-0">
-                <div class="eq-graphic">
-                    <span class="dotbar"></span><span class="dotbar"></span><span class="dotbar"></span>
-                    <span class="dotbar"></span><span class="dotbar"></span><span class="dotbar"></span>
-                    <span class="dotbar"></span><span class="dotbar"></span><span class="dotbar"></span>
+        <!-- EQ PANEL — X1-6 Equalizer Blocks, blank when paused -->
+        <section id="eq-panel" role="button" aria-label="EQ panel" aria-pressed="false" tabindex="0">
+            <div id="eq-box">
+                <div class="eq-anim active" id="eq-anim-0">
+                    <span class="eq-block"></span>
+                    <span class="eq-block"></span>
+                    <span class="eq-block"></span>
+                    <span class="eq-block"></span>
+                    <span class="eq-block"></span>
+                    <span class="eq-block"></span>
+                    <span class="eq-block"></span>
+                    <span class="eq-block"></span>
+                    <span class="eq-block"></span>
+                    <span class="eq-block"></span>
+                    <span class="eq-block"></span>
                 </div>
-            </div>
-            <!-- EQ-1: Aurora Pulse Dots -->
-            <div class="eq-anim" id="eq-anim-1">
-                <div class="aurora">
-                    <span></span><span></span><span></span><span></span><span></span><span></span>
-                    <span></span><span></span><span></span><span></span><span></span>
+                <div class="eq-anim" id="eq-anim-1">
+                    <div class="aurora-dots">
+                        <span class="aurora-dot"></span>
+                        <span class="aurora-dot"></span>
+                        <span class="aurora-dot"></span>
+                        <span class="aurora-dot"></span>
+                        <span class="aurora-dot"></span>
+                        <span class="aurora-dot"></span>
+                        <span class="aurora-dot"></span>
+                        <span class="aurora-dot"></span>
+                        <span class="aurora-dot"></span>
+                        <span class="aurora-dot"></span>
+                        <span class="aurora-dot"></span>
+                    </div>
                 </div>
-            </div>
-            <!-- EQ-2: Equalizer Blocks -->
-            <div class="eq-anim" id="eq-anim-2">
-                <div class="eq-box">
-                    <span></span><span></span><span></span><span></span><span></span><span></span>
-                    <span></span><span></span><span></span><span></span><span></span>
+                <div class="eq-anim" id="eq-anim-2">
+                    <div class="neon-wave">
+                        <span class="nw-bar"></span><span class="nw-bar"></span><span class="nw-bar"></span>
+                        <span class="nw-bar"></span><span class="nw-bar"></span><span class="nw-bar"></span>
+                        <span class="nw-bar"></span><span class="nw-bar"></span><span class="nw-bar"></span>
+                        <span class="nw-bar"></span><span class="nw-bar"></span><span class="nw-bar"></span>
+                        <span class="nw-bar"></span><span class="nw-bar"></span><span class="nw-bar"></span>
+                        <span class="nw-bar"></span><span class="nw-bar"></span><span class="nw-bar"></span>
+                        <span class="nw-bar"></span><span class="nw-bar"></span><span class="nw-bar"></span>
+                    </div>
+                </div>
+                <div class="eq-anim" id="eq-anim-3">
+                    <div class="spec-arc">
+                        <span class="arc-bar" style="--ah:5px"></span>
+                        <span class="arc-bar" style="--ah:12px"></span>
+                        <span class="arc-bar" style="--ah:20px"></span>
+                        <span class="arc-bar" style="--ah:29px"></span>
+                        <span class="arc-bar" style="--ah:36px"></span>
+                        <span class="arc-bar" style="--ah:40px"></span>
+                        <span class="arc-bar" style="--ah:38px"></span>
+                        <span class="arc-bar" style="--ah:36px"></span>
+                        <span class="arc-bar" style="--ah:29px"></span>
+                        <span class="arc-bar" style="--ah:20px"></span>
+                        <span class="arc-bar" style="--ah:12px"></span>
+                        <span class="arc-bar" style="--ah:5px"></span>
+                    </div>
+                </div>
+                <div class="eq-anim" id="eq-anim-4">
+                    <div class="cylon-scan"></div>
                 </div>
             </div>
         </section>
@@ -1022,7 +1241,7 @@ function cssEscape(s) {
 (function () {
     var body  = document.body;
     var panel = document.getElementById('eq-panel');
-    var anims = [document.getElementById('eq-anim-0'), document.getElementById('eq-anim-1'), document.getElementById('eq-anim-2')];
+    var anims = Array.from(panel.querySelectorAll('.eq-anim'));
     var EQ_KEY   = 'es_p3m1_eq_anim';
     var HIDE_KEY = 'es_p3m1_ctrl_hidden';
     var current = 0;
@@ -1030,7 +1249,7 @@ function cssEscape(s) {
     var pressTimer = null;
 
     /* Restore saved state */
-    try { var sc = parseInt(localStorage.getItem(EQ_KEY), 10); if (sc >= 0 && sc < 3) current = sc; } catch(e) {}
+    try { var sc = parseInt(localStorage.getItem(EQ_KEY), 10); if (sc >= 0 && sc < anims.length) current = sc; } catch(e) {}
     try { if (localStorage.getItem(HIDE_KEY) === '1') hidden = true; } catch(e) {}
 
     function showAnim(idx) {
@@ -1055,7 +1274,7 @@ function cssEscape(s) {
         if (pressTimer !== null) {
             clearTimeout(pressTimer);
             pressTimer = null;
-            current = (current + 1) % 3;
+            current = (current + 1) % anims.length;
             showAnim(current);
         }
     });
@@ -1063,7 +1282,7 @@ function cssEscape(s) {
         if (pressTimer !== null) { clearTimeout(pressTimer); pressTimer = null; }
     });
     panel.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { current = (current + 1) % 3; showAnim(current); }
+        if (e.key === 'Enter') { current = (current + 1) % anims.length; showAnim(current); }
         if (e.key === ' ')    { e.preventDefault(); hidden = !hidden; applyHide(); }
     });
 
