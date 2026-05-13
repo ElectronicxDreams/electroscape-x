@@ -1315,20 +1315,8 @@ body.glass-dark .music-card {
 }
 #m1-fav.is-active .fav-heart-path { fill: currentColor; }
 
-.m-section-label {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 10px 20px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-    font-size: 7px;
-    letter-spacing: 5px;
-    color: #00FFE6;
-    text-transform: uppercase;
-    border-top: 1px solid rgba(255,255,255,0.08);
-}
+        /* GRID CONTROL STRIP — hidden, controls moved into player-controls row */
+        .m-section-label { display: none; }
 #ctrl-hide-toggle,
 .m-dim-toggle {
     width: 28px;
@@ -1370,11 +1358,24 @@ body.playlist-dim-heavy #video-grid {
     opacity: 0.09;
     transition: opacity 0.28s ease;
 }
-body.ctrl-hidden #progress-bar-wrap,
-body.ctrl-hidden #player-controls {
+body.ctrl-hidden #progress-bar-wrap {
     opacity: 0 !important;
     pointer-events: none !important;
     transition: opacity 0.3s ease;
+}
+/* Hide each control child individually so #ctrl-hide-toggle stays visible */
+body.ctrl-hidden #m1-shuffle,
+body.ctrl-hidden .m-transport,
+body.ctrl-hidden #m1-fav,
+body.ctrl-hidden #m1-dim-toggle {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease;
+}
+/* ctrl-hide button stays at 25% and tappable */
+body.ctrl-hidden #ctrl-hide-toggle {
+    opacity: 0.25 !important;
+    pointer-events: auto !important;
 }
 #fav-backdrop {
     position: fixed;
@@ -1632,6 +1633,12 @@ body.fav-open { overflow: hidden; }
 
         <!-- PLAYER-CONTROLS -->
         <div id="player-controls" class="m-controls">
+            <button id="ctrl-hide-toggle" type="button" aria-label="Hide playback controls" aria-pressed="false">
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M4 2v4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 14v-4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
             <button class="m-btn-ghost" id="m1-shuffle" aria-label="Shuffle">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 7h3.4c2 0 3.2 1 4.4 2.8l2.4 3.4C14.4 15 15.6 16 17.6 16H19"/>
@@ -1656,26 +1663,19 @@ body.fav-open { overflow: hidden; }
                     <path class="fav-heart-path" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                 </svg>
             </button>
-        </div><!-- end #player-controls -->
-
-        <!-- GRID CONTROL STRIP -->
-        <div class="m-section-label">
-            <button id="ctrl-hide-toggle" type="button" aria-label="Hide playback controls" aria-pressed="false">
-                <svg viewBox="0 0 16 16" aria-hidden="true">
-                    <path d="M4 2v4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 14v-4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
             <button class="m-dim-toggle" id="m1-dim-toggle" type="button" aria-label="Dim grid">
                 <svg class="m-dim-icon" viewBox="0 0 24 18" fill="none" aria-hidden="true"></svg>
             </button>
-        </div>
+        </div><!-- end #player-controls -->
+
+        <!-- GRID CONTROL STRIP -->
+        <div class="m-section-label"></div>
 
         <!-- VIDEO-GRID -->
         <div id="video-grid"></div>
 
         <!-- VERSION FOOTER -->
-        <div id="version-footer">7.0.4</div>
+        <div id="version-footer">7.0.5</div>
 
     </div><!-- end #player-section -->
 
