@@ -94,6 +94,21 @@
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
         }
         #nav-popup.is-open { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+        #nav-popup-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 9400;
+            background: transparent;
+            opacity: 0;
+            pointer-events: none;
+            border: 0;
+            padding: 0;
+            margin: 0;
+        }
+        #nav-popup-backdrop.is-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
         .nav-popup-item {
             display: flex; align-items: center; justify-content: center; padding: 14px 20px;
             font-family: 'Michroma', sans-serif; font-size: 8px; letter-spacing: 5px;
@@ -645,6 +660,7 @@
     </div>
 
     <!-- NAV-POPUP -->
+    <button id="nav-popup-backdrop" type="button" aria-label="Close navigation links" tabindex="-1"></button>
     <div id="nav-popup" role="dialog" aria-label="Navigation links">
         <a class="nav-popup-item" href="https://links.electroscapex.com/" target="_blank" rel="noopener noreferrer">Weblinks</a>
         <button class="nav-popup-item" id="nav-music-btn">Music Directory</button>
@@ -779,17 +795,37 @@
 (function () {
     var btn   = document.getElementById('nav-links-btn');
     var popup = document.getElementById('nav-popup');
+    var backdrop = document.getElementById('nav-popup-backdrop');
     var wordmark = document.querySelector('.m-wordmark');
+    var popupTimer = null;
 
     /* Wordmark fades out after 6s */
     setTimeout(function () {
         if (wordmark) wordmark.classList.add('is-hidden');
     }, 6000);
 
-    function openP() { popup.classList.add('is-open'); btn.setAttribute('aria-expanded','true'); }
-    function closeP() { popup.classList.remove('is-open'); btn.setAttribute('aria-expanded','false'); }
+    function clearPopupTimer() {
+        if (popupTimer) { clearTimeout(popupTimer); popupTimer = null; }
+    }
+    function armPopupTimer() {
+        clearPopupTimer();
+        popupTimer = setTimeout(function () { closeP(); }, 6000);
+    }
+    function openP() {
+        popup.classList.add('is-open');
+        backdrop.classList.add('is-active');
+        btn.setAttribute('aria-expanded','true');
+        armPopupTimer();
+    }
+    function closeP() {
+        popup.classList.remove('is-open');
+        backdrop.classList.remove('is-active');
+        btn.setAttribute('aria-expanded','false');
+        clearPopupTimer();
+    }
 
     btn.addEventListener('click', function (e) { e.stopPropagation(); popup.classList.contains('is-open') ? closeP() : openP(); });
+    backdrop.addEventListener('click', closeP);
     document.addEventListener('click', function (e) { if (!popup.contains(e.target) && e.target !== btn) closeP(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeP(); });
     document.getElementById('nav-music-btn').addEventListener('click', function () {
