@@ -108,68 +108,66 @@
         }
 
         /* ============================================================
-           NAV-HEADER — LINKS button + WORDMARK area
-           In-page (not fixed). Part of the normal page flow.
-           Auto-hides 10s after load. NAV-REVEAL replaces it.
+           NAV-HEADER — persistent top controls
            ============================================================ */
         #nav-header {
+            position: fixed;
+            top: 10px;
+            left: 0;
+            right: 0;
+            z-index: 9300;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            padding: 14px 20px 0;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        #nav-header.is-hidden {
-            opacity: 0;
-            visibility: hidden;
+            padding: 0 16px;
             pointer-events: none;
         }
         #nav-links-btn {
-            background: rgba(0,255,230,0.08);
-            border: 1px solid rgba(0,255,230,0.3);
-            border-radius: 4px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,255,230,0.22);
+            background: rgba(0,255,230,0.06);
             color: var(--cyan);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 7px;
-            letter-spacing: 4px;
-            text-indent: 4px;
-            text-transform: uppercase;
-            padding: 6px 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: background 0.2s, border-color 0.2s;
+            pointer-events: auto;
         }
         #nav-links-btn:hover {
             background: rgba(0,255,230,0.14);
             border-color: var(--cyan);
         }
-
-        /* NAV-REVEAL — down chevron, fixed centred top, shown after nav hides */
-        #nav-reveal-cue {
-            position: fixed;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%) translateY(-100%);
-            width: 40px;
-            height: 28px;
-            display: flex;
+        #nav-links-btn svg {
+            width: 16px;
+            height: 16px;
+            display: block;
+        }
+        #nav-fav-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,255,230,0.22);
+            background: rgba(0,255,230,0.06);
+            color: var(--cyan);
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: transparent;
-            border: none;
-            color: var(--cyan);
-            z-index: 9100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.3s ease;
             cursor: pointer;
-        }
-        #nav-reveal-cue.is-visible {
-            opacity: 0.85;
+            transition: background 0.2s, border-color 0.2s;
             pointer-events: auto;
-            transform: translateX(-50%) translateY(0);
         }
-        #nav-reveal-cue:hover { opacity: 1; }
-        #nav-reveal-cue svg { width: 14px; height: 9px; stroke: currentColor; fill: none; }
+        #nav-fav-btn:hover,
+        #nav-fav-btn.is-active {
+            background: rgba(0,255,230,0.12);
+            border-color: var(--cyan);
+        }
+        #nav-fav-btn svg {
+            width: 16px;
+            height: 16px;
+        }
 
         #nav-popup {
             position: fixed;
@@ -230,12 +228,12 @@
            M1 layout (Spotify-minimal)
            ============================================================ */
 
-        /* M1 Header — reduced top padding since NAV-HEADER sits above */
+        /* M1 Header */
         body.theme-m1 .m-header {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 20px 10px;
+            padding: 56px 20px 10px;
             border-bottom: 1px solid var(--border-soft);
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
@@ -482,13 +480,7 @@
             pointer-events: none;
             transition: opacity 0.3s ease;
         }
-        body.ctrl-hidden #nav-reveal-cue {
-            opacity: 0 !important;
-            pointer-events: none !important;
-        }
-
-        .m-dim-toggle,
-        .m-sheet-toggle {
+        .m-dim-toggle {
             width: 28px;
             height: 24px;
             border: 1px solid rgba(0,255,230,0.22);
@@ -504,21 +496,13 @@
             transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
         }
         .m-dim-toggle:hover,
-        .m-dim-toggle.is-active,
-        .m-sheet-toggle:hover,
-        .m-sheet-toggle.is-active {
+        .m-dim-toggle.is-active {
             border-color: rgba(0,255,230,0.55);
             background: rgba(0,255,230,0.07);
         }
-        .m-dim-toggle.is-active,
-        .m-sheet-toggle.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
+        .m-dim-toggle.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
         .m-dim-toggle svg {
             width: 20px;
-            height: 16px;
-            display: block;
-        }
-        .m-sheet-toggle svg {
-            width: 16px;
             height: 16px;
             display: block;
         }
@@ -775,16 +759,18 @@
 </head>
 <body class="theme-m1">
 
-    <!-- NAV-HEADER: in-page, auto-hides after 10s -->
+    <!-- NAV-HEADER: persistent top controls -->
     <div id="nav-header">
-        <button id="nav-links-btn" aria-label="Links" aria-expanded="false" aria-controls="nav-popup">Links</button>
-    </div>
-
-    <!-- NAV-REVEAL: page-top chevron, appears after nav hides -->
-    <div id="nav-reveal-cue" role="button" tabindex="0" aria-label="Show navigation">
-        <svg viewBox="0 0 14 9" aria-hidden="true">
-            <path d="M1.5 1.5L7 7L12.5 1.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <button id="nav-links-btn" aria-label="Links" aria-expanded="false" aria-controls="nav-popup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h16"/>
+            </svg>
+        </button>
+        <button id="nav-fav-btn" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
+        </button>
     </div>
 
     <!-- NAV-POPUP -->
@@ -859,11 +845,6 @@
         </button>
         <button class="m-dim-toggle" id="m1-dim-toggle" type="button" aria-label="Dim playlist">
             <svg class="m-dim-icon" viewBox="0 0 24 18" fill="none" aria-hidden="true"></svg>
-        </button>
-        <button class="m-sheet-toggle" id="m1-fav-sheet-toggle" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M3 3h4v4H3zM9 3h4v4H9zM3 9h4v4H3zM9 9h4v4H9z" stroke="currentColor" stroke-width="1.3"/>
-            </svg>
         </button>
     </div>
     <div class="m-track-list" id="m-track-list"></div>
@@ -959,82 +940,33 @@
    ============================================================ */
 
 /* ============================================================
-   NAV AUTO-HIDE + REVEAL SYSTEM
-   LINKS button + WORDMARK hide after 10s.
-   NAV-REVEAL chevron appears. Click it to wake nav back up.
-   NAV-POPUP auto-closes 5s after opening if no link clicked.
+   NAV POPUP + TITLE FADE
+   Burger stays visible; title fade stays intact.
    ============================================================ */
 (function () {
     var btn      = document.getElementById('nav-links-btn');
     var popup    = document.getElementById('nav-popup');
-    var navHdr   = document.getElementById('nav-header');
     var wordmark = document.querySelector('.m-header');
-    var reveal   = document.getElementById('nav-reveal-cue');
+    var TITLE_HIDE_DELAY = 10000;
 
-    var hideTimer   = null;
-    var popupTimer  = null;
-    var HIDE_DELAY  = 10000;  /* 10s initial */
-    var REHIDE_DELAY = 4000;  /* 4s after popup closes */
-    var POPUP_AUTO  = 5000;   /* popup closes after 5s */
-
-    function dimNav() {
-        if (popup.classList.contains('is-open')) return;
-        navHdr.classList.add('is-hidden');
-        if (wordmark) wordmark.classList.add('is-hidden');
-        reveal.classList.add('is-visible');
-    }
-    function wakeNav() {
-        clearTimeout(hideTimer);
-        navHdr.classList.remove('is-hidden');
-        if (wordmark) wordmark.classList.remove('is-hidden');
-        reveal.classList.remove('is-visible');
-    }
-    function scheduleHide(delay) {
-        clearTimeout(hideTimer);
-        hideTimer = setTimeout(dimNav, delay);
+    if (wordmark) {
+        setTimeout(function () {
+            wordmark.classList.add('is-hidden');
+        }, TITLE_HIDE_DELAY);
     }
 
-    /* Initial auto-hide */
-    scheduleHide(HIDE_DELAY);
-
-    /* NAV-REVEAL click — wake + re-schedule hide */
-    reveal.addEventListener('click', function () {
-        wakeNav();
-        scheduleHide(REHIDE_DELAY);
-    });
-    reveal.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { wakeNav(); scheduleHide(REHIDE_DELAY); }
-    });
-
-    /* --- POPUP open/close --- */
     function openPopup() {
         popup.classList.add('is-open');
         btn.setAttribute('aria-expanded', 'true');
-        clearTimeout(hideTimer); /* don't hide while popup open */
-        /* Auto-close popup after 5s */
-        clearTimeout(popupTimer);
-        popupTimer = setTimeout(closePopup, POPUP_AUTO);
     }
     function closePopup() {
-        clearTimeout(popupTimer);
         popup.classList.remove('is-open');
         btn.setAttribute('aria-expanded', 'false');
-        scheduleHide(REHIDE_DELAY);
     }
 
     btn.addEventListener('click', function (e) {
         e.stopPropagation();
         popup.classList.contains('is-open') ? closePopup() : openPopup();
-    });
-
-    /* Reset popup auto-close timer if user interacts inside it */
-    popup.addEventListener('pointerenter', function () {
-        clearTimeout(popupTimer);
-    });
-    popup.addEventListener('pointerleave', function () {
-        if (popup.classList.contains('is-open')) {
-            popupTimer = setTimeout(closePopup, POPUP_AUTO);
-        }
     });
 
     document.addEventListener('click', function (e) {
@@ -1475,7 +1407,7 @@ function createFavouriteTrackButton(track) {
     var actions = document.getElementById('fav-actions');
     var currentFavBtn = document.getElementById('m1-fav');
     var openBtns = [
-        document.getElementById('m1-fav-sheet-toggle')
+        document.getElementById('nav-fav-btn')
     ].filter(Boolean);
 
     function load() {

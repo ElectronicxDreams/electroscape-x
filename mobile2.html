@@ -160,7 +160,15 @@
         .m-wordmark span:nth-child(12) { animation-delay: 2.42s; }
         @keyframes wordmarkFade { 0% { opacity: 0; } 100% { opacity: 1; } }
 
-        #nav-fav-btn { display: none; }
+        #nav-fav-btn {
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1px solid rgba(0,255,230,0.22); background: rgba(0,255,230,0.06);
+            color: var(--cyan); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.2s, border-color 0.2s;
+            flex-shrink: 0;
+        }
+        #nav-fav-btn svg { width: 16px; height: 16px; }
+        #nav-fav-btn.is-active { border-color: rgba(0,255,230,0.55); background: rgba(0,255,230,0.10); }
 
         /* PLAYER PANEL — in-flow, no positioning needed */
         #player-panel { background: #000; }
@@ -229,7 +237,7 @@
         #p2m3-play.is-playing { box-shadow: 0 0 32px rgba(0,255,230,0.65); }
 
         /* ============================================================
-           GRID SECTION HEADER — centred, [dim][fav]
+           GRID SECTION HEADER — centred controls
            ============================================================ */
         #grid-head { display: flex; align-items: center; justify-content: center; padding: 8px 15px 10px; border-top: 1px solid var(--border-soft); gap: 10px; }
 
@@ -256,18 +264,6 @@
             opacity: 0 !important;
             pointer-events: none !important;
         }
-
-        /* FAV SHEET TOGGLE — same size/style as dim toggle */
-        .m-sheet-toggle {
-            width: 28px; height: 24px; border: 1px solid rgba(0,255,230,0.22); border-radius: 4px;
-            background: rgba(0,255,230,0.03); color: var(--cyan);
-            display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer; padding: 0; flex-shrink: 0;
-            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-        }
-        .m-sheet-toggle:hover, .m-sheet-toggle.is-active { border-color: rgba(0,255,230,0.55); background: rgba(0,255,230,0.07); }
-        .m-sheet-toggle.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
-        .m-sheet-toggle svg { width: 16px; height: 16px; display: block; }
 
         /* DIM TOGGLE */
         .m-dim-toggle {
@@ -667,9 +663,9 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
         <div class="m-wordmark" aria-label="Electroscape"><span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span></div>
-        <button id="nav-fav-btn" aria-label="Open favourites">
-            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        <button id="nav-fav-btn" aria-label="Open favourites" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6"/>
             </svg>
         </button>
     </header>
@@ -732,11 +728,6 @@
         </button>
         <button class="m-dim-toggle" id="p2m3-dim-toggle" type="button" aria-label="Dim grid">
             <svg class="m-dim-icon" viewBox="0 0 24 18" fill="none"></svg>
-        </button>
-        <button class="m-sheet-toggle" id="p2m3-fav-sheet-btn" type="button" aria-label="Open favourites" aria-expanded="false">
-            <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M3 3h4v4H3zM9 3h4v4H9zM3 9h4v4H3zM9 9h4v4H9z" stroke="currentColor" stroke-width="1.3"/>
-            </svg>
         </button>
     </div>
 
@@ -965,13 +956,10 @@ function cssEscape(s) {
     document.getElementById('p2m3-shuffle').addEventListener('click', doShuffle);
 
     /* fav sheet toggle from grid header */
-    [document.getElementById('p2m3-fav-sheet-btn'), document.getElementById('nav-fav-btn')].forEach(function (b) {
+    [document.getElementById('nav-fav-btn')].forEach(function (b) {
         if (b) b.addEventListener('click', function () {
             var sheet = document.getElementById('fav-sheet');
-            var opening = !sheet.classList.contains('is-open');
-            opening ? openFavSheet() : closeFavSheet();
-            var tog = document.getElementById('p2m3-fav-sheet-btn');
-            if (tog) tog.classList.toggle('is-active', opening);
+            sheet.classList.contains('is-open') ? closeFavSheet() : openFavSheet();
         });
     });
 
@@ -1061,16 +1049,26 @@ function createFavButton(track) {
 }
 
 /* --- FAV-SHEET --- */
+function syncFavSheetButtons(isOpen) {
+    [document.getElementById('nav-fav-btn')].forEach(function (btn) {
+        if (!btn) return;
+        btn.classList.toggle('is-active', isOpen);
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+}
+
 function openFavSheet() {
     renderFavSheet();
     document.getElementById('fav-sheet').classList.add('is-open');
     document.getElementById('fav-backdrop').classList.add('is-visible');
     document.body.classList.add('fav-open');
+    syncFavSheetButtons(true);
 }
 function closeFavSheet() {
     document.getElementById('fav-sheet').classList.remove('is-open');
     document.getElementById('fav-backdrop').classList.remove('is-visible');
     document.body.classList.remove('fav-open');
+    syncFavSheetButtons(false);
 }
 
 (function () {
