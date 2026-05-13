@@ -60,7 +60,7 @@ body.glass-dark {
 }
 
 body.glass-dark #nav-popup,
-body.glass-dark #fav-sidebar,
+body.glass-dark #fav-sheet,
 body.glass-dark .music-modal-box {
     background: var(--glass-panel-bg);
     border-color: var(--glass-border);
@@ -101,12 +101,12 @@ body.glass-dark #fav-backdrop {
     -webkit-backdrop-filter: blur(18px) saturate(70%);
 }
 
-body.glass-dark #fav-sidebar {
-    background: rgba(3, 4, 6, 0.78);
+body.glass-dark #fav-sheet {
+    background: linear-gradient(180deg, rgba(6, 8, 12, 0.82), rgba(3, 5, 8, 0.76));
     border-left-color: rgba(0, 255, 230, 0.22);
-    box-shadow: -18px 0 70px rgba(0, 0, 0, 0.78), inset 1px 0 0 rgba(255,255,255,0.04);
-    backdrop-filter: blur(24px) saturate(80%);
-    -webkit-backdrop-filter: blur(24px) saturate(80%);
+    box-shadow: -18px 0 70px rgba(0, 0, 0, 0.78), inset 1px 0 0 rgba(255,255,255,0.08);
+    backdrop-filter: blur(26px) saturate(95%);
+    -webkit-backdrop-filter: blur(26px) saturate(95%);
 }
 
 body.glass-dark .fav-row {
@@ -1380,13 +1380,13 @@ body.ctrl-hidden #ctrl-hide-toggle {
 #fav-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 1180;
-    background: rgba(0,0,0,0.55);
+    z-index: 9700;
+    background: rgba(0,0,0,0.5);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.26s;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(16px) saturate(85%);
+    -webkit-backdrop-filter: blur(16px) saturate(85%);
 }
 #fav-backdrop.is-visible {
     opacity: 1;
@@ -1398,16 +1398,16 @@ body.ctrl-hidden #ctrl-hide-toggle {
     right: 0;
     bottom: 0;
     width: min(280px, 84vw);
-    z-index: 1200;
+    z-index: 9800;
     display: flex;
     flex-direction: column;
-    background: rgba(0,0,0,0.92);
+    background: linear-gradient(180deg, rgba(6,8,12,0.82), rgba(3,5,8,0.76));
     border-left: 1px solid rgba(0,255,230,0.22);
-    box-shadow: -12px 0 48px rgba(0,0,0,0.7);
+    box-shadow: -18px 0 58px rgba(0,0,0,0.66), inset 1px 0 0 rgba(255,255,255,0.08);
     transform: translateX(110%);
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(26px) saturate(95%);
+    -webkit-backdrop-filter: blur(26px) saturate(95%);
     overflow: hidden;
 }
 #fav-sheet.is-open { transform: translateX(0); }
@@ -1420,6 +1420,12 @@ body.ctrl-hidden #ctrl-hide-toggle {
     padding: 14px 14px 12px;
     border-bottom: 1px solid rgba(255,255,255,0.07);
     flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: rgba(4,7,11,0.48);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 #fav-title {
     font-family: 'Orbitron', sans-serif;
@@ -1431,8 +1437,9 @@ body.ctrl-hidden #ctrl-hide-toggle {
 #fav-close-btn {
     width: 32px;
     height: 32px;
-    border: none;
-    background: transparent;
+    border: 1px solid rgba(0,255,230,0.24);
+    border-radius: 50%;
+    background: rgba(0,255,230,0.05);
     color: #00FFE6;
     font-size: 20px;
     font-weight: 700;
@@ -1441,7 +1448,10 @@ body.ctrl-hidden #ctrl-hide-toggle {
     display: grid;
     place-items: center;
 }
-#fav-close-btn:hover { background: rgba(0,255,230,0.06); }
+#fav-close-btn:hover {
+    border-color: rgba(0,255,230,0.58);
+    background: rgba(0,255,230,0.12);
+}
 #fav-actions {
     display: none;
     padding: 6px 10px 4px;
@@ -1574,6 +1584,11 @@ body.ctrl-hidden #ctrl-hide-toggle {
     background: rgba(0,255,230,0.06);
 }
 body.fav-open { overflow: hidden; }
+body.fav-open #nav-popup,
+body.fav-open #nav-popup-backdrop {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
 @media (min-width: 621px) { .fav-row-thumb { height: 80px; } }
 
     </style>
@@ -1589,7 +1604,7 @@ body.fav-open { overflow: hidden; }
         </button>
         <button id="nav-fav-btn" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M9 6l6 6-6 6"/>
+                <path d="M15 18l-6-6 6-6"/>
             </svg>
         </button>
 
