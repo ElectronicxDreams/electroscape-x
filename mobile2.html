@@ -1,4 +1,4 @@
-<!-- mobile2.html | Electroscape Mobile | [M2] 1.0 -->
+<!-- mobile2.html | Electroscape Mobile | 1.3 -->
 <!-- v1.0: Codex rebuild — app-shell grid, portrait+landscape, burger nav -->
 <!DOCTYPE html>
 <html lang="en">
@@ -38,7 +38,7 @@
 
         #app-shell {
             width: 100%;
-            height: calc(100dvh - 44px);
+            height: 100dvh;
             display: grid;
             grid-template-rows: auto minmax(0, 1fr);
             overflow: hidden;
@@ -321,7 +321,7 @@
         #fav-play-all-btn, #fav-clear-btn { border-color: rgba(var(--accent-rgb),0.28); background: rgba(var(--accent-rgb),0.06); color: var(--accent); }
         .fav-row-btn { border-color: rgba(var(--accent-rgb),0.22); background: rgba(var(--accent-rgb),0.04); color: var(--accent); }
         .fav-row-btn:hover:not(:disabled) { border-color: rgba(var(--accent-rgb),0.62); background: rgba(var(--accent-rgb),0.08); }
-        #version-strip span { color: var(--accent); }
+        #page-version span { color: var(--accent); }
 
         /* ============================================================
            2-COLUMN VIDEO GRID — Entry 3 layout
@@ -449,11 +449,21 @@
         body.fav-open { overflow: hidden; }
         @media (min-width: 621px) { .fav-row-thumb { height: 80px; } }
 
-        /* ============================================================
-           VERSION STRIP
-           ============================================================ */
-        #version-strip { position: fixed; bottom: 0; left: 0; right: 0; height: 44px; z-index: 9000; background: #000; border-top: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; }
-        #version-strip span { color: var(--cyan); font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; }
+        /* Bottom in-flow version label (scroll-to-see) */
+        #page-version {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 12px 28px;
+        }
+        #page-version span {
+            color: var(--cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
 
         /* NAV SPACER — gap between nav and player */
         #nav-spacer { width: 100%; height: 0; }
@@ -462,7 +472,6 @@
            LANDSCAPE PLAYER-ONLY MODE
            ============================================================ */
         @media (orientation: landscape) {
-            #version-strip { display: none; }
             #app-shell {
                 height: 100dvh;
                 grid-template-rows: minmax(0, 1fr);
@@ -733,6 +742,7 @@
 
     <!-- VIDEO GRID -->
     <div id="video-grid"></div>
+    <div id="page-version"><span>1.3</span></div>
 
     </section>
     </main>
@@ -767,9 +777,6 @@
         <ul id="fav-list"></ul>
         <div id="fav-footer"><button id="fav-clear-btn" type="button">Clear All</button></div>
     </section>
-
-    <!-- VERSION STRIP -->
-    <div id="version-strip"><span>[M2] 1.0</span></div>
 
 <script>
 /* ============================================================
