@@ -490,11 +490,6 @@
             pointer-events: none;
             transition: opacity 0.3s ease;
         }
-        body.ctrl-hidden .m-controls {
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
         .m-dim-toggle {
             width: 28px;
             height: 24px;
@@ -534,10 +529,23 @@
             opacity: 0.09;
             transition: opacity 0.28s ease;
         }
-        body.ctrl-hidden .m-progress-wrap,
-        body.ctrl-hidden .m-controls {
+        body.ctrl-hidden .m-progress-wrap {
             opacity: 0 !important;
             pointer-events: none !important;
+        }
+        /* Hide each control child individually so parent stays visible for #ctrl-hide-toggle */
+        body.ctrl-hidden #m1-shuffle,
+        body.ctrl-hidden .m-transport,
+        body.ctrl-hidden #m1-fav,
+        body.ctrl-hidden #m1-dim-toggle {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.3s ease;
+        }
+        /* ctrl-hide button stays at 50% and tappable */
+        body.ctrl-hidden #ctrl-hide-toggle {
+            opacity: 0.25 !important;
+            pointer-events: auto !important;
         }
 
         /* ============================================================
@@ -950,7 +958,7 @@
     </div>
 
     <!-- VERSION FOOTER — plain scroll footer -->
-    <div id="version-footer">[M1] 5.1</div>
+    <div id="version-footer">[M1] 5.4</div>
 
 <script>
 /* ============================================================

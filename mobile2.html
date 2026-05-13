@@ -270,11 +270,25 @@
         #p2m3-ctrl-hide.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
         #p2m3-ctrl-hide svg { width: 17px; height: 17px; stroke: currentColor; fill: none; }
 
-        body.p2m3-ctrl-hidden #hero-progress-wrap,
-        body.p2m3-ctrl-hidden #controls-row {
+        body.p2m3-ctrl-hidden #hero-progress-wrap {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+        /* Hide each control child individually so parent stays visible for #p2m3-ctrl-hide */
+        body.p2m3-ctrl-hidden #p2m3-shuffle,
+        body.p2m3-ctrl-hidden #p2m3-prev,
+        body.p2m3-ctrl-hidden #p2m3-play,
+        body.p2m3-ctrl-hidden #p2m3-next,
+        body.p2m3-ctrl-hidden #p2m3-fav-open,
+        body.p2m3-ctrl-hidden #p2m3-dim-toggle {
             opacity: 0 !important;
             pointer-events: none !important;
             transition: opacity 0.3s ease;
+        }
+        /* ctrl-hide button stays at 25% and tappable */
+        body.p2m3-ctrl-hidden #p2m3-ctrl-hide {
+            opacity: 0.25 !important;
+            pointer-events: auto !important;
         }
         body.p2m3-ctrl-hidden #nav-reveal-cue {
             opacity: 0 !important;
@@ -501,7 +515,12 @@
 
             /* Force controls visible in landscape even if hidden-state was saved */
             body.p2m3-ctrl-hidden #hero-progress-wrap,
-            body.p2m3-ctrl-hidden #controls-row {
+            body.p2m3-ctrl-hidden #p2m3-shuffle,
+            body.p2m3-ctrl-hidden #p2m3-prev,
+            body.p2m3-ctrl-hidden #p2m3-play,
+            body.p2m3-ctrl-hidden #p2m3-next,
+            body.p2m3-ctrl-hidden #p2m3-fav-open,
+            body.p2m3-ctrl-hidden #p2m3-dim-toggle {
                 opacity: 1 !important;
                 pointer-events: auto !important;
             }
@@ -749,7 +768,7 @@
 
     <!-- VIDEO GRID -->
     <div id="video-grid"></div>
-    <div id="page-version"><span>1.7</span></div>
+    <div id="page-version"><span>1.8</span></div>
 
     </section>
     </main>
