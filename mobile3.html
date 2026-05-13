@@ -81,7 +81,7 @@
             transform: translateX(-50%) translateY(-8px); z-index: 9500;
             width: min(280px, 80vw);
             background: linear-gradient(180deg, rgba(8,4,20,0.85), rgba(2,3,10,0.78));
-            border: 1px solid rgba(157,71,255,0.25); border-radius: 10px;
+            border: none; border-radius: 10px;
             box-shadow: 0 28px 72px rgba(0,0,0,0.76), 0 0 40px rgba(157,71,255,0.12);
             opacity: 0; pointer-events: none;
             transition: opacity 0.22s, transform 0.22s;
@@ -1284,18 +1284,14 @@ function cssEscape(s) {
     var hidden  = false;
     var pressTimer = null;
 
-    /* Restore saved state */
-    try { var sc = parseInt(localStorage.getItem(EQ_KEY), 10); if (sc >= 0 && sc < anims.length) current = sc; } catch(e) {}
-    try { if (localStorage.getItem(HIDE_KEY) === '1') hidden = true; } catch(e) {}
+    /* State is session-only (no persistence) */
 
     function showAnim(idx) {
         anims.forEach(function(a, i) { a.classList.toggle('active', i === idx); });
-        try { localStorage.setItem(EQ_KEY, String(idx)); } catch(e) {}
     }
     function applyHide() {
         body.classList.toggle('p3m1-ctrl-hidden', hidden);
         panel.setAttribute('aria-pressed', hidden ? 'true' : 'false');
-        try { localStorage.setItem(HIDE_KEY, hidden ? '1' : '0'); } catch(e) {}
     }
 
     /* Short tap = cycle animation */
@@ -1348,10 +1344,8 @@ function cssEscape(s) {
         btn.classList.toggle('is-active', state > 0);
         btn.setAttribute('aria-label', cfg.label);
         if (ic) ic.innerHTML = iconSvg(cfg);
-        try { localStorage.setItem(KEY, String(state)); } catch(e) {}
     }
     btn.addEventListener('click', function () { state = (state + 1) % states.length; apply(); });
-    try { var s = parseInt(localStorage.getItem(KEY),10); if (s >= 0 && s < states.length) state = s; } catch(e) {}
     apply();
 }());
 

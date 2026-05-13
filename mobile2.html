@@ -87,7 +87,7 @@
             transform: translateX(-50%) translateY(-8px); z-index: 9500;
             width: min(280px, 80vw);
             background: linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.60));
-            border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+            border: none; border-radius: 6px;
             box-shadow: 0 28px 72px rgba(0,0,0,0.76), 0 0 40px rgba(0,255,230,0.08);
             opacity: 0; pointer-events: none;
             transition: opacity 0.22s, transform 0.22s;
@@ -1011,7 +1011,7 @@ function cssEscape(s) {
 (function () {
     var body = document.body;
     var btns = Array.from(document.querySelectorAll('.m-dim-toggle'));
-    var KEY = 'es_mobile_dim_state'; var state = 0;
+    var state = 0;
     var states = [
         { cl: '', label: 'Dim: off', bars: 3 },
         { cl: 'playlist-dim-medium', label: 'Dim: medium', bars: 2 },
@@ -1026,10 +1026,8 @@ function cssEscape(s) {
         body.classList.remove('playlist-dim-medium','playlist-dim-heavy');
         if (cfg.cl) body.classList.add(cfg.cl);
         btns.forEach(function(b){ var ic=b.querySelector('.m-dim-icon'); b.classList.toggle('is-active',state>0); b.setAttribute('aria-label',cfg.label); if(ic) ic.innerHTML=iconSvg(cfg); });
-        try { localStorage.setItem(KEY, String(state)); } catch(e) {}
     }
     btns.forEach(function(b){ b.addEventListener('click', function(){ state=(state+1)%states.length; apply(); }); });
-    try { var s=parseInt(localStorage.getItem(KEY),10); if(s>=0&&s<states.length) state=s; } catch(e) {}
     apply();
 }());
 
@@ -1201,7 +1199,6 @@ function closeFavSheet() {
 (function () {
     var body = document.body;
     var btn  = document.getElementById('p2m3-ctrl-hide');
-    var KEY  = 'es_p2m3_ctrl_hidden';
     var hidden = false;
 
     function apply() {
@@ -1209,12 +1206,10 @@ function closeFavSheet() {
         btn.classList.toggle('is-active', hidden);
         btn.setAttribute('aria-pressed', hidden ? 'true' : 'false');
         btn.setAttribute('aria-label', hidden ? 'Show playback controls' : 'Hide playback controls');
-        try { localStorage.setItem(KEY, hidden ? '1' : '0'); } catch(e) {}
     }
 
     btn.addEventListener('click', function () { hidden = !hidden; apply(); btn.blur && btn.blur(); });
 
-    try { if (localStorage.getItem(KEY) === '1') hidden = true; } catch(e) {}
     apply();
 }());
 

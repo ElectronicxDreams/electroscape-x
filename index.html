@@ -215,10 +215,9 @@ body.glass-dark .music-card {
     width: 520px;
 
     background: var(--color-bg-card);
-    border: 1px solid #2a2a2a;
+    border: none;
     border-radius: 6px;
     box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.03),
         0 28px 72px rgba(0, 0, 0, 0.82),
         0 0 40px rgba(0, 255, 230, 0.07);
 
@@ -2553,7 +2552,6 @@ function updatePlayIcon(state) {
 (function () {
     var body = document.body;
     var buttons = Array.from(document.querySelectorAll('.m-dim-toggle'));
-    var KEY = 'es_mobile_dim_state';
     var state = 0;
     var states = [
         { playlistClass: '', label: 'Grid dim: full light', iconBars: 3 },
@@ -2581,7 +2579,6 @@ function updatePlayIcon(state) {
             btn.setAttribute('aria-label', config.label);
             if (icon) icon.innerHTML = iconSvg(config);
         });
-        try { localStorage.setItem(KEY, String(state)); } catch (e) {}
     }
 
     buttons.forEach(function (btn) {
@@ -2591,11 +2588,6 @@ function updatePlayIcon(state) {
             btn.blur && btn.blur();
         });
     });
-
-    try {
-        var saved = parseInt(localStorage.getItem(KEY), 10);
-        if (saved >= 0 && saved < states.length) state = saved;
-    } catch (e) {}
 
     applyDimState();
 }());
@@ -2607,7 +2599,6 @@ function updatePlayIcon(state) {
 (function () {
     var body = document.body;
     var btn = document.getElementById('ctrl-hide-toggle');
-    var KEY = 'es_ctrl_hidden';
     var hidden = false;
 
     if (!btn) return;
@@ -2617,7 +2608,6 @@ function updatePlayIcon(state) {
         btn.classList.toggle('is-active', hidden);
         btn.setAttribute('aria-pressed', hidden ? 'true' : 'false');
         btn.setAttribute('aria-label', hidden ? 'Show playback controls' : 'Hide playback controls');
-        try { localStorage.setItem(KEY, hidden ? '1' : '0'); } catch (e) {}
     }
 
     btn.addEventListener('click', function () {
@@ -2626,9 +2616,6 @@ function updatePlayIcon(state) {
         btn.blur && btn.blur();
     });
 
-    try {
-        if (localStorage.getItem(KEY) === '1') hidden = true;
-    } catch (e) {}
     apply();
 }());
 
