@@ -231,6 +231,18 @@
             gap: 14px; padding: 8px 12px 10px;
         }
 
+        @media (max-width: 420px) {
+            #controls-row {
+                grid-template-columns: 36px 36px 36px 40px 36px 36px 36px;
+                gap: 8px;
+                padding: 8px 8px 10px;
+            }
+            .ctrl-round, #p2m3-ctrl-hide, .m-dim-toggle { width: 36px; height: 36px; }
+            .ctrl-round svg, #p2m3-ctrl-hide svg { width: 15px; height: 15px; }
+            #p2m3-play { width: 40px; height: 40px; }
+            #p2m3-play svg { width: 17px; height: 17px; }
+        }
+
         .ctrl-round {
             width: 41px; height: 41px; border-radius: 50%;
             border: 1px solid rgba(0,255,230,0.25); background: rgba(0,255,230,0.06);
@@ -768,7 +780,7 @@
 
     <!-- VIDEO GRID -->
     <div id="video-grid"></div>
-    <div id="page-version"><span>1.8</span></div>
+    <div id="page-version"><span>1.9</span></div>
 
     </section>
     </main>
