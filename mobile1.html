@@ -265,6 +265,10 @@
             overflow: hidden;
             pointer-events: none;
             text-align: center;
+            transition: opacity 1s ease;
+        }
+        body.theme-m1 .m-wordmark.is-hidden {
+            opacity: 0;
         }
         body.theme-m1 .m-wordmark span {
             display: inline-block;
@@ -956,7 +960,7 @@
     </div>
 
     <!-- VERSION FOOTER — plain scroll footer -->
-    <div id="version-footer">[M1] 4.9</div>
+    <div id="version-footer">[M1] 5.0</div>
 
 <script>
 /* ============================================================
@@ -974,7 +978,7 @@
     var backdrop = document.getElementById('nav-popup-backdrop');
     var wordmark = document.querySelector('.m-wordmark');
     var popupTimer = null;
-    var TITLE_HIDE_DELAY = 10000;
+    var TITLE_HIDE_DELAY = 7700;
 
     if (wordmark) {
         setTimeout(function () {
