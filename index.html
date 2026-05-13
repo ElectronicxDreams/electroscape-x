@@ -234,6 +234,22 @@ body.glass-dark .music-card {
     transform: translateX(-50%) translateY(0);
 }
 
+#nav-popup-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    background: transparent;
+    opacity: 0;
+    pointer-events: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+#nav-popup-backdrop.is-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 .nav-popup-item {
     display: flex;
     align-items: center;
@@ -1585,6 +1601,7 @@ body.fav-open { overflow: hidden; }
             </svg>
         </button>
 
+        <button id="nav-popup-backdrop" type="button" aria-label="Close navigation links" tabindex="-1"></button>
         <div id="nav-popup" role="dialog" aria-label="Navigation links">
             <a class="nav-popup-item" href="https://links.electroscapex.com/" target="_blank" rel="noopener noreferrer">Weblinks</a>
             <button class="nav-popup-item" id="nav-music-btn">Music Directory</button>
@@ -1903,11 +1920,24 @@ body.fav-open { overflow: hidden; }
     var btn   = document.getElementById('nav-links-btn');
     var logo  = document.getElementById('nav-logo');
     var popup = document.getElementById('nav-popup');
+    var backdrop = document.getElementById('nav-popup-backdrop');
+    var popupTimer = null;
+
+    function clearPopupTimer() {
+        if (popupTimer) { clearTimeout(popupTimer); popupTimer = null; }
+    }
+
+    function armPopupTimer() {
+        clearPopupTimer();
+        popupTimer = setTimeout(function () { closePopup(); }, 6000);
+    }
 
     function openPopup() {
         popup.classList.add('is-open');
+        backdrop.classList.add('is-active');
         btn.classList.add('is-open');
         btn.setAttribute('aria-expanded', 'true');
+        armPopupTimer();
         if (typeof window.esHideNavLogo === 'function') window.esHideNavLogo(false);
         else logo.classList.add('is-hidden');
     }
@@ -1915,8 +1945,10 @@ body.fav-open { overflow: hidden; }
     function closePopup() {
         if (!popup.classList.contains('is-open')) return;
         popup.classList.remove('is-open');
+        backdrop.classList.remove('is-active');
         btn.classList.remove('is-open');
         btn.setAttribute('aria-expanded', 'false');
+        clearPopupTimer();
         if (typeof window.esShowNavLogo === 'function') window.esShowNavLogo();
         else logo.classList.remove('is-hidden');
     }
@@ -1926,6 +1958,7 @@ body.fav-open { overflow: hidden; }
         popup.classList.contains('is-open') ? closePopup() : openPopup();
     });
 
+    backdrop.addEventListener('click', closePopup);
     document.addEventListener('click', function (e) {
         if (!popup.contains(e.target) && e.target !== btn) closePopup();
     });

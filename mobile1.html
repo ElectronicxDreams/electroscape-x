@@ -195,6 +195,21 @@
             pointer-events: auto;
             transform: translateX(-50%) translateY(0);
         }
+        #nav-popup-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 9400;
+            background: transparent;
+            opacity: 0;
+            pointer-events: none;
+            border: 0;
+            padding: 0;
+            margin: 0;
+        }
+        #nav-popup-backdrop.is-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
         .nav-popup-item {
             display: flex;
             align-items: center;
@@ -774,6 +789,7 @@
     </div>
 
     <!-- NAV-POPUP -->
+    <button id="nav-popup-backdrop" type="button" aria-label="Close navigation links" tabindex="-1"></button>
     <div id="nav-popup" role="dialog" aria-label="Navigation links">
         <a class="nav-popup-item" href="https://links.electroscapex.com/" target="_blank" rel="noopener noreferrer">Weblinks</a>
         <button class="nav-popup-item" id="nav-music-btn">Music Directory</button>
@@ -946,7 +962,9 @@
 (function () {
     var btn      = document.getElementById('nav-links-btn');
     var popup    = document.getElementById('nav-popup');
+    var backdrop = document.getElementById('nav-popup-backdrop');
     var wordmark = document.querySelector('.m-header');
+    var popupTimer = null;
     var TITLE_HIDE_DELAY = 10000;
 
     if (wordmark) {
@@ -955,13 +973,24 @@
         }, TITLE_HIDE_DELAY);
     }
 
+    function clearPopupTimer() {
+        if (popupTimer) { clearTimeout(popupTimer); popupTimer = null; }
+    }
+    function armPopupTimer() {
+        clearPopupTimer();
+        popupTimer = setTimeout(function () { closePopup(); }, 6000);
+    }
     function openPopup() {
         popup.classList.add('is-open');
+        backdrop.classList.add('is-active');
         btn.setAttribute('aria-expanded', 'true');
+        armPopupTimer();
     }
     function closePopup() {
         popup.classList.remove('is-open');
+        backdrop.classList.remove('is-active');
         btn.setAttribute('aria-expanded', 'false');
+        clearPopupTimer();
     }
 
     btn.addEventListener('click', function (e) {
@@ -969,6 +998,7 @@
         popup.classList.contains('is-open') ? closePopup() : openPopup();
     });
 
+    backdrop.addEventListener('click', closePopup);
     document.addEventListener('click', function (e) {
         if (!popup.contains(e.target) && e.target !== btn) closePopup();
     });
