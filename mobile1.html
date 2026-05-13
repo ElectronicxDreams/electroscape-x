@@ -542,223 +542,92 @@
         }
 
         /* ============================================================
-           FAVOURITES — Part 1 alternate compact playlist sheet
-           Part 2 note: P1-M1b keeps the drag-handle bottom sheet style.
+           FAVOURITES — right-sliding panel (P3-M1 structure, M1 colours)
            ============================================================ */
         #fav-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 44px;
-            z-index: 8800;
-            background: rgba(0,0,0,0.5);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.24s ease;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            position: fixed; inset: 0; z-index: 8800;
+            background: rgba(0,0,0,0.55); opacity: 0; pointer-events: none;
+            transition: opacity 0.26s;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         }
-        #fav-backdrop.is-visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        #fav-backdrop.is-visible { opacity: 1; pointer-events: auto; }
         #fav-sheet {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 44px;
-            height: min(64dvh, 560px);
-            z-index: 9200;
-            display: flex;
-            flex-direction: column;
-            background: rgba(0,0,0,0.88);
-            border-top: 1px solid rgba(0,255,230,0.22);
-            border-radius: 18px 18px 0 0;
-            box-shadow: 0 -24px 70px rgba(0,0,0,0.74), inset 0 1px 0 rgba(255,255,255,0.05);
-            transform: translateY(108%);
-            transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(18px) saturate(90%);
-            -webkit-backdrop-filter: blur(18px) saturate(90%);
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: min(280px, 84vw); z-index: 9200;
+            display: flex; flex-direction: column;
+            background: rgba(0,0,0,0.92);
+            border-left: 1px solid rgba(0,255,230,0.22);
+            box-shadow: -12px 0 48px rgba(0,0,0,0.7);
+            transform: translateX(110%);
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
             overflow: hidden;
         }
-        #fav-sheet.is-open { transform: translateY(0); }
-        .fav-sheet-handle {
-            width: 42px;
-            height: 3px;
-            border-radius: 999px;
-            background: rgba(0,255,230,0.35);
-            margin: 10px auto 12px;
-            flex-shrink: 0;
-        }
+        #fav-sheet.is-open { transform: translateX(0); }
+        .fav-sheet-handle { display: none; }
         #fav-header {
-            display: grid;
-            grid-template-columns: 1fr 32px;
-            align-items: center;
-            gap: 10px;
-            padding: 0 16px 10px;
+            display: grid; grid-template-columns: 1fr 36px;
+            align-items: center; gap: 10px;
+            padding: 14px 14px 12px;
             border-bottom: 1px solid rgba(255,255,255,0.07);
-        }
-        #fav-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 9px;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            color: var(--cyan);
-        }
-        #fav-close-btn {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: transparent;
-            color: var(--cyan);
-            font-size: 19px;
-            font-weight: 700;
-            line-height: 1;
-            cursor: pointer;
-        }
-        #fav-close-btn:hover { background: rgba(0,255,230,0.06); }
-        #fav-actions {
-            display: none;
-            padding: 11px 16px 8px;
             flex-shrink: 0;
         }
-        #fav-play-all-btn,
-        #fav-clear-btn {
-            border: 1px solid rgba(0,255,230,0.28);
-            border-radius: 4px;
-            background: rgba(0,255,230,0.06);
-            color: var(--cyan);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 8px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            cursor: pointer;
+        #fav-title { font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: var(--cyan); }
+        #fav-close-btn { width: 32px; height: 32px; border: none; background: transparent; color: var(--cyan); font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; display: grid; place-items: center; }
+        #fav-close-btn:hover { background: rgba(0,255,230,0.06); }
+        #fav-actions { display: none; padding: 6px 10px 4px; flex-shrink: 0; }
+        #fav-play-all-btn, #fav-clear-btn {
+            border: 1px solid rgba(0,255,230,0.28); border-radius: 4px;
+            background: rgba(0,255,230,0.06); color: var(--cyan);
+            font-family: 'Orbitron', sans-serif; font-size: 7px;
+            letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
         }
-        #fav-play-all-btn {
-            width: 100%;
-            padding: 10px 12px;
-        }
-        #fav-empty {
-            display: flex;
-            flex: 1;
-            align-items: center;
-            justify-content: center;
-            padding: 28px 22px;
-            color: var(--cyan);
-            font-size: 8px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            text-align: center;
-        }
-        #fav-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            overflow-y: auto;
-            flex: 1;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0,255,230,0.28) transparent;
-        }
-        #fav-list::-webkit-scrollbar { width: 4px; }
+        #fav-play-all-btn { width: 100%; padding: 6px 10px; }
+        #fav-empty { display: flex; flex: 1; align-items: center; justify-content: center; padding: 28px; color: var(--cyan); font-size: 8px; letter-spacing: 3px; text-transform: uppercase; text-align: center; }
+        #fav-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: rgba(0,255,230,0.28) transparent; }
+        #fav-list::-webkit-scrollbar { width: 3px; }
         #fav-list::-webkit-scrollbar-thumb { background: rgba(0,255,230,0.28); border-radius: 999px; }
+        /* Row: thumb / buttons / title — vertical stack */
         .fav-row {
-            min-height: 96px;
-            display: grid;
-            grid-template-columns: 72px minmax(104px, 132px) minmax(0, 1fr);
-            align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            cursor: pointer;
-            transition: background 0.18s ease;
+            display: flex; flex-direction: column; align-items: stretch;
+            padding: 7px 10px 9px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer; transition: background 0.18s;
         }
-        .fav-row:hover { background: rgba(255,255,255,0.04); }
+        .fav-row:hover { background: rgba(0,255,230,0.03); }
         .fav-row-thumb {
-            width: min(132px, 34vw);
-            aspect-ratio: 16 / 9;
-            border-radius: 4px;
-            background-color: #111;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            overflow: hidden;
+            width: 100%; height: 60px;
+            border-radius: 5px; background-color: #111;
+            background-size: cover; background-position: center;
             box-shadow: inset 0 0 0 1px rgba(0,255,230,0.1);
-        }
-        .fav-row-main {
-            min-width: 0;
-        }
-        .fav-row-title {
-            color: #fff;
-            font-size: 8.5px;
-            letter-spacing: 1px;
-            line-height: 1.3;
-            text-transform: uppercase;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            flex-shrink: 0; margin-bottom: 5px;
         }
         .fav-row-controls {
-            display: grid;
-            grid-template-columns: repeat(2, 30px);
-            grid-auto-rows: 26px;
-            gap: 6px;
-            justify-content: start;
+            display: flex; flex-direction: row;
+            gap: 4px; justify-content: center; margin-bottom: 5px;
         }
         .fav-row-btn {
-            width: 30px;
-            height: 26px;
-            border: 1px solid rgba(0,255,230,0.22);
-            border-radius: 4px;
-            background: rgba(0,255,230,0.04);
-            color: var(--cyan);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+            flex: 1; height: 20px;
+            border: 1px solid rgba(0,255,230,0.22); border-radius: 3px;
+            background: rgba(0,255,230,0.04); color: var(--cyan);
+            display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: border-color 0.2s, background 0.2s, opacity 0.2s;
         }
-        .fav-row-btn:hover:not(:disabled) {
-            border-color: rgba(0,255,230,0.62);
-            background: rgba(0,255,230,0.08);
+        .fav-row-btn:hover:not(:disabled) { border-color: rgba(0,255,230,0.55); background: rgba(0,255,230,0.08); }
+        .fav-row-btn:disabled { opacity: 0.25; cursor: default; }
+        .fav-row-btn svg { width: 10px; height: 10px; display: block; }
+        .fav-remove-btn { font-size: 12px; font-weight: 700; line-height: 1; }
+        .fav-row-main { min-width: 0; }
+        .fav-row-title {
+            color: #fff; font-size: 9px; letter-spacing: 0.3px; line-height: 1.35;
+            text-transform: uppercase;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+            text-align: center;
         }
-        .fav-row-btn:disabled {
-            opacity: 0.3;
-            cursor: default;
-        }
-        .fav-row-btn svg {
-            width: 13px;
-            height: 13px;
-            display: block;
-        }
-        .fav-play-btn {
-            width: 30px;
-        }
-        .fav-remove-btn {
-            font-size: 17px;
-            font-weight: 700;
-            line-height: 1;
-        }
-        #fav-footer {
-            display: none;
-            justify-content: center;
-            padding: 12px 16px 14px;
-            border-top: 1px solid rgba(255,255,255,0.07);
-            flex-shrink: 0;
-        }
-        #fav-clear-btn {
-            padding: 8px 18px;
-            color: var(--cyan);
-            border-color: rgba(0,255,230,0.32);
-            background: transparent;
-        }
-        #fav-clear-btn:hover {
-            color: var(--cyan);
-            border-color: var(--cyan);
-            background: rgba(0,255,230,0.06);
-        }
+        #fav-footer { display: none; justify-content: center; padding: 6px 10px 8px; border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
+        #fav-clear-btn { padding: 5px 14px; }
         body.fav-open { overflow: hidden; }
+        @media (min-width: 621px) { .fav-row-thumb { height: 80px; } }
 
         /* ============================================================
            MUSIC-SECTION — full screen modal, ported from index.html
@@ -925,6 +794,7 @@
         <a class="nav-popup-item" href="https://electroscapex.com/tv.html" target="_blank" rel="noopener noreferrer">TV</a>
         <a class="nav-popup-item" href="index.html?view=desktop">Desktop</a>
 	<a class="nav-popup-item" href="mobile2.html">Mobile V2</a>
+	<a class="nav-popup-item" href="mobile3.html">Mobile V3</a>
     </div>
 
     <!-- HEADER -->
@@ -1772,9 +1642,8 @@ function createFavouriteTrackButton(track) {
             controls.appendChild(up);
             controls.appendChild(down);
             main.appendChild(title);
-
-            row.appendChild(controls);
             row.appendChild(thumb);
+            row.appendChild(controls);
             row.appendChild(main);
             list.appendChild(row);
 

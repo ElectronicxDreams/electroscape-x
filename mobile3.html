@@ -454,8 +454,11 @@
         .v-fav-btn.is-active .fav-heart-path { fill: currentColor; }
 
         /* dim states */
-        body.playlist-dim-medium #video-grid { opacity: 0.30; transition: opacity 0.28s; }
-        body.playlist-dim-heavy  #video-grid { opacity: 0.09; pointer-events: none; transition: opacity 0.28s; }
+        body.playlist-dim-medium #video-grid,
+        body.playlist-dim-medium #playback { opacity: 0.30; transition: opacity 0.28s; }
+        body.playlist-dim-heavy  #video-grid,
+        body.playlist-dim-heavy  #playback { opacity: 0.09; transition: opacity 0.28s; }
+        body.playlist-dim-heavy  #video-grid { pointer-events: none; }
 
         /* ============================================================
            DIM TOGGLE — fixed bottom-right overlay above version strip
