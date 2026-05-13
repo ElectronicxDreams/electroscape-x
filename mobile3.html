@@ -40,8 +40,9 @@
             color: var(--text);
             font-family: 'Exo 2', sans-serif;
             height: 100%; min-height: 100%;
-            overflow: hidden;
-            overscroll-behavior: none;
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior-y: auto;
         }
 
         button { font-family: inherit; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; background: transparent; color: inherit; }
@@ -54,10 +55,11 @@
             width: 100%;
             max-width: 900px;
             margin: 0 auto;
-            height: 100dvh;
+            min-height: 100dvh;
+            height: auto;
             display: grid;
-            grid-template-rows: auto minmax(0, 1fr);
-            overflow: hidden;
+            grid-template-rows: auto auto;
+            overflow: visible;
         }
 
         #top-zone { min-height: 0; z-index: 2; }
@@ -65,7 +67,7 @@
         #bottom-zone {
             min-height: 0;
             overflow-x: hidden;
-            overflow-y: auto;
+            overflow-y: visible;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             scrollbar-color: rgba(157,71,255,0.4) transparent;
@@ -1223,8 +1225,9 @@ function playTrack(index) {
     if (window.esPlayer && typeof window.esPlayer.loadVideoById === 'function') window.esPlayer.loadVideoById(track.id);
     setActiveCard(window.esCurrentIndex);
     if (typeof window.esSyncFavouriteButtons === 'function') window.esSyncFavouriteButtons();
-    var bz = document.getElementById('bottom-zone');
-    if (bz) bz.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+    document.body.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function updatePlayIcon(state) {
