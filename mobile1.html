@@ -118,9 +118,10 @@
             left: 0;
             right: 0;
             z-index: 9300;
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 34px 1fr 34px;
             align-items: center;
+            gap: 8px;
             padding: 0 16px;
             pointer-events: none;
         }
@@ -246,27 +247,24 @@
 
         /* M1 Header */
         body.theme-m1 .m-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 56px 20px 10px;
-            border-bottom: 1px solid var(--border-soft);
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            display: none;
         }
-        body.theme-m1 .m-header.is-hidden {
-            opacity: 0;
-            visibility: hidden;
+        /* NAV-HEADER spacer — replaces the gap .m-header used to provide */
+        #nav-header-spacer {
+            height: 54px;
         }
         body.theme-m1 .m-wordmark {
             font-family: 'Michroma', sans-serif;
-            font-size: clamp(8px, 2.2vw, 11px);
-            letter-spacing: clamp(3px, 1.6vw, 14px);
-            text-indent: clamp(3px, 1.6vw, 14px);
+            font-size: clamp(7px, 2.2vw, 10px);
+            letter-spacing: clamp(2px, 1.2vw, 10px);
+            text-indent: clamp(2px, 1.2vw, 10px);
             color: var(--cyan);
             text-transform: uppercase;
             display: flex;
             justify-content: center;
-            overflow: visible;
+            overflow: hidden;
+            pointer-events: none;
+            text-align: center;
         }
         body.theme-m1 .m-wordmark span {
             display: inline-block;
@@ -787,12 +785,18 @@
                 <path d="M4 7h16M4 12h16M4 17h16"/>
             </svg>
         </button>
+        <div class="m-wordmark" aria-label="Electroscape">
+            <span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span>
+        </div>
         <button id="nav-fav-btn" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M9 6l6 6-6 6"/>
             </svg>
         </button>
     </div>
+
+    <!-- NAV-HEADER SPACER -->
+    <div id="nav-header-spacer"></div>
 
     <!-- NAV-POPUP -->
     <button id="nav-popup-backdrop" type="button" aria-label="Close navigation links" tabindex="-1"></button>
@@ -804,13 +808,6 @@
 	<a class="nav-popup-item" href="mobile2.html">Mobile V2</a>
 	<a class="nav-popup-item" href="mobile3.html">Mobile V3</a>
     </div>
-
-    <!-- HEADER -->
-    <header class="m-header">
-        <div class="m-wordmark" aria-label="Electroscape">
-            <span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span>
-        </div>
-    </header>
 
     <!-- PLAYER -->
     <div class="m-player">
@@ -953,7 +950,7 @@
     </div>
 
     <!-- VERSION FOOTER — plain scroll footer -->
-    <div id="version-footer">[M1] 4.6</div>
+    <div id="version-footer">[M1] 4.7</div>
 
 <script>
 /* ============================================================
@@ -969,7 +966,7 @@
     var btn      = document.getElementById('nav-links-btn');
     var popup    = document.getElementById('nav-popup');
     var backdrop = document.getElementById('nav-popup-backdrop');
-    var wordmark = document.querySelector('.m-header');
+    var wordmark = document.querySelector('.m-wordmark');
     var popupTimer = null;
     var TITLE_HIDE_DELAY = 10000;
 
