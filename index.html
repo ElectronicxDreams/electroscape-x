@@ -23,7 +23,7 @@
     --font-ui:            'Orbitron', sans-serif;
     --font-title:         'Michroma', sans-serif;
     --nav-height:         48px;
-    --nav-logo-height:    56px;
+    --nav-logo-height:    0px;
     --z-nav:              20;
     --z-popup:            100;
     --z-logo:             10;
@@ -145,7 +145,7 @@ body.glass-dark .music-card {
 #nav-top {
     position: relative;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     height: var(--nav-height);
     padding: 0 24px;
@@ -156,38 +156,52 @@ body.glass-dark .music-card {
    NAV-LINKS-BTN
    ============================================================ */
 #nav-links-btn {
-    background: transparent;
-    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,255,230,0.22);
+    background: rgba(0,255,230,0.06);
     cursor: pointer;
-    font-family: var(--font-ui);
-    font-size: 10px;
-    font-weight: 400;
-    letter-spacing: 8px;
-    text-transform: uppercase;
     color: var(--color-accent);
-    padding: 8px 0;
-    transition: color 0.25s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
     outline: none;
-    display: flex;
-    flex-direction: column;
+    display: inline-flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
 }
-
-/* LINKS text label */
-#nav-links-btn .btn-label {
+#nav-links-btn:hover,
+#nav-links-btn.is-open {
+    background: rgba(0,255,230,0.12);
+    border-color: var(--color-accent);
+}
+#nav-links-btn svg {
+    width: 16px;
+    height: 16px;
     display: block;
-    transition: opacity 0.5s ease;
 }
-
-#nav-links-btn.is-dimmed .btn-label {
-    opacity: 0;
-    pointer-events: none;
+#nav-fav-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,255,230,0.22);
+    background: rgba(0,255,230,0.06);
+    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    outline: none;
 }
-
-#nav-links-btn:hover .btn-label,
-#nav-links-btn.is-open .btn-label {
-    opacity: 1;
+#nav-fav-btn:hover,
+#nav-fav-btn.is-active {
+    background: rgba(0,255,230,0.12);
+    border-color: var(--color-accent);
+}
+#nav-fav-btn svg {
+    width: 16px;
+    height: 16px;
+    display: block;
 }
 
 /* ============================================================
@@ -256,6 +270,16 @@ body.glass-dark .music-card {
    NAV-LOGO — 100% original elasticAssemble, untouched
    ============================================================ */
 #nav-logo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 19;
     visibility: visible;
     opacity: 1;
     transition: opacity 0.6s ease, visibility 0.6s ease;
@@ -273,7 +297,9 @@ body.glass-dark .music-card {
     font-weight: 400;
     color: #00FFE6;
     text-transform: uppercase;
-    margin-bottom: 40px;
+    margin: 0;
+    height: var(--nav-height);
+    align-items: center;
     display: flex;
     justify-content: center;
     overflow: hidden;
@@ -315,47 +341,6 @@ body.glass-dark .music-card {
     0%   { opacity: 0; transform: translateX(-100vw); }
     30%  { opacity: 1; }
     100% { opacity: 1; transform: translateX(0); }
-}
-
-/* NAV-REVEAL-CUE */
-#nav-reveal-cue {
-    position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-10px);
-    width: 34px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    color: var(--color-accent);
-    z-index: 1450;
-    opacity: 0;
-    pointer-events: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    cursor: pointer;
-}
-
-#nav-reveal-cue.is-visible {
-    opacity: 0.78;
-    pointer-events: auto;
-    transform: translateX(-50%) translateY(0);
-}
-
-#nav-reveal-cue:hover {
-    opacity: 1;
-}
-
-#nav-reveal-cue svg {
-    width: 14px;
-    height: 9px;
-    stroke: currentColor;
-    fill: none;
 }
 
 /* ============================================================
@@ -1338,8 +1323,7 @@ body.glass-dark .music-card {
     border-top: 1px solid rgba(255,255,255,0.08);
 }
 #ctrl-hide-toggle,
-.m-dim-toggle,
-.m-sheet-toggle {
+.m-dim-toggle {
     width: 28px;
     height: 24px;
     border: 1px solid rgba(0,255,230,0.22);
@@ -1357,18 +1341,14 @@ body.glass-dark .music-card {
 #ctrl-hide-toggle:hover,
 #ctrl-hide-toggle.is-active,
 .m-dim-toggle:hover,
-.m-dim-toggle.is-active,
-.m-sheet-toggle:hover,
-.m-sheet-toggle.is-active {
+.m-dim-toggle.is-active {
     border-color: rgba(0,255,230,0.55);
     background: rgba(0,255,230,0.07);
 }
 #ctrl-hide-toggle.is-active,
-.m-dim-toggle.is-active,
-.m-sheet-toggle.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
+.m-dim-toggle.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
 #ctrl-hide-toggle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
 .m-dim-toggle svg { width: 20px; height: 16px; display: block; }
-.m-sheet-toggle svg { width: 16px; height: 16px; display: block; }
 .m-dim-toggle .dim-zone {
     stroke: currentColor;
     stroke-width: 2;
@@ -1389,22 +1369,16 @@ body.ctrl-hidden #player-controls {
     pointer-events: none !important;
     transition: opacity 0.3s ease;
 }
-body.ctrl-hidden #nav-reveal-cue {
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
-
 #fav-backdrop {
     position: fixed;
     inset: 0;
     z-index: 1180;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.55);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.24s ease;
+    transition: opacity 0.26s;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    display: block;
 }
 #fav-backdrop.is-visible {
     opacity: 1;
@@ -1412,44 +1386,37 @@ body.ctrl-hidden #nav-reveal-cue {
 }
 #fav-sheet {
     position: fixed;
-    left: 0;
+    top: 0;
     right: 0;
     bottom: 0;
-    height: min(64dvh, 560px);
+    width: min(280px, 84vw);
     z-index: 1200;
     display: flex;
     flex-direction: column;
-    background: rgba(0,0,0,0.88);
-    border-top: 1px solid rgba(0,255,230,0.22);
-    border-radius: 18px 18px 0 0;
-    box-shadow: 0 -24px 70px rgba(0,0,0,0.74), inset 0 1px 0 rgba(255,255,255,0.05);
-    transform: translateY(108%);
+    background: rgba(0,0,0,0.92);
+    border-left: 1px solid rgba(0,255,230,0.22);
+    box-shadow: -12px 0 48px rgba(0,0,0,0.7);
+    transform: translateX(110%);
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(18px) saturate(90%);
-    -webkit-backdrop-filter: blur(18px) saturate(90%);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     overflow: hidden;
 }
-#fav-sheet.is-open { transform: translateY(0); }
-.fav-sheet-handle {
-    width: 42px;
-    height: 3px;
-    border-radius: 999px;
-    background: rgba(0,255,230,0.35);
-    margin: 10px auto 12px;
-    flex-shrink: 0;
-}
+#fav-sheet.is-open { transform: translateX(0); }
+.fav-sheet-handle { display: none; }
 #fav-header {
     display: grid;
-    grid-template-columns: 1fr 32px;
+    grid-template-columns: 1fr 36px;
     align-items: center;
     gap: 10px;
-    padding: 0 16px 10px;
+    padding: 14px 14px 12px;
     border-bottom: 1px solid rgba(255,255,255,0.07);
+    flex-shrink: 0;
 }
 #fav-title {
     font-family: 'Orbitron', sans-serif;
     font-size: 9px;
-    letter-spacing: 5px;
+    letter-spacing: 4px;
     text-transform: uppercase;
     color: #00FFE6;
 }
@@ -1459,15 +1426,17 @@ body.ctrl-hidden #nav-reveal-cue {
     border: none;
     background: transparent;
     color: #00FFE6;
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
+    display: grid;
+    place-items: center;
 }
 #fav-close-btn:hover { background: rgba(0,255,230,0.06); }
 #fav-actions {
     display: none;
-    padding: 11px 16px 8px;
+    padding: 6px 10px 4px;
     flex-shrink: 0;
 }
 #fav-play-all-btn,
@@ -1477,18 +1446,18 @@ body.ctrl-hidden #nav-reveal-cue {
     background: rgba(0,255,230,0.06);
     color: #00FFE6;
     font-family: 'Orbitron', sans-serif;
-    font-size: 8px;
-    letter-spacing: 3px;
+    font-size: 7px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     cursor: pointer;
 }
-#fav-play-all-btn { width: 100%; padding: 10px 12px; }
+#fav-play-all-btn { width: 100%; padding: 6px 10px; }
 #fav-empty {
     display: flex;
     flex: 1;
     align-items: center;
     justify-content: center;
-    padding: 28px 22px;
+    padding: 28px;
     color: #00FFE6;
     font-size: 8px;
     letter-spacing: 3px;
@@ -1504,55 +1473,55 @@ body.ctrl-hidden #nav-reveal-cue {
     scrollbar-width: thin;
     scrollbar-color: rgba(0,255,230,0.28) transparent;
 }
-#fav-list::-webkit-scrollbar { width: 4px; }
+#fav-list::-webkit-scrollbar { width: 3px; }
 #fav-list::-webkit-scrollbar-thumb { background: rgba(0,255,230,0.28); border-radius: 999px; }
+/* Row: thumb / buttons / title — vertical stack */
 .fav-row {
-    min-height: 96px;
-    display: grid;
-    grid-template-columns: 72px minmax(104px, 132px) minmax(0, 1fr);
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 7px 10px 9px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
     cursor: pointer;
-    transition: background 0.18s ease;
+    transition: background 0.18s;
 }
-.fav-row:hover { background: rgba(255,255,255,0.04); }
+.fav-row:hover { background: rgba(0,255,230,0.03); }
 .fav-row-thumb {
-    width: min(132px, 34vw);
-    aspect-ratio: 16 / 9;
-    border-radius: 4px;
+    width: 100%;
+    height: 60px;
+    border-radius: 5px;
     background-color: #111;
-    background-size: contain;
+    background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
-    overflow: hidden;
     box-shadow: inset 0 0 0 1px rgba(0,255,230,0.1);
+    flex-shrink: 0;
+    margin-bottom: 5px;
 }
 .fav-row-main { min-width: 0; }
 .fav-row-title {
     color: #fff;
-    font-size: 8.5px;
-    letter-spacing: 1px;
-    line-height: 1.3;
+    font-size: 9px;
+    letter-spacing: 0.3px;
+    line-height: 1.35;
     text-transform: uppercase;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    text-align: center;
 }
 .fav-row-controls {
-    display: grid;
-    grid-template-columns: repeat(2, 30px);
-    grid-auto-rows: 26px;
-    gap: 6px;
-    justify-content: start;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    justify-content: center;
+    margin-bottom: 5px;
 }
 .fav-row-btn {
-    width: 30px;
-    height: 26px;
+    flex: 1;
+    height: 20px;
     border: 1px solid rgba(0,255,230,0.22);
-    border-radius: 4px;
+    border-radius: 3px;
     background: rgba(0,255,230,0.04);
     color: #00FFE6;
     display: inline-flex;
@@ -1566,28 +1535,28 @@ body.ctrl-hidden #nav-reveal-cue {
     background: rgba(0,255,230,0.08);
 }
 .fav-row-btn:disabled {
-    opacity: 0.3;
+    opacity: 0.25;
     cursor: default;
 }
 .fav-row-btn svg {
-    width: 13px;
-    height: 13px;
+    width: 10px;
+    height: 10px;
     display: block;
 }
 .fav-remove-btn {
-    font-size: 17px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 1;
 }
 #fav-footer {
     display: none;
     justify-content: center;
-    padding: 12px 16px 14px;
+    padding: 6px 10px 8px;
     border-top: 1px solid rgba(255,255,255,0.07);
     flex-shrink: 0;
 }
 #fav-clear-btn {
-    padding: 8px 18px;
+    padding: 5px 14px;
     color: #00FFE6;
     border-color: rgba(0,255,230,0.32);
     background: transparent;
@@ -1597,6 +1566,7 @@ body.ctrl-hidden #nav-reveal-cue {
     background: rgba(0,255,230,0.06);
 }
 body.fav-open { overflow: hidden; }
+@media (min-width: 621px) { .fav-row-thumb { height: 80px; } }
 
     </style>
 </head>
@@ -1605,7 +1575,14 @@ body.fav-open { overflow: hidden; }
     <!-- NAV-TOP -->
     <nav id="nav-top">
         <button id="nav-links-btn" aria-expanded="false" aria-controls="nav-popup">
-            <span class="btn-label">Links</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h16"/>
+            </svg>
+        </button>
+        <button id="nav-fav-btn" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6"/>
+            </svg>
         </button>
 
         <div id="nav-popup" role="dialog" aria-label="Navigation links">
@@ -1623,13 +1600,6 @@ body.fav-open { overflow: hidden; }
         <h1 aria-label="Electroscape">
             <span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span>
         </h1>
-    </div>
-
-    <!-- NAV-REVEAL-CUE -->
-    <div id="nav-reveal-cue" role="button" tabindex="0" aria-label="Show header">
-        <svg viewBox="0 0 14 9" aria-hidden="true">
-            <path d="M1.5 1.5L7 7L12.5 1.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
     </div>
 
     <!-- =====================================================
@@ -1690,11 +1660,6 @@ body.fav-open { overflow: hidden; }
             </button>
             <button class="m-dim-toggle" id="m1-dim-toggle" type="button" aria-label="Dim grid">
                 <svg class="m-dim-icon" viewBox="0 0 24 18" fill="none" aria-hidden="true"></svg>
-            </button>
-            <button class="m-sheet-toggle" id="m1-fav-sheet-toggle" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
-                <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M3 3h4v4H3zM9 3h4v4H9zM3 9h4v4H3zM9 9h4v4H9z" stroke="currentColor" stroke-width="1.3"/>
-                </svg>
             </button>
         </div>
 
@@ -1848,6 +1813,35 @@ body.fav-open { overflow: hidden; }
 }());
 
 /* ============================================================
+   NAV-LOGO auto-fade timing
+   Letters finish at ~4.7s (2.3s delay + 2.4s animation),
+   then wait 6s before fading out.
+   ============================================================ */
+(function () {
+    var logo = document.getElementById('nav-logo');
+    if (!logo) return;
+
+    var LETTERS_FORM_MS = 4700;
+    var HOLD_AFTER_FORM_MS = 6000;
+
+    window.esLogoAutoHideLocked = false;
+
+    window.esHideNavLogo = function (lockAfterHide) {
+        if (lockAfterHide) window.esLogoAutoHideLocked = true;
+        logo.classList.add('is-hidden');
+    };
+
+    window.esShowNavLogo = function () {
+        if (window.esLogoAutoHideLocked) return;
+        logo.classList.remove('is-hidden');
+    };
+
+    setTimeout(function () {
+        window.esHideNavLogo(true);
+    }, LETTERS_FORM_MS + HOLD_AFTER_FORM_MS);
+}());
+
+/* ============================================================
    MUSIC-SECTION toggle
    ============================================================ */
 (function () {
@@ -1860,7 +1854,8 @@ body.fav-open { overflow: hidden; }
     function openMusic() {
         musicSection.classList.add('active');
         musicSection.setAttribute('aria-hidden', 'false');
-        logo.classList.add('is-hidden');
+        if (typeof window.esHideNavLogo === 'function') window.esHideNavLogo(false);
+        else logo.classList.add('is-hidden');
         if (modalBox) modalBox.scrollTo({ top: 0, behavior: 'smooth' });
         if (closeBtn) closeBtn.focus({ preventScroll: true });
     }
@@ -1868,7 +1863,8 @@ body.fav-open { overflow: hidden; }
     function closeMusic() {
         musicSection.classList.remove('active');
         musicSection.setAttribute('aria-hidden', 'true');
-        logo.classList.remove('is-hidden');
+        if (typeof window.esShowNavLogo === 'function') window.esShowNavLogo();
+        else logo.classList.remove('is-hidden');
     }
 
     musicBtn.addEventListener('click', openMusic);
@@ -1897,7 +1893,8 @@ body.fav-open { overflow: hidden; }
         popup.classList.add('is-open');
         btn.classList.add('is-open');
         btn.setAttribute('aria-expanded', 'true');
-        logo.classList.add('is-hidden');
+        if (typeof window.esHideNavLogo === 'function') window.esHideNavLogo(false);
+        else logo.classList.add('is-hidden');
     }
 
     function closePopup() {
@@ -1905,7 +1902,8 @@ body.fav-open { overflow: hidden; }
         popup.classList.remove('is-open');
         btn.classList.remove('is-open');
         btn.setAttribute('aria-expanded', 'false');
-        logo.classList.remove('is-hidden');
+        if (typeof window.esShowNavLogo === 'function') window.esShowNavLogo();
+        else logo.classList.remove('is-hidden');
     }
 
     btn.addEventListener('click', function (e) {
@@ -1926,99 +1924,6 @@ body.fav-open { overflow: hidden; }
         /* MUSIC-SECTION wired here later */
     });
 }());
-
-/* ============================================================
-   AUTO-DIM / WAKE SYSTEM
-   ============================================================ */
-(function () {
-    var btn          = document.getElementById('nav-links-btn');
-    var nav          = document.getElementById('nav-top');
-    var logo         = document.getElementById('nav-logo');
-    var cue          = document.getElementById('nav-reveal-cue');
-    var popup        = document.getElementById('nav-popup');
-    var hideTimer;
-    var initialHoldActive = true;
-    var topHoverActive = false;
-    var INITIAL_DELAY = 15000;  /* 15s — logo finishes animating at ~4.7s */
-    var REHIDE_DELAY  = 4000;
-
-    function dim() {
-        if (popup.classList.contains('is-open')) return;
-        btn.classList.add('is-dimmed');
-        logo.classList.add('is-hidden');
-        cue.classList.add('is-visible');
-    }
-
-    function wake() {
-        clearTimeout(hideTimer);
-        btn.classList.remove('is-dimmed');
-        logo.classList.remove('is-hidden');
-        cue.classList.remove('is-visible');
-    }
-
-    function scheduleHide(delay) {
-        clearTimeout(hideTimer);
-        hideTimer = setTimeout(dim, delay);
-    }
-
-    function scheduleRehideIfReady() {
-        if (initialHoldActive) return;
-        if (!popup.classList.contains('is-open')) {
-            scheduleHide(REHIDE_DELAY);
-        }
-    }
-
-    function enterTopArea() {
-        topHoverActive = true;
-        wake();
-    }
-
-    function leaveTopArea() {
-        topHoverActive = false;
-        scheduleRehideIfReady();
-    }
-
-    nav.addEventListener('mouseenter', enterTopArea);
-    nav.addEventListener('mouseleave', leaveTopArea);
-    logo.addEventListener('mouseenter', enterTopArea);
-    logo.addEventListener('mouseleave', leaveTopArea);
-    popup.addEventListener('mouseenter', enterTopArea);
-    popup.addEventListener('mouseleave', leaveTopArea);
-    cue.addEventListener('mouseenter', enterTopArea);
-    cue.addEventListener('mouseleave', leaveTopArea);
-    cue.addEventListener('pointerdown', wake);
-    cue.addEventListener('touchstart', wake, { passive: true });
-
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') wake();
-    });
-
-    logo.addEventListener('click', function () {
-        scheduleRehideIfReady();
-    });
-
-    btn.addEventListener('click', function () {
-        if (popup.classList.contains('is-open')) {
-            clearTimeout(hideTimer);
-        } else {
-            scheduleRehideIfReady();
-        }
-    });
-
-    new MutationObserver(function () {
-        if (popup.classList.contains('is-open')) {
-            clearTimeout(hideTimer);
-        } else {
-            scheduleRehideIfReady();
-        }
-    }).observe(popup, { attributes: true, attributeFilter: ['class'] });
-
-    setTimeout(function () {
-        initialHoldActive = false;
-        if (!topHoverActive) dim();
-    }, INITIAL_DELAY);
-}());
-
 
 /* ============================================================
    PLAYER-EMBED — YouTube IFrame API
@@ -2215,7 +2120,7 @@ function cssEscape(s) {
     var footer = document.getElementById('fav-footer');
     var actions = document.getElementById('fav-actions');
     var currentFavBtn = document.getElementById('m1-fav');
-    var openBtns = [document.getElementById('m1-fav-sheet-toggle')].filter(Boolean);
+    var openBtns = [document.getElementById('nav-fav-btn')].filter(Boolean);
 
     function load() {
         try {
@@ -2367,8 +2272,8 @@ function cssEscape(s) {
             controls.appendChild(down);
             main.appendChild(title);
 
-            row.appendChild(controls);
             row.appendChild(thumb);
+            row.appendChild(controls);
             row.appendChild(main);
             list.appendChild(row);
 
