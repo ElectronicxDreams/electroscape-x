@@ -618,7 +618,11 @@
             transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
         }
         .v-card:hover { transform: scale(1.02); border-color: rgba(255,67,247,.4); box-shadow: 0 0 20px rgba(157,71,255,.18); }
-        .v-card.active { border-color: var(--mag); box-shadow: 0 0 18px rgba(255,67,247,.22), inset 0 0 0 1px rgba(255,67,247,.1); }
+        .v-card.active { animation: cardActivePulse 1s ease-out forwards; }
+        @keyframes cardActivePulse {
+            0%   { border-color: var(--mag); box-shadow: 0 0 18px rgba(255,67,247,.22), inset 0 0 0 1px rgba(255,67,247,.1); }
+            100% { border-color: rgba(157,71,255,.22); box-shadow: none; }
+        }
         .v-card-thumb { aspect-ratio: 16/9; background-size: cover; background-position: center; background-color: #111; }
         .v-card-body { padding: 7px 9px 9px; text-align: center; }
         .v-card-title {
@@ -938,7 +942,7 @@
         <!-- EQ PANEL — X1-6 Equalizer Blocks, blank when paused -->
         <section id="eq-panel" role="button" aria-label="EQ panel" aria-pressed="false" tabindex="0">
             <div id="eq-box">
-                <div class="eq-anim active" id="eq-anim-0">
+                <div class="eq-anim" id="eq-anim-0">
                     <span class="eq-block"></span>
                     <span class="eq-block"></span>
                     <span class="eq-block"></span>
@@ -993,7 +997,7 @@
                         <span class="arc-bar" style="--ah:5px"></span>
                     </div>
                 </div>
-                <div class="eq-anim" id="eq-anim-4">
+                <div class="eq-anim active" id="eq-anim-4">
                     <div class="cylon-scan"></div>
                 </div>
             </div>
@@ -1041,7 +1045,7 @@
     </section>
     <section id="bottom-zone" aria-label="Scrollable playlist">
         <div id="video-grid"></div>
-        <div id="version-strip"><span>[P3-M1] [3.3]</span></div>
+        <div id="version-strip"><span>[M3] [3.5]</span></div>
     </section>
     </main>
 
@@ -1284,7 +1288,7 @@ function cssEscape(s) {
     var anims = Array.from(panel.querySelectorAll('.eq-anim'));
     var EQ_KEY   = 'es_p3m1_eq_anim';
     var HIDE_KEY = 'es_p3m1_ctrl_hidden';
-    var current = 0;
+    var current = 4;
     var hidden  = false;
     var pressTimer = null;
 

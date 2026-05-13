@@ -308,7 +308,7 @@
         .m-dim-toggle:hover, .m-dim-toggle.is-active { border-color: rgba(var(--accent-rgb),0.55); background: rgba(var(--accent-rgb),0.07); }
         .m-dim-toggle.is-active { box-shadow: 0 0 12px rgba(var(--accent-rgb),0.12); }
         .v-card:hover { border-color: rgba(var(--accent-rgb),0.3); }
-        .v-card.active { border-color: var(--accent); box-shadow: 0 0 18px rgba(var(--accent-rgb),0.12), inset 0 0 0 1px rgba(var(--accent-rgb),0.06); }
+        .v-card.active { animation: cardActivePulse 1s ease-out forwards; }
         .v-card.active .v-card-title { color: var(--accent); }
         .v-card-num { color: rgba(var(--accent-rgb),0.72); }
         .v-play-btn { background: var(--accent); box-shadow: 0 0 8px rgba(var(--accent-rgb),0.25); }
@@ -352,8 +352,11 @@
         }
         .v-card:hover { transform: scale(1.02); border-color: rgba(0,255,230,0.3); }
         .v-card.active {
-            border-color: var(--cyan);
-            box-shadow: 0 0 18px rgba(0,255,230,0.12), inset 0 0 0 1px rgba(0,255,230,0.06);
+            animation: cardActivePulse 1s ease-out forwards;
+        }
+        @keyframes cardActivePulse {
+            0%   { border-color: var(--cyan); box-shadow: 0 0 18px rgba(0,255,230,0.12), inset 0 0 0 1px rgba(0,255,230,0.06); }
+            100% { border-color: rgba(255,255,255,0.07); box-shadow: none; }
         }
 
         .v-card-thumb { aspect-ratio: 16/9; background-size: cover; background-position: center; background-color: #111; }
@@ -751,7 +754,7 @@
 
     <!-- VIDEO GRID -->
     <div id="video-grid"></div>
-    <div id="page-version"><span>1.3</span></div>
+    <div id="page-version"><span>1.5</span></div>
 
     </section>
     </main>

@@ -828,14 +828,8 @@ body.glass-dark .music-card {
 }
 .video:hover { transform: scale(1.03); background: #111; }
 
-@keyframes activePulse {
-    0%   { box-shadow: 0 0 5px rgba(0,255,230,0.10); }
-    50%  { box-shadow: 0 0 20px rgba(0,255,230,0.35); }
-    100% { box-shadow: 0 0 5px rgba(0,255,230,0.10); }
-}
 .video.is-playing {
-    border-color: #00FFE6 !important;
-    animation: activePulse 2s infinite ease-in-out;
+    border-color: rgba(0,255,230,0.0) !important;
 }
 
 .thumb-container {
@@ -1681,7 +1675,7 @@ body.fav-open { overflow: hidden; }
         <div id="video-grid"></div>
 
         <!-- VERSION FOOTER -->
-        <div id="version-footer">7.0.0</div>
+        <div id="version-footer">7.0.3</div>
 
     </div><!-- end #player-section -->
 
