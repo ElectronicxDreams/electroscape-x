@@ -161,17 +161,6 @@
         #nav-fav-btn:hover { border-color: var(--blue); background: rgba(31,123,255,.12); }
         #nav-fav-btn.is-active { border-color: var(--blue); background: rgba(31,123,255,.14); }
         .circle-btn svg { width: 18px; height: 18px; }
-        /* VERSION — right of dim-btn in the centre flex row */
-        #nav-version {
-            text-align: left;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 9px;
-            letter-spacing: 3px;
-            color: var(--mag);
-            opacity: 0.5;
-            pointer-events: none;
-            user-select: none;
-        }
         .screen-title { min-height: 1px; }
 
         /* ============================================================
@@ -757,16 +746,6 @@
         @media (min-width: 621px) {
             .fav-row-thumb { height: 80px; }
         }
-        #version-strip {
-            text-align: center;
-            padding: 20px 0 16px;
-        }
-        #version-strip span {
-            color: var(--mag);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
-            opacity: 0.38;
-        }
 
         /* ============================================================
            LANDSCAPE — phone only (max-height 600px)
@@ -897,7 +876,6 @@
                 <button id="nav-dim-btn" type="button" aria-label="Dim grid">
                     <svg class="dim-icon" viewBox="0 0 18 14" fill="none"></svg>
                 </button>
-                <div id="nav-version">3.3</div>
             </div>
             <button class="circle-btn" id="nav-fav-btn" aria-label="Open favourites">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -1019,7 +997,6 @@
     </section>
     <section id="bottom-zone" aria-label="Scrollable playlist">
         <div id="video-grid"></div>
-        <div id="version-strip"><span>[M3] [3.6]</span></div>
     </section>
     </main>
 
