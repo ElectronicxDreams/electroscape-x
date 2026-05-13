@@ -223,25 +223,25 @@
         .hero-time-row { display: flex; justify-content: space-between; padding: 4px 12px 0; font-size: 7px; letter-spacing: 1px; color: var(--cyan); }
 
         /* ============================================================
-           CONTROLS ROW — all buttons uniform 33px (25% smaller)
+           CONTROLS ROW — 7 buttons: hide | shuffle | prev | play | next | fav | dim
            ============================================================ */
         #controls-row {
-            display: grid; grid-template-columns: repeat(5, 33px);
+            display: grid; grid-template-columns: 41px 41px 41px 45px 41px 41px 41px;
             align-items: center; justify-content: center;
-            gap: 10px; padding: 8px 12px 10px;
+            gap: 14px; padding: 8px 12px 10px;
         }
 
         .ctrl-round {
-            width: 33px; height: 33px; border-radius: 50%;
+            width: 41px; height: 41px; border-radius: 50%;
             border: 1px solid rgba(0,255,230,0.25); background: rgba(0,255,230,0.06);
             color: var(--cyan); display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.15s;
         }
         .ctrl-round:hover { border-color: var(--cyan); background: rgba(0,255,230,0.12); transform: scale(1.08); }
-        .ctrl-round svg { width: 14px; height: 14px; }
+        .ctrl-round svg { width: 17px; height: 17px; }
 
         #p2m3-play {
-            width: 33px; height: 33px; border-radius: 50%;
+            width: 45px; height: 45px; border-radius: 50%;
             border: 1px solid rgba(0,255,230,0.25); background: var(--cyan); color: #000;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; flex-shrink: 0;
@@ -250,26 +250,25 @@
         }
         #p2m3-play:hover { transform: scale(1.08); box-shadow: 0 0 26px rgba(0,255,230,0.55); }
         #p2m3-play:active { transform: scale(0.95); }
-        #p2m3-play svg { width: 14px; height: 14px; }
+        #p2m3-play svg { width: 19px; height: 19px; }
         #p2m3-play.is-playing { box-shadow: 0 0 32px rgba(0,255,230,0.65); }
 
         /* ============================================================
-           GRID SECTION HEADER — centred controls
+           GRID SECTION HEADER — hidden, controls moved into controls-row
            ============================================================ */
-        #grid-head { display: flex; align-items: center; justify-content: center; padding: 8px 15px 10px; border-top: 1px solid var(--border-soft); gap: 10px; }
+        #grid-head { display: none; }
 
-        /* CTRL-HIDE TOGGLE — independent of dimmer */
+        /* CTRL-HIDE TOGGLE — now lives in controls-row, styled as ctrl-round */
         #p2m3-ctrl-hide {
-            width: 28px; height: 24px;
-            border: 1px solid rgba(0,255,230,0.22); border-radius: 4px;
-            background: rgba(0,255,230,0.03); color: var(--cyan);
+            width: 41px; height: 41px; border-radius: 50%;
+            border: 1px solid rgba(0,255,230,0.22); background: rgba(0,255,230,0.03); color: var(--cyan);
             display: inline-flex; align-items: center; justify-content: center;
             cursor: pointer; padding: 0; flex-shrink: 0;
             transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
         }
         #p2m3-ctrl-hide:hover, #p2m3-ctrl-hide.is-active { border-color: rgba(0,255,230,0.55); background: rgba(0,255,230,0.07); }
         #p2m3-ctrl-hide.is-active { box-shadow: 0 0 12px rgba(0,255,230,0.12); }
-        #p2m3-ctrl-hide svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
+        #p2m3-ctrl-hide svg { width: 17px; height: 17px; stroke: currentColor; fill: none; }
 
         body.p2m3-ctrl-hidden #hero-progress-wrap,
         body.p2m3-ctrl-hidden #controls-row {
@@ -282,9 +281,9 @@
             pointer-events: none !important;
         }
 
-        /* DIM TOGGLE */
+        /* DIM TOGGLE — now lives in controls-row, styled as ctrl-round */
         .m-dim-toggle {
-            width: 28px; height: 24px; border: 1px solid rgba(0,255,230,0.22); border-radius: 4px;
+            width: 41px; height: 41px; border-radius: 50%; border: 1px solid rgba(0,255,230,0.22);
             background: rgba(0,255,230,0.03); color: var(--cyan);
             display: inline-flex; align-items: center; justify-content: center;
             cursor: pointer; padding: 0; flex-shrink: 0;
@@ -532,12 +531,12 @@
 
             /* Compact controls just enough for shorter phone landscape heights */
             #controls-row {
-                grid-template-columns: repeat(5, clamp(27px, 3.3dvh, 33px));
-                gap: clamp(6px, 1dvh, 10px);
+                grid-template-columns: repeat(7, clamp(27px, 3.3dvh, 41px));
+                gap: clamp(6px, 1dvh, 14px);
                 padding: 6px 12px 8px;
             }
-            .ctrl-round, #p2m3-play { width: clamp(27px, 3.3dvh, 33px); height: clamp(27px, 3.3dvh, 33px); }
-            .ctrl-round svg, #p2m3-play svg { width: clamp(11px, 1.5dvh, 14px); height: clamp(11px, 1.5dvh, 14px); }
+            .ctrl-round, #p2m3-play, #p2m3-ctrl-hide, .m-dim-toggle { width: clamp(27px, 3.3dvh, 41px); height: clamp(27px, 3.3dvh, 41px); }
+            .ctrl-round svg, #p2m3-play svg, #p2m3-ctrl-hide svg { width: clamp(11px, 1.5dvh, 17px); height: clamp(11px, 1.5dvh, 17px); }
             .hero-time-row { padding-top: 3px; }
         }
 
@@ -713,6 +712,12 @@
 
     <!-- CONTROLS ROW -->
     <div id="controls-row">
+        <button id="p2m3-ctrl-hide" type="button" aria-label="Hide playback controls" aria-pressed="false">
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M4 2v4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 14v-4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
         <button class="ctrl-round" id="p2m3-shuffle" aria-label="Shuffle">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 7h3.4c2 0 3.2 1 4.4 2.8l2.4 3.4C14.4 15 15.6 16 17.6 16H19"/>
@@ -734,27 +739,17 @@
                 <path class="fav-heart-path" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
         </button>
-    </div>
-
-    </section>
-    <section id="bottom-zone" aria-label="Scrollable playlist">
-
-    <!-- GRID HEADER -->
-    <div id="grid-head">
-        <button id="p2m3-ctrl-hide" type="button" aria-label="Hide playback controls" aria-pressed="false">
-            <svg viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M4 2v4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 14v-4H8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </button>
         <button class="m-dim-toggle" id="p2m3-dim-toggle" type="button" aria-label="Dim grid">
             <svg class="m-dim-icon" viewBox="0 0 24 18" fill="none"></svg>
         </button>
     </div>
 
+    </section>
+    <section id="bottom-zone" aria-label="Scrollable playlist">
+
     <!-- VIDEO GRID -->
     <div id="video-grid"></div>
-    <div id="page-version"><span>1.6</span></div>
+    <div id="page-version"><span>1.7</span></div>
 
     </section>
     </main>
