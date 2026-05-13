@@ -518,8 +518,7 @@ body.glass-dark .music-card {
     position: fixed;
     top: 0;
     right: 0;
-    width: 400px;
-    max-width: 92vw;
+    width: min(400px, 92vw);
     height: 100%;
     background: #0a0a0a;
     border-left: 1px solid #1e1e1e;
@@ -1159,10 +1158,10 @@ body.glass-dark .music-card {
 }
 
 .music-card {
-    flex: 0 1 250px;
+    flex: 0 1 280px;
     min-width: 0;
-    width: 250px;
-    max-width: 100%;
+    width: 100%;
+    max-width: 280px;
     background: rgba(255, 255, 255, 0.04);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -1231,11 +1230,10 @@ body.glass-dark .music-card {
     transition: 0.3s;
 }
 
-.music-card:hover .card-arrow         { color: #00FFE6; }
-.music-card.spotify:hover .card-arrow  { color: #00FFE6; }
-.music-card.tidal:hover .card-arrow    { color: #ff6b35; }
-.music-card.deezer:hover .card-arrow   { color: #a238ff; }
-.music-card.youtube:hover .card-arrow  { color: #ff0000; }
+.music-card:hover .card-arrow { color: #00FFE6; }
+.music-card.tidal:hover .card-arrow { color: #ff6b35; }
+.music-card.deezer:hover .card-arrow { color: #a238ff; }
+.music-card.youtube:hover .card-arrow { color: #ff0000; }
 
 /* ============================================================
    INDEX2 HYBRID OVERRIDES
@@ -1596,7 +1594,7 @@ body.fav-open { overflow: hidden; }
         </button>
         <button id="nav-fav-btn" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M15 18l-6-6 6-6"/>
+                <path d="M9 6l6 6-6 6"/>
             </svg>
         </button>
 
@@ -1968,7 +1966,6 @@ body.fav-open { overflow: hidden; }
 
     document.getElementById('nav-music-btn').addEventListener('click', function () {
         closePopup();
-        /* MUSIC-SECTION wired here later */
     });
 }());
 

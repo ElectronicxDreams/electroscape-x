@@ -1261,8 +1261,9 @@ function cssEscape(s) {
     function doShuffle() {
         var grid = document.getElementById('video-grid');
         var cards = Array.from(grid.querySelectorAll('.v-card'));
-        for (var i = cards.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); grid.appendChild(cards[j]); var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp; }
-        cards.forEach(function (c, ni) { c.setAttribute('data-idx', ni); });
+        for (var i = cards.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp; }
+        grid.innerHTML = '';
+        cards.forEach(function (c, ni) { c.setAttribute('data-idx', ni); grid.appendChild(c); });
         buildQueue();
         var still = window.esQueue.findIndex(function (t) { return t.el && t.el.classList.contains('active'); });
         window.esCurrentIndex = still !== -1 ? still : 0;

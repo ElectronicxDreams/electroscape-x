@@ -33,6 +33,8 @@
             font-family: 'Orbitron', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior-y: auto;
         }
 
         /* ============================================================
@@ -615,7 +617,12 @@
         .fav-row-btn:disabled { opacity: 0.25; cursor: default; }
         .fav-row-btn svg { width: 10px; height: 10px; display: block; }
         .fav-remove-btn { font-size: 12px; font-weight: 700; line-height: 1; }
-        .fav-row-main { min-width: 0; }
+        .fav-row-main {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
         .fav-row-title {
             color: #fff; font-size: 9px; letter-spacing: 0.3px; line-height: 1.35;
             text-transform: uppercase;
@@ -782,7 +789,7 @@
         </button>
         <button id="nav-fav-btn" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M15 18l-6-6 6-6"/>
+                <path d="M9 6l6 6-6 6"/>
             </svg>
         </button>
     </div>
@@ -1111,12 +1118,15 @@
 (function () {
     fetch('tracks.json')
         .then(function (r) {
-            /* fallback to parent tracks.json when this file is nested in _dev */
-            if (!r.ok) return fetch('../tracks.json').then(function(r2){
-                if (!r2.ok) throw new Error('tracks.json failed: ' + r2.status);
-                return r2.json();
+            if (r.ok) return r.json();
+            /* Fallback chain: _LIVE/tracks.json → ../tracks.json (_dev) → ../../tracks.json (deeper nesting) */
+            return fetch('../tracks.json').then(function(r2){
+                if (r2.ok) return r2.json();
+                return fetch('../../tracks.json').then(function(r3){
+                    if (!r3.ok) throw new Error('tracks.json failed: ' + r3.status);
+                    return r3.json();
+                });
             });
-            return r.json();
         })
         .then(function (tracks) {
             var listM1 = document.getElementById('m-track-list');
@@ -1302,7 +1312,8 @@ function cssEscape(s) {
             var j = Math.floor(Math.random() * (i + 1));
             var tmp = rowsM1[i]; rowsM1[i] = rowsM1[j]; rowsM1[j] = tmp;
         }
-        /* Re-append in shuffled order */
+        /* Clear list and re-append in shuffled order */
+        listM1.innerHTML = '';
         rowsM1.forEach(function (rowM1, newIdx) {
             rowM1.setAttribute('data-idx', newIdx);
             listM1.appendChild(rowM1);
@@ -1367,7 +1378,7 @@ function cssEscape(s) {
 
     function applyDimState() {
         var config = states[state];
-        body.classList.remove('playlist-dim-medium', 'playlist-dim-heavy', 'playback-dim-light', 'playback-dim-medium');
+        body.classList.remove('playlist-dim-medium', 'playlist-dim-heavy');
         if (config.playlistClass) body.classList.add(config.playlistClass);
         buttons.forEach(function (btn) {
             var icon = btn.querySelector('.m-dim-icon');

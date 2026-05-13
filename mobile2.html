@@ -683,7 +683,7 @@
         <div class="m-wordmark" aria-label="Electroscape"><span>E</span><span>L</span><span>E</span><span>C</span><span>T</span><span>R</span><span>O</span><span>S</span><span>C</span><span>A</span><span>P</span><span>E</span></div>
         <button id="nav-fav-btn" aria-label="Open favourites" aria-expanded="false">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 18l-6-6 6-6"/>
+                <path d="M9 6l6 6-6 6"/>
             </svg>
         </button>
     </header>
@@ -986,8 +986,9 @@ function cssEscape(s) {
     function doShuffle() {
         var grid = document.getElementById('video-grid');
         var cards = Array.from(grid.querySelectorAll('.v-card'));
-        for (var i = cards.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); grid.appendChild(cards[j]); var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp; }
-        cards.forEach(function (c, ni) { c.setAttribute('data-idx', ni); });
+        for (var i = cards.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp; }
+        grid.innerHTML = '';
+        cards.forEach(function (c, ni) { c.setAttribute('data-idx', ni); grid.appendChild(c); });
         buildQueue();
         var still = window.esQueue.findIndex(function (t) { return t.el && t.el.classList.contains('active'); });
         window.esCurrentIndex = still !== -1 ? still : 0;
