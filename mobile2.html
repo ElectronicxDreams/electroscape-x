@@ -1053,8 +1053,30 @@ function restoreMainQueue(autoplay, startAfterCurrent) {
 }
 
 function scrollToTop() {
-    var se = document.scrollingElement || document.documentElement || document.body;
-    if (se.scrollTo) se.scrollTo({top:0, behavior:'smooth'}); else se.scrollTop = 0;
+    var behavior = { top: 0, behavior: 'smooth' };
+    try {
+        window.scrollTo(behavior);
+    } catch (e) {
+        window.scrollTo(0, 0);
+    }
+
+    var targets = [
+        document.scrollingElement,
+        document.documentElement,
+        document.body,
+        document.getElementById('bottom-zone'),
+        document.getElementById('app-shell')
+    ];
+    targets.forEach(function (el) {
+        if (!el) return;
+        try { if (typeof el.scrollTo === 'function') el.scrollTo(behavior); } catch (e) {}
+        el.scrollTop = 0;
+    });
+
+    var topZone = document.getElementById('top-zone');
+    if (topZone && typeof topZone.scrollIntoView === 'function') {
+        topZone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 function resolvePlayableIndex(startIndex) {
@@ -1281,6 +1303,7 @@ function closeFavSheet() {
         setQueueMode('fav');
         playTrack(index);
         closeFavSheet();
+        requestAnimationFrame(function () { scrollToTop(); });
     }
     function moveFavBy(from, delta) {
         var favs=load(); var to=from+delta;
