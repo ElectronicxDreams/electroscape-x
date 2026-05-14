@@ -389,46 +389,46 @@
             overflow: hidden;
         }
         /* Narrow hard beam */
-        .cylon-scan::before {
+.cylon-scan::before {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translateX(-50%) translateY(-50%);
-            width: 6%;
+            width: 5%;
             height: 1.5px;
             border-radius: 999px;
             background: transparent;
             pointer-events: none;
         }
         /* Wide soft glow halo */
-        .cylon-scan::after {
+.cylon-scan::after {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translateX(-50%) translateY(-50%);
-            width: 11%;
+            width: 10%;
             height: 7px;
             border-radius: 999px;
             background: transparent;
             pointer-events: none;
         }
-        body.playing .cylon-scan::before {
+body.playing .cylon-scan::before {
             background: #ff1a1a;
             box-shadow:
                 0 0 2px 1px rgba(255,0,0,1),
                 0 0 5px 2px rgba(200,0,0,.8);
-            animation: cylonBeam 2.4s infinite cubic-bezier(0.37,0,0.63,1) alternate;
-        }
-        body.playing .cylon-scan::after {
+    animation: cylonBeam 1.6s infinite cubic-bezier(0.37,0,0.63,1) alternate;
+}
+body.playing .cylon-scan::after {
             background: radial-gradient(ellipse at center,
                 rgba(255,20,0,.22) 0%,
                 rgba(200,0,0,.08) 55%,
                 transparent 100%
             );
-            animation: cylonBeam 2.4s infinite cubic-bezier(0.37,0,0.63,1) alternate;
-        }
+    animation: cylonBeam 1.6s infinite cubic-bezier(0.37,0,0.63,1) alternate;
+}
         @keyframes cylonBeam {
             from { transform: translateX(-428%) translateY(-50%); }
             to   { transform: translateX(246%) translateY(-50%); }
