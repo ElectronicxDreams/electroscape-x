@@ -60,7 +60,6 @@ body.glass-dark {
 }
 
 body.glass-dark #nav-popup,
-body.glass-dark #fav-sidebar,
 body.glass-dark .music-modal-box {
     background: var(--glass-panel-bg);
     border-color: var(--glass-border);
@@ -87,26 +86,11 @@ body.glass-dark #player-container {
     -webkit-backdrop-filter: var(--glass-blur);
 }
 
-body.glass-dark .ctrl-btn,
-body.glass-dark .cmd-play-btn {
-    background: var(--glass-surface-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-}
-
 /* Dark glass tuning: keep the link popup vivid, but make larger panels neutral black. */
 body.glass-dark #fav-backdrop {
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(18px) saturate(70%);
     -webkit-backdrop-filter: blur(18px) saturate(70%);
-}
-
-body.glass-dark #fav-sidebar {
-    background: rgba(3, 4, 6, 0.78);
-    border-left-color: rgba(0, 255, 230, 0.22);
-    box-shadow: -18px 0 70px rgba(0, 0, 0, 0.78), inset 1px 0 0 rgba(255,255,255,0.04);
-    backdrop-filter: blur(24px) saturate(80%);
-    -webkit-backdrop-filter: blur(24px) saturate(80%);
 }
 
 body.glass-dark .fav-row {
@@ -370,138 +354,10 @@ body.glass-dark .music-card {
     position: relative;
 }
 
-/* Dim button active state */
-#grid-toggle-btn.is-active {
-    opacity: 0.4;
-    border-color: rgba(0,255,230,0.15);
-}
-
-.ctrl-btn {
-    background: transparent;
-    border: 1px solid rgba(0,255,230,0.3);
-    color: rgba(0,255,230,0.6);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 6px;
-    cursor: pointer;
-    transition: border-color 0.4s, color 0.4s;
-    border-radius: 6px;
-    outline: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-}
-.ctrl-btn:hover { border-color: #00FFE6; color: #00FFE6; }
-.ctrl-btn:focus { border-color: rgba(0,255,230,0.25); }
-
-.cmd-arrow-btn {
-    border: 2px solid rgba(0,255,230,0.36);
-    border-radius: 6px;
-    width: 39px;
-    height: 31px;
-    padding: 0;
-    flex-shrink: 0;
-}
-.cmd-arrow-btn:hover { border-color: #00FFE6; }
-.cmd-arrow-btn svg { width: 7px; height: 7px; }
-
-.cmd-play-btn {
-    position: relative;
-    background: transparent;
-    border: 2px solid rgba(0,255,230,0.36);
-    border-radius: 6px;
-    outline: none;
-    cursor: pointer;
-    width: 39px;
-    height: 31px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    padding: 0;
-    filter: none;
-    transition: transform 0.15s ease-out, border-color 0.4s;
-}
-.cmd-play-btn:hover  { transform: scale(1.05); border-color: #00FFE6; }
-.cmd-play-btn:active { transform: scale(0.97); }
-.cmd-play-btn.is-playing { border-color: #00FFE6; }
-
-.play-icon { width: 18px; height: 18px; overflow: visible; flex-shrink: 0; }
-
-.play-bar-left {
-    fill: rgba(0,255,230,0.85);
-    d: path("M7,4 L17,12 L7,20 Z");
-    transition: d 0.18s ease-out;
-}
-.play-bar-right {
-    fill: rgba(0,255,230,0.85);
-    d: path("M7,4 L7,4 L7,20 L7,20 Z");
-    transition: d 0.18s ease-out;
-}
-.cmd-play-btn.is-playing .play-bar-left  { d: path("M5,4 L9,4 L9,20 L5,20 Z"); }
-.cmd-play-btn.is-playing .play-bar-right { d: path("M13,4 L17,4 L17,20 L13,20 Z"); }
-
-.play-ripple { position: absolute; inset: 0; border-radius: 50%; pointer-events: none; }
-@keyframes rippleOut {
-    0%   { box-shadow: 0 0 0 0px rgba(0,255,230,0.45); opacity: 1; }
-    100% { box-shadow: 0 0 0 18px rgba(0,255,230,0);   opacity: 0; }
-}
-.cmd-play-btn.ripple-active .play-ripple { animation: rippleOut 0.35s ease-out forwards; }
-
-.icon-only-btn {
-    width: 31px;
-    height: 31px;
-    padding: 0;
-    border-width: 2px;
-}
-.icon-only-btn svg { width: 14px; height: 14px; stroke: currentColor; }
-
-.control-spacer {
-    width: 31px;
-    height: 31px;
-    flex: 0 0 31px;
-    pointer-events: none;
-}
-
-@media (max-width: 620px) {
-    #player-controls {
-        gap: 6px;
-        padding: 12px 10px 16px;
-    }
-
-    .icon-only-btn,
-    .control-spacer {
-        width: 30px;
-        height: 30px;
-        flex-basis: 30px;
-    }
-
-    .cmd-arrow-btn,
-    .cmd-play-btn {
-        width: 36px;
-        height: 30px;
-        flex-basis: 36px;
-    }
-
-    .icon-only-btn svg {
-        width: 13px;
-        height: 13px;
-    }
-
-    .cmd-arrow-btn svg {
-        width: 6px;
-        height: 6px;
-    }
-}
-
 .video:hover .fav-heart-btn,
 .fav-heart-btn.is-active { opacity: 1; }
 .fav-heart-btn:hover { background: rgba(0,0,0,0.7); border-color: #00FFE6; }
 .fav-heart-svg { width: 14px; height: 14px; display: block; }
-
-/* fav-sidebar removed — replaced by bottom sheet in hybrid overrides below */
 
 #fav-backdrop {
     display: none;
@@ -513,23 +369,6 @@ body.glass-dark .music-card {
     transition: opacity 0.3s ease;
 }
 #fav-backdrop.is-visible { display: block; opacity: 1; }
-
-#fav-sidebar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: min(400px, 92vw);
-    height: 100%;
-    background: #0a0a0a;
-    border-left: 1px solid #1e1e1e;
-    z-index: 1200;
-    display: flex;
-    flex-direction: column;
-    transform: translateX(100%);
-    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: -8px 0 32px rgba(0,0,0,0.6);
-}
-#fav-sidebar.is-open { transform: translateX(0); }
 
 #fav-header {
     display: flex;
@@ -612,26 +451,6 @@ body.glass-dark .music-card {
     position: relative;
 }
 .fav-row:hover { background: #111; }
-.fav-row-dragging { opacity: 0.4; }
-.fav-row-over { border-top: 2px solid rgba(0,255,230,0.5); background: #0d0d0d; }
-
-.fav-drag-handle {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    cursor: grab;
-    background: rgba(0,0,0,0.55);
-    border-radius: 3px;
-    transition: opacity 0.2s;
-}
-.fav-row:hover .fav-drag-handle { opacity: 0.7; }
-
 .fav-row-thumb {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -750,71 +569,6 @@ body.glass-dark .music-card {
 
 @media (max-width: 620px) {
     #video-grid { grid-template-columns: minmax(0, var(--video-card-max)); }
-}
-
-/* Suppress persistent focus glow on touch devices */
-@media (hover: none) {
-    .ctrl-btn:focus,
-    .cmd-arrow-btn:focus,
-    .cmd-play-btn:focus { outline: none; border-color: rgba(0,255,230,0.3); }
-    #shuffle-btn:focus { border-color: rgba(0,255,230,0.3); color: rgba(0,255,230,0.6); }
-}
-
-/* Mobile-only: single row, 3 buttons only */
-@media (max-width: 620px) {
-
-    /* Hide everything except transport + shuffle */
-    #grid-toggle-btn,
-    #fav-toggle-btn { display: none; }
-    #shuffle-btn { display: inline-flex; }
-    .control-spacer { display: none; }
-    .ctrl-row-break { display: none; }
-
-    /* Tighten the row */
-    #player-controls {
-        gap: 6px;
-        padding: 10px 8px 14px;
-    }
-
-    /* Button sizing */
-    #prev-btn, #next-btn {
-        width: 44px;
-        height: 34px;
-    }
-    #playpause-btn {
-        width: 44px;
-        height: 34px;
-    }
-    #shuffle-btn {
-        width: 34px;
-        height: 34px;
-        margin: 0 4px;
-    }
-    #shuffle-btn svg {
-        width: 15px;
-        height: 15px;
-    }
-}
-
-/* Grid dimmed states */
-#video-grid.is-dim-1 {
-    opacity: 0.5;
-    transition: opacity 0.4s ease;
-}
-#video-grid.is-dim-2 {
-    opacity: 0.1;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-}
-
-#player-controls.is-dim-1 {
-    opacity: 0.5;
-    transition: opacity 0.4s ease;
-}
-
-#player-controls.is-dim-2 {
-    opacity: 0.5;
-    transition: opacity 0.4s ease;
 }
 
 .video {
@@ -1013,17 +767,6 @@ body.glass-dark .music-card {
     position: absolute;
     inset: 0;
 }
-#page-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: calc(100vh - var(--nav-height) - var(--nav-logo-height));
-    color: var(--color-text-dim);
-    font-size: 9px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-}
-
 /* ============================================================
    MUSIC-SECTION
    ============================================================ */
@@ -2130,6 +1873,17 @@ body.fav-open { overflow: hidden; }
         });
 }());
 
+function applyThumb(el, id) {
+    var url = 'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg';
+    el.style.backgroundImage = 'url(' + url + ')';
+    var img = new Image(); img.src = url;
+    img.onerror = function () {
+        var sd = 'https://img.youtube.com/vi/' + id + '/sddefault.jpg';
+        el.style.backgroundImage = 'url(' + sd + ')';
+        var img2 = new Image(); img2.src = sd;
+        img2.onerror = function () { el.style.backgroundImage = 'url(https://img.youtube.com/vi/' + id + '/hqdefault.jpg)'; };
+    };
+}
 
 /* ============================================================
    CSS ESCAPE
@@ -2253,7 +2007,7 @@ function cssEscape(s) {
 
             var thumb = document.createElement('div');
             thumb.className = 'fav-row-thumb';
-            thumb.style.backgroundImage = 'url(' + thumbUrl(fav.id) + ')';
+            applyThumb(thumb, fav.id);
 
             var main = document.createElement('div');
             main.className = 'fav-row-main';

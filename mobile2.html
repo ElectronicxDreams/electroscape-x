@@ -350,15 +350,11 @@
 
         .v-card-thumb { aspect-ratio: 16/9; background-size: cover; background-position: center; background-color: #111; }
 
-        .v-card-body { padding: 8px 9px 10px; }
         .v-card-title {
             font-size: 8px; line-height: 1.35; letter-spacing: 1px; text-transform: uppercase; color: #fff;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
         .v-card.active .v-card-title { color: var(--cyan); }
-
-        .v-card-actions { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .v-card-num { display: none; }
 
         .v-play-btn {
             width: 26px; height: 26px; border-radius: 50%; border: none;
@@ -466,9 +462,6 @@
             opacity: 0.8;
         }
 
-        /* NAV SPACER — gap between nav and player */
-        #nav-spacer { width: 100%; height: 0; }
-
         /* ============================================================
            LANDSCAPE PLAYER-ONLY MODE
            ============================================================ */
@@ -540,7 +533,6 @@
         @media (min-width: 621px) {
             .m-wordmark { font-size: 13px; letter-spacing: 14px; text-indent: 14px; }
             #video-grid { grid-template-columns: repeat(3, 1fr); padding: 0 28px 16px; }
-            #grid-head { padding: 8px 28px 10px; }
         }
 
         /* ============================================================
@@ -680,9 +672,6 @@
             </svg>
         </button>
     </header>
-
-    <!-- NAV SPACER — sits below nav, holds space when nav hides so player stays put -->
-    <div id="nav-spacer"></div>
 
     <!-- HERO-CARD -->
     <section id="hero-card">
@@ -851,6 +840,18 @@
     };
 }());
 
+function applyThumb(el, id) {
+    var url = 'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg';
+    el.style.backgroundImage = 'url(' + url + ')';
+    var img = new Image(); img.src = url;
+    img.onerror = function () {
+        var sd = 'https://img.youtube.com/vi/' + id + '/sddefault.jpg';
+        el.style.backgroundImage = 'url(' + sd + ')';
+        var img2 = new Image(); img2.src = sd;
+        img2.onerror = function () { el.style.backgroundImage = 'url(https://img.youtube.com/vi/' + id + '/hqdefault.jpg)'; };
+    };
+}
+
 /* --- TRACK LOADER --- */
 (function () {
     fetch('tracks.json')
@@ -885,18 +886,6 @@
             if (window.esAPIReady) window.esCreatePlayer();
         })
         .catch(function (err) { console.error('Electroscape: ' + err); });
-
-    function applyThumb(el, id) {
-        var url = 'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg';
-        el.style.backgroundImage = 'url(' + url + ')';
-        var img = new Image(); img.src = url;
-        img.onerror = function () {
-            var sd = 'https://img.youtube.com/vi/' + id + '/sddefault.jpg';
-            el.style.backgroundImage = 'url(' + sd + ')';
-            var img2 = new Image(); img2.src = sd;
-            img2.onerror = function () { el.style.backgroundImage = 'url(https://img.youtube.com/vi/' + id + '/hqdefault.jpg)'; };
-        };
-    }
 }());
 
 /* --- QUEUE & PLAYBACK --- */
@@ -1120,7 +1109,7 @@ function closeFavSheet() {
         favs.forEach(function(fav,idx){
             var row=document.createElement('li'); row.className='fav-row';
             var thumb=document.createElement('div'); thumb.className='fav-row-thumb';
-            thumb.style.backgroundImage='url(https://img.youtube.com/vi/'+fav.id+'/maxresdefault.jpg)';
+            applyThumb(thumb, fav.id);
             var main=document.createElement('div'); main.className='fav-row-main';
             var title=document.createElement('span'); title.className='fav-row-title'; title.textContent=fav.title;
             var controls=document.createElement('div'); controls.className='fav-row-controls';

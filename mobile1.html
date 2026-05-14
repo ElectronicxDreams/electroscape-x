@@ -1103,6 +1103,17 @@
     window.esCreatePlayer = createPlayer;
 }());
 
+function applyThumb(el, id) {
+    var url = 'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg';
+    el.style.backgroundImage = 'url(' + url + ')';
+    var img = new Image(); img.src = url;
+    img.onerror = function () {
+        var sd = 'https://img.youtube.com/vi/' + id + '/sddefault.jpg';
+        el.style.backgroundImage = 'url(' + sd + ')';
+        var img2 = new Image(); img2.src = sd;
+        img2.onerror = function () { el.style.backgroundImage = 'url(https://img.youtube.com/vi/' + id + '/hqdefault.jpg)'; };
+    };
+}
 
 /* ============================================================
    TRACK LOADER — builds the M1 track list
@@ -1170,20 +1181,6 @@
         .catch(function (err) {
             console.error('Electroscape: ' + err);
         });
-
-    /* YouTube thumb with sddefault fallback */
-    function applyThumb(el, id) {
-        var url = 'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg';
-        el.style.backgroundImage = 'url(' + url + ')';
-        var img = new Image();
-        img.src = url;
-        img.onerror = function () {
-            var sd = 'https://img.youtube.com/vi/' + id + '/sddefault.jpg';
-            el.style.backgroundImage = 'url(' + sd + ')';
-            var img2 = new Image(); img2.src = sd;
-            img2.onerror = function () { el.style.backgroundImage = 'url(https://img.youtube.com/vi/' + id + '/hqdefault.jpg)'; };
-        };
-    }
 
     function syncPlaylistOrder(listEl) {
         var rows = Array.from(listEl.querySelectorAll('.m-track'));
@@ -1548,7 +1545,7 @@ function createFavouriteTrackButton(track) {
 
             var thumb = document.createElement('div');
             thumb.className = 'fav-row-thumb';
-            thumb.style.backgroundImage = 'url(' + thumbUrl(fav.id) + ')';
+            applyThumb(thumb, fav.id);
 
             var main = document.createElement('div');
             main.className = 'fav-row-main';

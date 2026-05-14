@@ -950,7 +950,6 @@
                         <span class="arc-bar" style="--ah:5px"></span>
                     </div>
                 </div>
-                <div class="eq-anim" id="eq-anim-5"></div>
             </div>
         </section>
 
@@ -1234,14 +1233,14 @@ function cssEscape(s) {
     var body  = document.body;
     var panel = document.getElementById('eq-panel');
     var anims = Array.from(panel.querySelectorAll('.eq-anim'));
+    var total  = anims.length + 1; /* last slot = blank */
     var current = 0;
     var hidden  = false;
     var pressTimer = null;
 
-    /* State is session-only (no persistence) */
-
     function showAnim(idx) {
-        anims.forEach(function(a, i) { a.classList.toggle('active', i === idx); });
+        var blank = idx >= anims.length;
+        anims.forEach(function(a, i) { a.classList.toggle('active', !blank && i === idx); });
     }
     function applyHide() {
         body.classList.toggle('p3m1-ctrl-hidden', hidden);
@@ -1260,7 +1259,7 @@ function cssEscape(s) {
         if (pressTimer !== null) {
             clearTimeout(pressTimer);
             pressTimer = null;
-            current = (current + 1) % anims.length;
+            current = (current + 1) % total;
             showAnim(current);
         }
     });
@@ -1268,7 +1267,7 @@ function cssEscape(s) {
         if (pressTimer !== null) { clearTimeout(pressTimer); pressTimer = null; }
     });
     panel.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { current = (current + 1) % anims.length; showAnim(current); }
+        if (e.key === 'Enter') { current = (current + 1) % total; showAnim(current); }
         if (e.key === ' ')    { e.preventDefault(); hidden = !hidden; applyHide(); }
     });
 
