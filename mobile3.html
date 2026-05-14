@@ -1177,8 +1177,6 @@ function playTrack(index) {
     if (window.esPlayer && typeof window.esPlayer.loadVideoById === 'function') window.esPlayer.loadVideoById(track.id);
     setActiveCard(window.esCurrentIndex);
     if (typeof window.esSyncFavouriteButtons === 'function') window.esSyncFavouriteButtons();
-    var bz = document.getElementById('bottom-zone');
-    if (bz) bz.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function updatePlayIcon(state) {
