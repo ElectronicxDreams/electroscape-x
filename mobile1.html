@@ -168,9 +168,26 @@
             background: rgba(0,255,230,0.12);
             border-color: var(--cyan);
         }
+        #nav-fav-btn { position: relative; }
         #nav-fav-btn svg {
             width: 16px;
             height: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        #nav-fav-btn.queue-active::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -6px;
+            transform: translateY(-50%);
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: 0 0 8px rgba(0,255,230,0.8);
+            z-index: 2;
+            pointer-events: none;
         }
 
         #nav-popup {
@@ -831,7 +848,7 @@
         </div>
         <button id="nav-fav-btn" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M15 18l-6-6 6-6"/>
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l7.78-7.78a5.5 5.5 0 0 0 1.06-8.84z"/>
             </svg>
         </button>
     </div>
@@ -1138,7 +1155,23 @@
                 onStateChange: function (event) {
                     if (event.data === YT.PlayerState.ENDED && !window.esEnded) {
                         window.esEnded = true;
-                        playTrack(window.esCurrentIndex + 1);
+                        var atFavEnd = (
+                            window.esQueueMode === 'fav' &&
+                            window.esQueue &&
+                            window.esQueue.length &&
+                            window.esCurrentIndex >= (window.esQueue.length - 1)
+                        );
+                        if (atFavEnd) {
+                            if (window.esMainQueue && window.esMainQueue.length) {
+                                restoreMainQueue(true, true);
+                            } else {
+                                if (window.esPlayer && typeof window.esPlayer.pauseVideo === 'function') window.esPlayer.pauseVideo();
+                                window.esCurrentIndex = -1;
+                                clearActiveRows();
+                            }
+                        } else {
+                            playTrack(window.esCurrentIndex + 1);
+                        }
                     }
                     updatePlayIcon(event.data);
                     if (event.data === YT.PlayerState.PLAYING) {
@@ -1320,9 +1353,11 @@ function cloneQueue(queue) {
 function updateQueueModeUI() {
     var banner = document.getElementById('queue-mode-banner');
     var label = document.getElementById('queue-mode-label');
+    var favBtn = document.getElementById('nav-fav-btn');
     if (!banner || !label) return;
     var favMode = (window.esQueueMode === 'fav');
     banner.classList.toggle('is-active', favMode);
+    if (favBtn) favBtn.classList.toggle('queue-active', favMode);
     label.textContent = favMode ? 'FAV QUEUE ACTIVE' : 'MAIN QUEUE';
 }
 
@@ -1331,8 +1366,9 @@ function setQueueMode(mode) {
     updateQueueModeUI();
 }
 
-function restoreMainQueue(autoplay) {
+function restoreMainQueue(autoplay, startAfterCurrent) {
     autoplay = (autoplay !== false);
+    startAfterCurrent = (startAfterCurrent === true);
     var cur = window.esQueue && window.esQueue[window.esCurrentIndex];
     var curId = cur && cur.id ? cur.id : null;
     window.esQueue = cloneQueue(window.esMainQueue);
@@ -1345,7 +1381,13 @@ function restoreMainQueue(autoplay) {
     var nextIndex = 0;
     if (curId) {
         var found = window.esQueue.findIndex(function (t) { return t.id === curId; });
-        if (found !== -1) nextIndex = found;
+        if (found !== -1) nextIndex = startAfterCurrent ? (found + 1) : found;
+    }
+    if (nextIndex >= window.esQueue.length) {
+        window.esCurrentIndex = -1;
+        clearActiveRows();
+        if (window.esPlayer && typeof window.esPlayer.pauseVideo === 'function') window.esPlayer.pauseVideo();
+        return;
     }
     playTrack(nextIndex, autoplay);
 }
@@ -1368,9 +1410,21 @@ function scrollToTop() {
 
 function playTrack(index, autoplay) {
     autoplay = (autoplay !== false);
+    if (autoplay) window.esUserInitiatedPlayback = true;
     var q = window.esQueue;
     if (!q.length) return;
-    var start = ((index % q.length) + q.length) % q.length;
+    var start;
+    if (window.esQueueMode === 'fav') {
+        if (index < 0) return;
+        if (index >= q.length) {
+            if (window.esMainQueue && window.esMainQueue.length) restoreMainQueue(autoplay, true);
+            else if (window.esPlayer && typeof window.esPlayer.pauseVideo === 'function') window.esPlayer.pauseVideo();
+            return;
+        }
+        start = index;
+    } else {
+        start = ((index % q.length) + q.length) % q.length;
+    }
     var nextIndex = resolvePlayableIndex(start);
     if (nextIndex === -1) {
         window.esCurrentIndex = -1;

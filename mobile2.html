@@ -170,9 +170,24 @@
             color: var(--cyan); display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: background 0.2s, border-color 0.2s;
             flex-shrink: 0;
+            position: relative;
         }
-        #nav-fav-btn svg { width: 16px; height: 16px; }
+        #nav-fav-btn svg { width: 16px; height: 16px; position: relative; z-index: 1; }
         #nav-fav-btn.is-active { border-color: rgba(0,255,230,0.55); background: rgba(0,255,230,0.10); }
+        #nav-fav-btn.queue-active::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -6px;
+            transform: translateY(-50%);
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: 0 0 8px rgba(0,255,230,0.8);
+            z-index: 2;
+            pointer-events: none;
+        }
 
         /* HERO-CARD */
         #hero-card { border: none; border-radius: 0; background: #000; overflow: hidden; box-shadow: none; }
@@ -852,11 +867,31 @@
                     if (window.esQueue.length) {
                         window.esPlayer.cueVideoById(window.esQueue[0].id);
                         window.esCurrentIndex = 0;
+                        setActiveCard(0);
                         if (typeof window.esSyncFavouriteButtons === 'function') window.esSyncFavouriteButtons();
                     }
                 },
                 onStateChange: function (ev) {
-                    if (ev.data === YT.PlayerState.ENDED && !window.esEnded) { window.esEnded = true; playTrack(window.esCurrentIndex + 1); }
+                    if (ev.data === YT.PlayerState.ENDED && !window.esEnded) {
+                        window.esEnded = true;
+                        var atFavEnd = (
+                            window.esQueueMode === 'fav' &&
+                            window.esQueue &&
+                            window.esQueue.length &&
+                            window.esCurrentIndex >= (window.esQueue.length - 1)
+                        );
+                        if (atFavEnd) {
+                            if (window.esMainQueue && window.esMainQueue.length) {
+                                restoreMainQueue(true, true);
+                            } else {
+                                if (window.esPlayer && typeof window.esPlayer.pauseVideo === 'function') window.esPlayer.pauseVideo();
+                                window.esCurrentIndex = -1;
+                                setActiveCard(-1);
+                            }
+                        } else {
+                            playTrack(window.esCurrentIndex + 1);
+                        }
+                    }
                     updatePlayIcon(ev.data);
                     if (ev.data === YT.PlayerState.PLAYING && typeof window.esStartProgressTracker === 'function') window.esStartProgressTracker();
                 },
@@ -909,7 +944,16 @@ function applyThumb(el, id) {
 /* --- TRACK LOADER --- */
 (function () {
     fetch('tracks.json')
-        .then(function (r) { if (!r.ok) return fetch('../tracks.json').then(function(r2){ if(!r2.ok) throw new Error('tracks.json failed'); return r2.json(); }); return r.json(); })
+        .then(function (r) {
+            if (r.ok) return r.json();
+            return fetch('../tracks.json').then(function(r2){
+                if (r2.ok) return r2.json();
+                return fetch('../../tracks.json').then(function(r3){
+                    if (!r3.ok) throw new Error('tracks.json failed');
+                    return r3.json();
+                });
+            });
+        })
         .then(function (tracks) {
             var grid = document.getElementById('video-grid');
             tracks.forEach(function (track, idx) {
@@ -969,9 +1013,11 @@ function cloneQueue(queue) {
 function updateQueueModeUI() {
     var banner = document.getElementById('queue-mode-banner');
     var label = document.getElementById('queue-mode-label');
+    var favBtn = document.getElementById('nav-fav-btn');
     if (!banner || !label) return;
     var favMode = (window.esQueueMode === 'fav');
     banner.classList.toggle('is-active', favMode);
+    if (favBtn) favBtn.classList.toggle('queue-active', favMode);
     label.textContent = favMode ? 'FAV QUEUE ACTIVE' : 'MAIN QUEUE';
 }
 
@@ -980,8 +1026,9 @@ function setQueueMode(mode) {
     updateQueueModeUI();
 }
 
-function restoreMainQueue(autoplay) {
+function restoreMainQueue(autoplay, startAfterCurrent) {
     autoplay = (autoplay !== false);
+    startAfterCurrent = (startAfterCurrent === true);
     var cur = window.esQueue && window.esQueue[window.esCurrentIndex];
     var curId = cur && cur.id ? cur.id : null;
     window.esQueue = cloneQueue(window.esMainQueue);
@@ -994,7 +1041,13 @@ function restoreMainQueue(autoplay) {
     var nextIndex = 0;
     if (curId) {
         var found = window.esQueue.findIndex(function (t) { return t.id === curId; });
-        if (found !== -1) nextIndex = found;
+        if (found !== -1) nextIndex = startAfterCurrent ? (found + 1) : found;
+    }
+    if (nextIndex >= window.esQueue.length) {
+        window.esCurrentIndex = -1;
+        setActiveCard(-1);
+        if (window.esPlayer && typeof window.esPlayer.pauseVideo === 'function') window.esPlayer.pauseVideo();
+        return;
     }
     playTrack(nextIndex, autoplay);
 }
@@ -1017,8 +1070,20 @@ function resolvePlayableIndex(startIndex) {
 
 function playTrack(index, autoplay) {
     autoplay = (autoplay !== false);
+    if (autoplay) window.esUserInitiatedPlayback = true;
     var q = window.esQueue; if (!q.length) return;
-    var start = ((index % q.length) + q.length) % q.length;
+    var start;
+    if (window.esQueueMode === 'fav') {
+        if (index < 0) return;
+        if (index >= q.length) {
+            if (window.esMainQueue && window.esMainQueue.length) restoreMainQueue(autoplay, true);
+            else if (window.esPlayer && typeof window.esPlayer.pauseVideo === 'function') window.esPlayer.pauseVideo();
+            return;
+        }
+        start = index;
+    } else {
+        start = ((index % q.length) + q.length) % q.length;
+    }
     var nextIndex = resolvePlayableIndex(start);
     if (nextIndex === -1) {
         window.esCurrentIndex = -1;
