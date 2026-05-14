@@ -1459,6 +1459,122 @@ function closeFavSheet() {
     document.addEventListener('keydown', function(e){if(e.key==='Escape'&&document.getElementById('fav-sheet').classList.contains('is-open')) closeFavSheet();});
     var _fi=load(); syncHearts(_fi); syncLikeHearts(_fi);
 }());
+
+/* --- PULL-TO-REFRESH ---
+   Attaches to #bottom-zone. When the user drags down from the very top
+   of the playlist, a pill indicator appears and releasing triggers reload.
+   Does not touch any layout or existing event handlers.
+   -------------------------------------------------------------------- */
+(function () {
+    var zone      = document.getElementById('bottom-zone');
+    var THRESHOLD = 72;   /* px of drag needed to trigger */
+    var MAX_PULL  = 96;   /* px — indicator stops growing beyond this */
+
+    /* --- Build the indicator pill --- */
+    var indicator = document.createElement('div');
+    indicator.id  = 'ptr-indicator';
+    indicator.innerHTML =
+        '<svg id="ptr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+            '<polyline points="23 4 23 10 17 10"/>' +
+            '<path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>' +
+        '</svg>' +
+        '<span id="ptr-label">Pull to refresh</span>';
+
+    /* Inject styles */
+    var style = document.createElement('style');
+    style.textContent =
+        '#ptr-indicator {' +
+            'position: absolute; top: 0; left: 50%; transform: translateX(-50%) translateY(-56px);' +
+            'display: flex; align-items: center; gap: 7px;' +
+            'background: rgba(31,123,255,0.13);' +
+            'border: 1px solid rgba(31,123,255,0.28);' +
+            'backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);' +
+            'color: rgba(255,255,255,0.82);' +
+            'font-family: "Exo 2", sans-serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;' +
+            'padding: 7px 16px 7px 12px; border-radius: 999px;' +
+            'pointer-events: none; z-index: 9999;' +
+            'transition: background 0.2s, border-color 0.2s, color 0.2s;' +
+            'will-change: transform;' +
+        '}' +
+        '#ptr-indicator.ptr-ready {' +
+            'background: rgba(157,71,255,0.18);' +
+            'border-color: rgba(157,71,255,0.48);' +
+            'color: #fff;' +
+        '}' +
+        '#ptr-indicator.ptr-releasing {' +
+            'transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), opacity 0.25s;' +
+            'opacity: 0;' +
+        '}' +
+        '#ptr-icon {' +
+            'width: 15px; height: 15px; flex-shrink: 0;' +
+            'transition: transform 0.2s;' +
+        '}' +
+        '#ptr-indicator.ptr-ready #ptr-icon { transform: rotate(180deg); }';
+    document.head.appendChild(style);
+
+    /* #bottom-zone needs position:relative so the pill can be absolute inside it */
+    zone.style.position = 'relative';
+    zone.insertBefore(indicator, zone.firstChild);
+
+    /* --- State --- */
+    var startY     = 0;
+    var pulling    = false;
+    var pullDist   = 0;
+
+    function setPill(dist) {
+        var clamped = Math.min(dist, MAX_PULL);
+        /* Ease the travel so it feels springy */
+        var travel  = clamped * 0.55;
+        indicator.style.transform = 'translateX(-50%) translateY(' + (travel - 56) + 'px)';
+        var ready = dist >= THRESHOLD;
+        indicator.classList.toggle('ptr-ready', ready);
+        document.getElementById('ptr-label').textContent = ready ? 'Release to refresh' : 'Pull to refresh';
+    }
+
+    function resetPill(doReload) {
+        pulling  = false;
+        pullDist = 0;
+        if (doReload) {
+            indicator.classList.add('ptr-releasing');
+            indicator.style.transform = 'translateX(-50%) translateY(10px)';
+            setTimeout(function () { location.reload(); }, 260);
+        } else {
+            indicator.style.transition = 'transform 0.3s cubic-bezier(0.22,1,0.36,1)';
+            indicator.style.transform  = 'translateX(-50%) translateY(-56px)';
+            indicator.classList.remove('ptr-ready');
+            document.getElementById('ptr-label').textContent = 'Pull to refresh';
+            setTimeout(function () { indicator.style.transition = ''; }, 320);
+        }
+    }
+
+    zone.addEventListener('touchstart', function (e) {
+        /* Only activate when the list is scrolled to the very top */
+        if (zone.scrollTop !== 0) return;
+        startY  = e.touches[0].clientY;
+        pulling = true;
+        pullDist = 0;
+    }, { passive: true });
+
+    zone.addEventListener('touchmove', function (e) {
+        if (!pulling) return;
+        var dy = e.touches[0].clientY - startY;
+        if (dy <= 0) { pulling = false; resetPill(false); return; }
+        /* If the user has started scrolling content (zone already moved), bail */
+        if (zone.scrollTop > 0) { pulling = false; resetPill(false); return; }
+        pullDist = dy;
+        setPill(dy);
+    }, { passive: true });
+
+    zone.addEventListener('touchend', function () {
+        if (!pulling) return;
+        resetPill(pullDist >= THRESHOLD);
+    }, { passive: true });
+
+    zone.addEventListener('touchcancel', function () {
+        if (!pulling) return;
+        resetPill(false);
+    }, { passive: true });
+}());
 </script>
 </body>
 </html>
