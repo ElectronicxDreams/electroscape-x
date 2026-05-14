@@ -1,4 +1,4 @@
-<!-- mobile2.html | Electroscape Mobile | 3.0 -->
+<!-- mobile2.html | Electroscape Tablet | 3.0 -->
 <!-- v1.0: Codex rebuild — app-shell grid, portrait+landscape, burger nav -->
 <!DOCTYPE html>
 <html lang="en">
@@ -72,7 +72,7 @@
         #nav-popup {
             position: fixed; top: 66px; left: 50%;
             transform: translateX(-50%) translateY(-8px); z-index: 9500;
-            width: min(280px, 80vw);
+            width: min(330px, 92vw);
             background: linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.60));
             border: none; border-radius: 6px;
             box-shadow: 0 28px 72px rgba(0,0,0,0.76), 0 0 40px rgba(0,255,230,0.08);
@@ -98,7 +98,8 @@
         }
         .nav-popup-item {
             display: flex; align-items: center; justify-content: center; padding: 14px 20px;
-            font-family: 'Michroma', sans-serif; font-size: 8px; letter-spacing: 5px;
+            font-family: 'Michroma', sans-serif; font-size: 8px; letter-spacing: 3px;
+            line-height: 2.5;
             text-transform: uppercase; color: var(--text); text-decoration: none;
             border-bottom: 1px solid rgba(255,255,255,0.09);
             transition: color 0.2s, background 0.2s; cursor: pointer;
@@ -668,9 +669,9 @@
         <a class="nav-popup-item" href="https://links.electroscapex.com/" target="_blank" rel="noopener noreferrer">Weblinks</a>
         <button class="nav-popup-item" id="nav-music-btn">Music Directory</button>
         <a class="nav-popup-item" href="https://electroscapex.com/tv.html" target="_blank" rel="noopener noreferrer">TV</a>
-        <a class="nav-popup-item" href="index.html?view=desktop" onclick="try{localStorage.setItem('es_force_desktop_view','1');}catch(e){}">Desktop</a>
-	<a class="nav-popup-item" href="mobile1.html">Mobile V1</a>
-	<a class="nav-popup-item" href="mobile3.html">Mobile V3</a>
+        <a class="nav-popup-item" href="index.html?view=desktop" onclick="try{localStorage.setItem('es_force_desktop_view','1');}catch(e){}">Electroscape Desktop</a>
+	<a class="nav-popup-item" href="mobile1.html">Electroscape Mobile</a>
+	<a class="nav-popup-item" href="mobile3.html">Electroscape Mobile -Alt</a>
     </div>
 
     <main id="app-shell">
