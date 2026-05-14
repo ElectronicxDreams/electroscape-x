@@ -134,6 +134,7 @@ body.glass-dark .music-card {
     height: var(--nav-height);
     padding: 0 24px;
     z-index: var(--z-nav);
+    transition: opacity 0.22s ease;
 }
 
 /* ============================================================
@@ -354,168 +355,6 @@ body.glass-dark .music-card {
     position: relative;
 }
 
-.video:hover .fav-heart-btn,
-.fav-heart-btn.is-active { opacity: 1; }
-.fav-heart-btn:hover { background: rgba(0,0,0,0.7); border-color: #00FFE6; }
-.fav-heart-svg { width: 14px; height: 14px; display: block; }
-
-#fav-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 1199;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-#fav-backdrop.is-visible { display: block; opacity: 1; }
-
-#fav-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 20px 14px;
-    border-bottom: 1px solid #1a1a1a;
-    flex-shrink: 0;
-}
-#fav-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    letter-spacing: 6px;
-    text-transform: uppercase;
-    color: #00FFE6;
-}
-#fav-close-btn {
-    background: transparent;
-    border: none;
-    color: #555;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 4px 6px;
-    line-height: 1;
-    transition: color 0.2s;
-}
-#fav-close-btn:hover { color: #00FFE6; }
-
-#fav-actions {
-    display: none;
-    padding: 12px 14px 4px;
-    flex-shrink: 0;
-}
-#fav-play-all-btn {
-    width: 100%;
-    border-radius: 4px;
-    padding: 10px;
-    font-size: 9px;
-    letter-spacing: 4px;
-}
-
-#fav-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    flex: 1;
-    padding: 40px 24px;
-    color: #333;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 9px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    text-align: center;
-    line-height: 1.8;
-}
-
-#fav-list {
-    list-style: none;
-    margin: 0;
-    padding: 8px 0;
-    overflow-y: auto;
-    flex: 1;
-    scrollbar-width: thin;
-    scrollbar-color: #222 transparent;
-}
-#fav-list::-webkit-scrollbar { width: 4px; }
-#fav-list::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
-
-.fav-row {
-    display: flex;
-    flex-direction: column;
-    padding: 12px 14px 10px;
-    border-bottom: 1px solid #151515;
-    cursor: grab;
-    transition: background 0.2s;
-    user-select: none;
-    gap: 0;
-    position: relative;
-}
-.fav-row:hover { background: #111; }
-.fav-row-thumb {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    background-size: cover;
-    background-position: center;
-    background-color: #111;
-    border-radius: 3px;
-    flex-shrink: 0;
-}
-
-.fav-row-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: #ccc;
-    line-height: 1.5;
-    padding: 10px 0 8px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.fav-row-controls {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-}
-.fav-row-btn {
-    background: transparent;
-    border: 1px solid #2a2a2a;
-    cursor: pointer;
-    border-radius: 2px;
-    padding: 7px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color 0.2s, color 0.2s;
-    flex: 1;
-}
-.fav-move-btn { font-size: 10px; color: #555; }
-.fav-move-btn:hover { border-color: #00FFE6; color: #00FFE6; }
-.fav-play-btn svg { width: 12px; height: 12px; }
-.fav-play-btn:hover { border-color: #00FFE6; }
-.fav-remove-btn { color: #444; font-size: 11px; line-height: 1; }
-.fav-remove-btn:hover { border-color: #ff4466; color: #ff4466; }
-
-#fav-footer {
-    display: none;
-    justify-content: center;
-    padding: 14px 20px;
-    border-top: 1px solid #1a1a1a;
-    flex-shrink: 0;
-}
-#fav-clear-btn {
-    font-size: 9px;
-    letter-spacing: 4px;
-    padding: 8px 20px;
-    color: rgba(255,68,102,0.6);
-    border-color: rgba(255,68,102,0.3);
-    border-radius: 22px;
-}
-#fav-clear-btn:hover { color: #ff4466; border-color: #ff4466; }
 
 .fav-heart-btn {
     position: absolute;
@@ -977,13 +816,6 @@ body.glass-dark .music-card {
    Desktop nav + fixed player width from index
    Mobile control/fav behaviour merged onto index grid
    ============================================================ */
-#player-controls.m-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 18px 14px;
-}
 #player-controls.m-controls .m-transport {
     display: flex;
     align-items: center;
@@ -1057,6 +889,38 @@ body.glass-dark .music-card {
     transition: fill 0.2s ease;
 }
 #m1-fav.is-active .fav-heart-path { fill: currentColor; }
+#queue-mode-banner {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 12px 0;
+}
+#queue-mode-banner.is-active { display: flex; }
+#queue-mode-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 7px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #00FFE6;
+}
+#queue-mode-exit {
+    border: 1px solid rgba(0,255,230,0.28);
+    border-radius: 999px;
+    background: rgba(0,255,230,0.06);
+    color: #00FFE6;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 7px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    height: 18px;
+    padding: 0 8px;
+    cursor: pointer;
+}
+#queue-mode-exit:hover {
+    border-color: rgba(0,255,230,0.6);
+    background: rgba(0,255,230,0.10);
+}
 
 #ctrl-hide-toggle,
 .m-dim-toggle {
@@ -1121,7 +985,7 @@ body.ctrl-hidden #ctrl-hide-toggle {
 #fav-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 1180;
+    z-index: 9350;
     background: rgba(0,0,0,0.55);
     opacity: 0;
     pointer-events: none;
@@ -1139,16 +1003,16 @@ body.ctrl-hidden #ctrl-hide-toggle {
     right: 0;
     bottom: 0;
     width: min(280px, 84vw);
-    z-index: 1200;
+    z-index: 9360;
     display: flex;
     flex-direction: column;
-    background: rgba(0,0,0,0.92);
+    background: linear-gradient(180deg, rgba(5,8,11,0.74), rgba(2,4,6,0.68));
     border-left: 1px solid rgba(0,255,230,0.22);
     box-shadow: -12px 0 48px rgba(0,0,0,0.7);
     transform: translateX(110%);
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(24px) saturate(130%);
+    -webkit-backdrop-filter: blur(24px) saturate(130%);
     overflow: hidden;
 }
 #fav-sheet.is-open { transform: translateX(0); }
@@ -1314,6 +1178,16 @@ body.ctrl-hidden #ctrl-hide-toggle {
     background: rgba(0,255,230,0.06);
 }
 body.fav-open { overflow: hidden; }
+body.fav-open #nav-top,
+body.fav-open #nav-logo {
+    opacity: 0;
+    pointer-events: none;
+}
+body.fav-open #nav-popup,
+body.fav-open #nav-popup-backdrop {
+    opacity: 0;
+    pointer-events: none;
+}
 @media (min-width: 621px) { .fav-row-thumb { height: 80px; } }
 
     </style>
@@ -1329,7 +1203,7 @@ body.fav-open { overflow: hidden; }
         </button>
         <button id="nav-fav-btn" type="button" aria-label="Open favourites" aria-expanded="false" aria-controls="fav-sheet">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M9 6l6 6-6 6"/>
+                <path d="M15 18l-6-6 6-6"/>
             </svg>
         </button>
 
@@ -1365,10 +1239,14 @@ body.fav-open { overflow: hidden; }
         </div>
 
         <!-- PROGRESS-BAR -->
-        <div id="progress-bar-wrap" class="m-progress-wrap">
+        <div id="progress-bar-wrap">
             <div id="progress-bar-track">
                 <div id="progress-bar-fill"></div>
             </div>
+        </div>
+        <div id="queue-mode-banner" aria-live="polite">
+            <span id="queue-mode-label">FAV QUEUE ACTIVE</span>
+            <button id="queue-mode-exit" type="button" aria-label="Exit favourites queue">Exit Fav Queue</button>
         </div>
 
         <!-- PLAYER-CONTROLS -->
@@ -1714,7 +1592,11 @@ body.fav-open { overflow: hidden; }
     /* Shared state */
     window.esPlayer       = null;
     window.esQueue        = [];
+    window.esMainQueue    = [];
+    window.esQueueMode    = 'main';
     window.esCurrentIndex = -1;
+    window.esInvalidVideoIds = {};
+    window.esUserInitiatedPlayback = false;
     window.esEnded        = false;
     window.esAPIReady     = false;
 
@@ -1773,6 +1655,13 @@ body.fav-open { overflow: hidden; }
                             window.esStartProgressTracker();
                         }
                     }
+                },
+                onError: function () {
+                    var cur = window.esQueue && window.esQueue[window.esCurrentIndex];
+                    if (cur && cur.id) window.esInvalidVideoIds[cur.id] = true;
+                    if (window.esQueue && window.esQueue.length) {
+                        playTrack(window.esCurrentIndex + 1, window.esUserInitiatedPlayback);
+                    }
                 }
             }
         });
@@ -1780,8 +1669,6 @@ body.fav-open { overflow: hidden; }
 
     /* Expose createPlayer so track loader can call it after tracks are ready */
     window.esCreatePlayer = createPlayer;
-
-    window.esQueue = [];
 
 }());
 
@@ -1806,16 +1693,7 @@ body.fav-open { overflow: hidden; }
 
                 var thumb = document.createElement('div');
                 thumb.className = 'thumb-container';
-                thumb.style.backgroundImage = 'url(https://img.youtube.com/vi/' + track.id + '/maxresdefault.jpg)';
-
-                var img = new Image();
-                img.src = thumb.style.backgroundImage.slice(5, -2);
-                img.onerror = function () {
-                    var sd = 'https://img.youtube.com/vi/' + track.id + '/sddefault.jpg';
-                    thumb.style.backgroundImage = 'url(' + sd + ')';
-                    var img2 = new Image(); img2.src = sd;
-                    img2.onerror = function () { thumb.style.backgroundImage = 'url(https://img.youtube.com/vi/' + track.id + '/hqdefault.jpg)'; };
-                };
+                applyThumb(thumb, track.id);
 
                 var label = document.createElement('div');
                 label.className = 'video-label';
@@ -1874,15 +1752,39 @@ body.fav-open { overflow: hidden; }
 }());
 
 function applyThumb(el, id) {
-    var url = 'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg';
-    el.style.backgroundImage = 'url(' + url + ')';
-    var img = new Image(); img.src = url;
-    img.onerror = function () {
-        var sd = 'https://img.youtube.com/vi/' + id + '/sddefault.jpg';
-        el.style.backgroundImage = 'url(' + sd + ')';
-        var img2 = new Image(); img2.src = sd;
-        img2.onerror = function () { el.style.backgroundImage = 'url(https://img.youtube.com/vi/' + id + '/hqdefault.jpg)'; };
-    };
+    var svgFallback = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">' +
+        '<rect width="1280" height="720" fill="#000000"/>' +
+        '<text x="640" y="372" text-anchor="middle" fill="#00FFE6" font-family="Michroma,Arial,sans-serif" font-size="62" letter-spacing="22">ELECTROSCAPE</text>' +
+        '</svg>'
+    );
+    var urls = [
+        'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg',
+        'https://img.youtube.com/vi/' + id + '/sddefault.jpg',
+        'https://img.youtube.com/vi/' + id + '/hqdefault.jpg',
+        'https://img.youtube.com/vi/' + id + '/mqdefault.jpg'
+    ];
+    function isTinyPlaceholder(img) {
+        return (img.naturalWidth <= 120 && img.naturalHeight <= 90);
+    }
+    function tryAt(index) {
+        if (index >= urls.length) {
+            el.style.backgroundImage = 'url(' + svgFallback + ')';
+            return;
+        }
+        var url = urls[index];
+        var img = new Image();
+        img.onload = function () {
+            if (isTinyPlaceholder(img)) {
+                tryAt(index + 1);
+                return;
+            }
+            el.style.backgroundImage = 'url(' + url + ')';
+        };
+        img.onerror = function () { tryAt(index + 1); };
+        img.src = url;
+    }
+    tryAt(0);
 }
 
 /* ============================================================
@@ -1923,10 +1825,6 @@ function cssEscape(s) {
 
     function save(favs) {
         try { localStorage.setItem(KEY, JSON.stringify(favs)); } catch (err) {}
-    }
-
-    function thumbUrl(id) {
-        return 'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg';
     }
 
     function isFavourite(id, favs) {
@@ -1976,6 +1874,7 @@ function cssEscape(s) {
         var queue = queueFromFavourites(favs);
         if (!queue.length) return;
         window.esQueue = queue;
+        setQueueMode('fav');
         playTrack(index);
         close();
     }
@@ -2157,8 +2056,13 @@ function cssEscape(s) {
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && sheet.classList.contains('is-open')) close();
     });
+    document.getElementById('queue-mode-exit').addEventListener('click', function () {
+        restoreMainQueue(true);
+        this.blur && this.blur();
+    });
 
     syncHearts(load());
+    updateQueueModeUI();
 }());
 
 
@@ -2174,6 +2078,8 @@ function buildQueue() {
             el: el
         });
     });
+    window.esMainQueue = cloneQueue(window.esQueue);
+    setQueueMode('main');
 }
 
 function setActiveCard(index) {
@@ -2189,20 +2095,92 @@ function clearActiveCards() {
     });
 }
 
-function playTrack(index) {
+function cloneQueue(queue) {
+    return (queue || []).map(function (t) {
+        return { id: t.id, title: t.title, el: t.el || null };
+    });
+}
+
+function updateQueueModeUI() {
+    var banner = document.getElementById('queue-mode-banner');
+    var label = document.getElementById('queue-mode-label');
+    if (!banner || !label) return;
+    var favMode = (window.esQueueMode === 'fav');
+    banner.classList.toggle('is-active', favMode);
+    label.textContent = favMode ? 'FAV QUEUE ACTIVE' : 'MAIN QUEUE';
+}
+
+function setQueueMode(mode) {
+    window.esQueueMode = (mode === 'fav') ? 'fav' : 'main';
+    updateQueueModeUI();
+}
+
+function restoreMainQueue(autoplay) {
+    autoplay = (autoplay !== false);
+    var cur = window.esQueue && window.esQueue[window.esCurrentIndex];
+    var curId = cur && cur.id ? cur.id : null;
+    window.esQueue = cloneQueue(window.esMainQueue);
+    setQueueMode('main');
+    if (!window.esQueue.length) {
+        window.esCurrentIndex = -1;
+        clearActiveCards();
+        return;
+    }
+    var nextIndex = 0;
+    if (curId) {
+        var found = window.esQueue.findIndex(function (t) { return t.id === curId; });
+        if (found !== -1) nextIndex = found;
+    }
+    playTrack(nextIndex, autoplay);
+}
+
+function resolvePlayableIndex(startIndex) {
+    var q = window.esQueue || [];
+    if (!q.length) return -1;
+    for (var offset = 0; offset < q.length; offset++) {
+        var idx = ((startIndex + offset) % q.length + q.length) % q.length;
+        var track = q[idx];
+        if (track && track.id && !window.esInvalidVideoIds[track.id]) return idx;
+    }
+    return -1;
+}
+
+function scrollToTop() {
+    var scroller = document.scrollingElement || document.documentElement || document.body;
+    if (!scroller) return;
+    if (typeof scroller.scrollTo === 'function') scroller.scrollTo({ top: 0, behavior: 'smooth' });
+    else scroller.scrollTop = 0;
+}
+
+function playTrack(index, autoplay) {
+    autoplay = (autoplay !== false);
     var q = window.esQueue;
     if (!q.length) return;
-    window.esCurrentIndex = ((index % q.length) + q.length) % q.length;
+    var start = ((index % q.length) + q.length) % q.length;
+    var nextIndex = resolvePlayableIndex(start);
+    if (nextIndex === -1) {
+        window.esCurrentIndex = -1;
+        clearActiveCards();
+        if (typeof window.esSyncFavouriteButtons === 'function') {
+            window.esSyncFavouriteButtons();
+        }
+        return;
+    }
+    window.esCurrentIndex = nextIndex;
     window.esEnded = false;
     var track = q[window.esCurrentIndex];
-    if (window.esPlayer && typeof window.esPlayer.loadVideoById === 'function') {
-        window.esPlayer.loadVideoById(track.id);
+    if (window.esPlayer) {
+        if (autoplay && typeof window.esPlayer.loadVideoById === 'function') {
+            window.esPlayer.loadVideoById(track.id);
+        } else if (typeof window.esPlayer.cueVideoById === 'function') {
+            window.esPlayer.cueVideoById(track.id);
+        }
     }
     setActiveCard(window.esCurrentIndex);
     if (typeof window.esSyncFavouriteButtons === 'function') {
         window.esSyncFavouriteButtons();
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
 }
 
 function updatePlayIcon(state) {
@@ -2222,6 +2200,7 @@ function updatePlayIcon(state) {
    ============================================================ */
 (function () {
     function playPauseClick() {
+        window.esUserInitiatedPlayback = true;
         var p = window.esPlayer;
         if (!p) return;
         var state = p.getPlayerState();
@@ -2270,18 +2249,10 @@ function updatePlayIcon(state) {
         this.blur && this.blur();
     }
 
-    ['m1-play'].forEach(function (id) {
-        var el = document.getElementById(id); if (el) el.addEventListener('click', playPauseClick);
-    });
-    ['m1-prev'].forEach(function (id) {
-        var el = document.getElementById(id); if (el) el.addEventListener('click', prevClick);
-    });
-    ['m1-next'].forEach(function (id) {
-        var el = document.getElementById(id); if (el) el.addEventListener('click', nextClick);
-    });
-    ['m1-shuffle'].forEach(function (id) {
-        var el = document.getElementById(id); if (el) el.addEventListener('click', shuffleClick);
-    });
+    var elPlay = document.getElementById('m1-play'); if (elPlay) elPlay.addEventListener('click', playPauseClick);
+    var elPrev = document.getElementById('m1-prev'); if (elPrev) elPrev.addEventListener('click', prevClick);
+    var elNext = document.getElementById('m1-next'); if (elNext) elNext.addEventListener('click', nextClick);
+    var elShuffle = document.getElementById('m1-shuffle'); if (elShuffle) elShuffle.addEventListener('click', shuffleClick);
 }());
 
 
