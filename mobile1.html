@@ -124,6 +124,7 @@
             gap: 8px;
             padding: 0 16px;
             pointer-events: none;
+            transition: opacity 0.22s ease;
         }
         #nav-links-btn {
             width: 34px;
@@ -300,6 +301,38 @@
             font-size: 7px;
             letter-spacing: 1px;
             color: var(--cyan);
+        }
+        #queue-mode-banner {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 4px 0 0;
+        }
+        #queue-mode-banner.is-active { display: flex; }
+        #queue-mode-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 7px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--cyan);
+        }
+        #queue-mode-exit {
+            border: 1px solid rgba(0,255,230,0.28);
+            border-radius: 999px;
+            background: rgba(0,255,230,0.06);
+            color: var(--cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 7px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            height: 18px;
+            padding: 0 8px;
+            cursor: pointer;
+        }
+        #queue-mode-exit:hover {
+            border-color: rgba(0,255,230,0.6);
+            background: rgba(0,255,230,0.10);
         }
 
         /* M1 Controls — floating pill */
@@ -542,7 +575,7 @@
            FAVOURITES — right-sliding panel (P3-M1 structure, M1 colours)
            ============================================================ */
         #fav-backdrop {
-            position: fixed; inset: 0; z-index: 8800;
+            position: fixed; inset: 0; z-index: 9350;
             background: rgba(0,0,0,0.55); opacity: 0; pointer-events: none;
             transition: opacity 0.26s;
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
@@ -550,14 +583,14 @@
         #fav-backdrop.is-visible { opacity: 1; pointer-events: auto; }
         #fav-sheet {
             position: fixed; top: 0; right: 0; bottom: 0;
-            width: min(280px, 84vw); z-index: 9200;
+            width: min(280px, 84vw); z-index: 9360;
             display: flex; flex-direction: column;
-            background: rgba(0,0,0,0.92);
+            background: linear-gradient(180deg, rgba(5,8,11,0.74), rgba(2,4,6,0.68));
             border-left: 1px solid rgba(0,255,230,0.22);
             box-shadow: -12px 0 48px rgba(0,0,0,0.7);
             transform: translateX(110%);
             transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            backdrop-filter: blur(24px) saturate(130%); -webkit-backdrop-filter: blur(24px) saturate(130%);
             overflow: hidden;
         }
         #fav-sheet.is-open { transform: translateX(0); }
@@ -628,6 +661,15 @@
         #fav-footer { display: none; justify-content: center; padding: 6px 10px 8px; border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
         #fav-clear-btn { padding: 5px 14px; }
         body.fav-open { overflow: hidden; }
+        body.fav-open #nav-header {
+            opacity: 0;
+            pointer-events: none;
+        }
+        body.fav-open #nav-popup,
+        body.fav-open #nav-popup-backdrop {
+            opacity: 0;
+            pointer-events: none;
+        }
         @media (min-width: 621px) { .fav-row-thumb { height: 80px; } }
 
         /* ============================================================
@@ -821,6 +863,10 @@
         <div class="m-time-row">
             <span id="time-current-m1">0:00</span>
             <span id="time-total-m1">0:00</span>
+        </div>
+        <div id="queue-mode-banner" aria-live="polite">
+            <span id="queue-mode-label">FAV QUEUE ACTIVE</span>
+            <button id="queue-mode-exit" type="button" aria-label="Exit favourites queue">Exit Fav Queue</button>
         </div>
     </div>
 
@@ -1050,7 +1096,11 @@
 
     window.esPlayer       = null;
     window.esQueue        = [];
+    window.esMainQueue    = [];
+    window.esQueueMode    = 'main';
     window.esCurrentIndex = -1;
+    window.esInvalidVideoIds = {};
+    window.esUserInitiatedPlayback = false;
     window.esEnded        = false;
     window.esAPIReady     = false;
 
@@ -1095,6 +1145,13 @@
                             window.esStartProgressTracker();
                         }
                     }
+                },
+                onError: function () {
+                    var cur = window.esQueue && window.esQueue[window.esCurrentIndex];
+                    if (cur && cur.id) window.esInvalidVideoIds[cur.id] = true;
+                    if (window.esQueue && window.esQueue.length) {
+                        playTrack(window.esCurrentIndex + 1, window.esUserInitiatedPlayback);
+                    }
                 }
             }
         });
@@ -1104,15 +1161,39 @@
 }());
 
 function applyThumb(el, id) {
-    var url = 'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg';
-    el.style.backgroundImage = 'url(' + url + ')';
-    var img = new Image(); img.src = url;
-    img.onerror = function () {
-        var sd = 'https://img.youtube.com/vi/' + id + '/sddefault.jpg';
-        el.style.backgroundImage = 'url(' + sd + ')';
-        var img2 = new Image(); img2.src = sd;
-        img2.onerror = function () { el.style.backgroundImage = 'url(https://img.youtube.com/vi/' + id + '/hqdefault.jpg)'; };
-    };
+    var svgFallback = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">' +
+        '<rect width="1280" height="720" fill="#000000"/>' +
+        '<text x="640" y="372" text-anchor="middle" fill="#00FFE6" font-family="Michroma,Arial,sans-serif" font-size="62" letter-spacing="22">ELECTROSCAPE</text>' +
+        '</svg>'
+    );
+    var urls = [
+        'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg',
+        'https://img.youtube.com/vi/' + id + '/sddefault.jpg',
+        'https://img.youtube.com/vi/' + id + '/hqdefault.jpg',
+        'https://img.youtube.com/vi/' + id + '/mqdefault.jpg'
+    ];
+    function isTinyPlaceholder(img) {
+        return (img.naturalWidth <= 120 && img.naturalHeight <= 90);
+    }
+    function tryAt(index) {
+        if (index >= urls.length) {
+            el.style.backgroundImage = 'url(' + svgFallback + ')';
+            return;
+        }
+        var url = urls[index];
+        var img = new Image();
+        img.onload = function () {
+            if (isTinyPlaceholder(img)) {
+                tryAt(index + 1);
+                return;
+            }
+            el.style.backgroundImage = 'url(' + url + ')';
+        };
+        img.onerror = function () { tryAt(index + 1); };
+        img.src = url;
+    }
+    tryAt(0);
 }
 
 /* ============================================================
@@ -1210,6 +1291,8 @@ function buildQueue() {
             el:    el
         });
     });
+    window.esMainQueue = cloneQueue(window.esQueue);
+    setQueueMode('main');
 }
 
 function setActiveRow(index) {
@@ -1227,21 +1310,90 @@ function clearActiveRows() {
     });
 }
 
-function playTrack(index) {
+function cloneQueue(queue) {
+    return (queue || []).map(function (t) {
+        return { id: t.id, title: t.title, el: t.el || null };
+    });
+}
+
+function updateQueueModeUI() {
+    var banner = document.getElementById('queue-mode-banner');
+    var label = document.getElementById('queue-mode-label');
+    if (!banner || !label) return;
+    var favMode = (window.esQueueMode === 'fav');
+    banner.classList.toggle('is-active', favMode);
+    label.textContent = favMode ? 'FAV QUEUE ACTIVE' : 'MAIN QUEUE';
+}
+
+function setQueueMode(mode) {
+    window.esQueueMode = (mode === 'fav') ? 'fav' : 'main';
+    updateQueueModeUI();
+}
+
+function restoreMainQueue(autoplay) {
+    autoplay = (autoplay !== false);
+    var cur = window.esQueue && window.esQueue[window.esCurrentIndex];
+    var curId = cur && cur.id ? cur.id : null;
+    window.esQueue = cloneQueue(window.esMainQueue);
+    setQueueMode('main');
+    if (!window.esQueue.length) {
+        window.esCurrentIndex = -1;
+        clearActiveRows();
+        return;
+    }
+    var nextIndex = 0;
+    if (curId) {
+        var found = window.esQueue.findIndex(function (t) { return t.id === curId; });
+        if (found !== -1) nextIndex = found;
+    }
+    playTrack(nextIndex, autoplay);
+}
+
+function resolvePlayableIndex(startIndex) {
+    var q = window.esQueue || [];
+    if (!q.length) return -1;
+    for (var offset = 0; offset < q.length; offset++) {
+        var idx = ((startIndex + offset) % q.length + q.length) % q.length;
+        var track = q[idx];
+        if (track && track.id && !window.esInvalidVideoIds[track.id]) return idx;
+    }
+    return -1;
+}
+
+function scrollToTop() {
+    var se = document.scrollingElement || document.documentElement || document.body;
+    if (se.scrollTo) se.scrollTo({top:0, behavior:'smooth'}); else se.scrollTop = 0;
+}
+
+function playTrack(index, autoplay) {
+    autoplay = (autoplay !== false);
     var q = window.esQueue;
     if (!q.length) return;
-    window.esCurrentIndex = ((index % q.length) + q.length) % q.length;
+    var start = ((index % q.length) + q.length) % q.length;
+    var nextIndex = resolvePlayableIndex(start);
+    if (nextIndex === -1) {
+        window.esCurrentIndex = -1;
+        clearActiveRows();
+        if (typeof window.esSyncFavouriteButtons === 'function') {
+            window.esSyncFavouriteButtons();
+        }
+        return;
+    }
+    window.esCurrentIndex = nextIndex;
     window.esEnded = false;
     var track = q[window.esCurrentIndex];
-    if (window.esPlayer && typeof window.esPlayer.loadVideoById === 'function') {
-        window.esPlayer.loadVideoById(track.id);
+    if (window.esPlayer) {
+        if (autoplay && typeof window.esPlayer.loadVideoById === 'function') {
+            window.esPlayer.loadVideoById(track.id);
+        } else if (typeof window.esPlayer.cueVideoById === 'function') {
+            window.esPlayer.cueVideoById(track.id);
+        }
     }
     setActiveRow(window.esCurrentIndex);
     if (typeof window.esSyncFavouriteButtons === 'function') {
         window.esSyncFavouriteButtons();
     }
-    /* Scroll to top — triple target for tablet/desktop compat */
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
 }
 
 function updatePlayIcon(state) {
@@ -1270,6 +1422,7 @@ function cssEscape(s) {
    ============================================================ */
 (function () {
     function playPauseClick() {
+        window.esUserInitiatedPlayback = true;
         var p = window.esPlayer;
         if (!p) return;
         var state = p.getPlayerState();
@@ -1448,10 +1601,6 @@ function createFavouriteTrackButton(track) {
         try { localStorage.setItem(KEY, JSON.stringify(favs)); } catch (err) {}
     }
 
-    function thumbUrl(id) {
-        return 'https://img.youtube.com/vi/' + id + '/maxresdefault.jpg';
-    }
-
     function isFavourite(id, favs) {
         return favs.some(function (fav) { return fav.id === id; });
     }
@@ -1514,6 +1663,7 @@ function createFavouriteTrackButton(track) {
         var queue = queueFromFavourites(favs);
         if (!queue.length) return;
         window.esQueue = queue;
+        setQueueMode('fav');
         playTrack(index);
         close();
     }
@@ -1693,11 +1843,16 @@ function createFavouriteTrackButton(track) {
         syncHearts([]);
         render();
     });
+    document.getElementById('queue-mode-exit').addEventListener('click', function () {
+        restoreMainQueue(true);
+        this.blur && this.blur();
+    });
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && sheet.classList.contains('is-open')) close();
     });
 
     syncHearts(load());
+    updateQueueModeUI();
 }());
 
 
