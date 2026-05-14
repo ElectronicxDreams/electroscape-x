@@ -1053,30 +1053,27 @@ function restoreMainQueue(autoplay, startAfterCurrent) {
 }
 
 function scrollToTop() {
-    var behavior = { top: 0, behavior: 'smooth' };
-    try {
-        window.scrollTo(behavior);
-    } catch (e) {
-        window.scrollTo(0, 0);
-    }
-
+    var se = document.scrollingElement || document.documentElement || document.body;
     var targets = [
-        document.scrollingElement,
+        window,
+        se,
         document.documentElement,
         document.body,
         document.getElementById('bottom-zone'),
         document.getElementById('app-shell')
     ];
-    targets.forEach(function (el) {
-        if (!el) return;
-        try { if (typeof el.scrollTo === 'function') el.scrollTo(behavior); } catch (e) {}
-        el.scrollTop = 0;
-    });
 
-    var topZone = document.getElementById('top-zone');
-    if (topZone && typeof topZone.scrollIntoView === 'function') {
-        topZone.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    targets.forEach(function (t) {
+        if (!t) return;
+        try {
+            if (t === window && typeof window.scrollTo === 'function') {
+                window.scrollTo(0, 0);
+                return;
+            }
+            if (typeof t.scrollTo === 'function') t.scrollTo(0, 0);
+            if (typeof t.scrollTop === 'number') t.scrollTop = 0;
+        } catch (e) {}
+    });
 }
 
 function resolvePlayableIndex(startIndex) {
@@ -1303,7 +1300,6 @@ function closeFavSheet() {
         setQueueMode('fav');
         playTrack(index);
         closeFavSheet();
-        requestAnimationFrame(function () { scrollToTop(); });
     }
     function moveFavBy(from, delta) {
         var favs=load(); var to=from+delta;
