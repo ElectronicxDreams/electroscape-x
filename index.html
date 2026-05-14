@@ -179,6 +179,7 @@ body.glass-dark .music-card {
     cursor: pointer;
     transition: background 0.2s ease, border-color 0.2s ease;
     outline: none;
+    position: relative;
 }
 #nav-fav-btn:hover,
 #nav-fav-btn.is-active {
@@ -189,6 +190,20 @@ body.glass-dark .music-card {
     width: 16px;
     height: 16px;
     display: block;
+}
+#nav-fav-btn.queue-active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -6px;
+    transform: translateY(-50%);
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 8px rgba(0,255,230,0.8);
+    z-index: 2;
+    pointer-events: none;
 }
 
 /* ============================================================
@@ -378,11 +393,14 @@ body.glass-dark .music-card {
     opacity: 0;
     transition: opacity 0.25s, border-color 0.25s, background 0.25s;
     padding: 0;
+    color: #00FFE6;
 }
 .video:hover .fav-heart-btn,
 .fav-heart-btn.is-active { opacity: 1; }
 .fav-heart-btn:hover { background: rgba(0,0,0,0.7); border-color: #00FFE6; }
 .fav-heart-svg { width: 14px; height: 14px; display: block; }
+.fav-heart-btn .fav-heart-path { fill: none; stroke: #00FFE6; }
+.fav-heart-btn.is-active .fav-heart-path { fill: #00FFE6; stroke: #00FFE6; }
 
 /* ============================================================
    VIDEO-GRID
@@ -1298,7 +1316,7 @@ body.fav-open #nav-popup-backdrop {
     </div><!-- end #player-section -->
 
     <!-- FAV-BACKDROP -->
-    <div id="fav-backdrop"></div>
+    <div id="fav-backdrop" aria-hidden="true"></div>
 
     <!-- FAVOURITES SHEET -->
     <section id="fav-sheet" role="dialog" aria-modal="true" aria-label="Favourites">
@@ -1631,7 +1649,7 @@ body.fav-open #nav-popup-backdrop {
                     if (window.esQueue.length) {
                         window.esPlayer.cueVideoById(window.esQueue[0].id);
                         window.esCurrentIndex = 0;
-                        clearActiveCards();
+                        setActiveCard(0);
                         if (typeof window.esSyncFavouriteButtons === 'function') {
                             window.esSyncFavouriteButtons();
                         }
@@ -1641,16 +1659,28 @@ body.fav-open #nav-popup-backdrop {
                     /* Auto-advance on end */
                     if (event.data === YT.PlayerState.ENDED && !window.esEnded) {
                         window.esEnded = true;
-                        playTrack(window.esCurrentIndex + 1);
+                        var atFavEnd = (
+                            window.esQueueMode === 'fav' &&
+                            window.esQueue &&
+                            window.esQueue.length &&
+                            window.esCurrentIndex >= (window.esQueue.length - 1)
+                        );
+                        if (atFavEnd) {
+                            if (window.esMainQueue && window.esMainQueue.length) {
+                                restoreMainQueue(true, true);
+                            } else {
+                                if (window.esPlayer && typeof window.esPlayer.pauseVideo === 'function') window.esPlayer.pauseVideo();
+                                window.esCurrentIndex = -1;
+                                clearActiveCards();
+                            }
+                        } else {
+                            playTrack(window.esCurrentIndex + 1);
+                        }
                     }
                     /* Sync play/pause icon */
                     updatePlayIcon(event.data);
                     if (event.data === YT.PlayerState.PLAYING) {
-                        if (!window.esActiveCardTimer) {
-                            setActiveCard(window.esCurrentIndex);
-                        }
-                    } else {
-                        clearActiveCards();
+                        setActiveCard(window.esCurrentIndex);
                     }
                     /* Start progress tracker on first play */
                     if (event.data === YT.PlayerState.PLAYING) {
@@ -1838,7 +1868,10 @@ function cssEscape(s) {
         var path = btn.querySelector('.fav-heart-path');
         btn.classList.toggle('is-active', active);
         btn.setAttribute('aria-label', active ? 'Remove from favourites' : 'Add to favourites');
-        if (path) path.setAttribute('fill', active ? '#00FFE6' : 'none');
+        if (path) {
+            path.setAttribute('fill', active ? '#00FFE6' : 'none');
+            path.setAttribute('stroke', '#00FFE6');
+        }
     }
 
     function getCurrentTrack() {
@@ -2107,10 +2140,11 @@ function cloneQueue(queue) {
 function updateQueueModeUI() {
     var banner = document.getElementById('queue-mode-banner');
     var label = document.getElementById('queue-mode-label');
-    if (!banner || !label) return;
     var favMode = (window.esQueueMode === 'fav');
-    banner.classList.toggle('is-active', favMode);
-    label.textContent = favMode ? 'FAV QUEUE ACTIVE' : 'MAIN QUEUE';
+    if (banner) banner.classList.toggle('is-active', favMode);
+    if (label) label.textContent = favMode ? 'FAV QUEUE ACTIVE' : 'MAIN QUEUE';
+    var navFavBtn = document.getElementById('nav-fav-btn');
+    if (navFavBtn) navFavBtn.classList.toggle('queue-active', favMode);
 }
 
 function setQueueMode(mode) {
@@ -2118,8 +2152,9 @@ function setQueueMode(mode) {
     updateQueueModeUI();
 }
 
-function restoreMainQueue(autoplay) {
+function restoreMainQueue(autoplay, startAfterCurrent) {
     autoplay = (autoplay !== false);
+    startAfterCurrent = (startAfterCurrent === true);
     var cur = window.esQueue && window.esQueue[window.esCurrentIndex];
     var curId = cur && cur.id ? cur.id : null;
     window.esQueue = cloneQueue(window.esMainQueue);
@@ -2132,7 +2167,13 @@ function restoreMainQueue(autoplay) {
     var nextIndex = 0;
     if (curId) {
         var found = window.esQueue.findIndex(function (t) { return t.id === curId; });
-        if (found !== -1) nextIndex = found;
+        if (found !== -1) nextIndex = startAfterCurrent ? (found + 1) : found;
+    }
+    if (nextIndex >= window.esQueue.length) {
+        window.esCurrentIndex = -1;
+        clearActiveCards();
+        if (window.esPlayer && typeof window.esPlayer.pauseVideo === 'function') window.esPlayer.pauseVideo();
+        return;
     }
     playTrack(nextIndex, autoplay);
 }
@@ -2150,16 +2191,36 @@ function resolvePlayableIndex(startIndex) {
 
 function scrollToTop() {
     var scroller = document.scrollingElement || document.documentElement || document.body;
-    if (!scroller) return;
-    if (typeof scroller.scrollTo === 'function') scroller.scrollTo({ top: 0, behavior: 'smooth' });
-    else scroller.scrollTop = 0;
+    if (typeof window.scrollTo === 'function') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (scroller) {
+        if (typeof scroller.scrollTo === 'function') scroller.scrollTo({ top: 0, behavior: 'smooth' });
+        scroller.scrollTop = 0;
+    }
+    var playerSection = document.getElementById('player-section');
+    if (playerSection && typeof playerSection.scrollIntoView === 'function') {
+        playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 function playTrack(index, autoplay) {
     autoplay = (autoplay !== false);
+    if (autoplay) window.esUserInitiatedPlayback = true;
     var q = window.esQueue;
     if (!q.length) return;
-    var start = ((index % q.length) + q.length) % q.length;
+    var start;
+    if (window.esQueueMode === 'fav') {
+        if (index < 0) return;
+        if (index >= q.length) {
+            if (window.esMainQueue && window.esMainQueue.length) restoreMainQueue(autoplay, true);
+            else if (window.esPlayer && typeof window.esPlayer.pauseVideo === 'function') window.esPlayer.pauseVideo();
+            return;
+        }
+        start = index;
+    } else {
+        start = ((index % q.length) + q.length) % q.length;
+    }
     var nextIndex = resolvePlayableIndex(start);
     if (nextIndex === -1) {
         window.esCurrentIndex = -1;
