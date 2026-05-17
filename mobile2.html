@@ -427,7 +427,7 @@
         /* ============================================================
            FAV-SHEET — right-sliding panel (P3-M1 structure, M2 colours)
            ============================================================ */
-        #fav-backdrop { position: fixed; inset: 0; z-index: 9350; background: rgba(0,0,0,0.55); opacity: 0; pointer-events: none; transition: opacity 0.26s; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        #fav-backdrop { position: fixed; inset: 0; z-index: 9350; background: rgba(0,0,0,0.55); opacity: 0; pointer-events: none; transition: opacity 0.26s; }
         #fav-backdrop.is-visible { opacity: 1; pointer-events: auto; }
         #fav-sheet {
             position: fixed; top: 0; right: 0; bottom: 0;
@@ -466,6 +466,39 @@
         .fav-row-title { color: #fff; font-size: 9px; letter-spacing: 0.3px; line-height: 1.35; text-transform: uppercase; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-align: center; }
         #fav-footer { display: none; justify-content: center; padding: 6px 10px 8px; border-top: 1px solid rgba(255,255,255,0.07); flex-shrink: 0; }
         #fav-clear-btn { padding: 5px 14px; }
+        /* FAV-SHEET transport row (Prev / Play / Next) */
+        #fav-transport { display: none; padding: 6px 10px 4px; flex-shrink: 0; }
+        #fav-queue-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 7px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(0,255,230,0.78);
+            text-align: center;
+            margin-bottom: 7px;
+        }
+        .fav-transport-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .fav-panel-btn {
+            height: 32px;
+            border: 1px solid rgba(0,255,230,0.22);
+            border-radius: 4px;
+            background: rgba(0,255,230,0.04);
+            color: var(--cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 8px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+        }
+        .fav-panel-btn:hover:not(:disabled) {
+            border-color: rgba(0,255,230,0.55);
+            background: rgba(0,255,230,0.08);
+        }
+        .fav-panel-btn:disabled { opacity: 0.35; cursor: default; }
         body.fav-open { overflow: hidden; }
         body.fav-open #nav-header {
             opacity: 0;
@@ -782,6 +815,14 @@
         <div id="fav-actions"><button id="fav-play-all-btn" type="button">Play All</button></div>
         <div id="fav-empty">No favourites yet.</div>
         <ul id="fav-list"></ul>
+        <div id="fav-transport">
+            <div id="fav-queue-label">Now Controlling: Main Queue</div>
+            <div class="fav-transport-row">
+                <button class="fav-panel-btn" id="fav-prev-btn" type="button">Prev</button>
+                <button class="fav-panel-btn" id="fav-play-btn" type="button">Play</button>
+                <button class="fav-panel-btn" id="fav-next-btn" type="button">Next</button>
+            </div>
+        </div>
         <div id="fav-footer"><button id="fav-clear-btn" type="button">Clear All</button></div>
     </section>
 
@@ -1016,10 +1057,12 @@ function updateQueueModeUI() {
     var banner = document.getElementById('queue-mode-banner');
     var label = document.getElementById('queue-mode-label');
     var favBtn = document.getElementById('nav-fav-btn');
+    var footerLabel = document.getElementById('fav-queue-label');
     if (!banner || !label) return;
     var favMode = (window.esQueueMode === 'fav');
     banner.classList.toggle('is-active', favMode);
     if (favBtn) favBtn.classList.toggle('queue-active', favMode);
+    if (footerLabel) footerLabel.textContent = 'Now Controlling: ' + (favMode ? 'Fav Queue' : 'Main Queue');
     label.textContent = favMode ? 'FAV QUEUE ACTIVE' : 'MAIN QUEUE';
 }
 
@@ -1130,6 +1173,11 @@ function updatePlayIcon(state) {
     var playSvg  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
     var b = document.getElementById('p2m3-play');
     if (b) { b.classList.toggle('is-playing', playing); b.innerHTML = playing ? pauseSvg : playSvg; }
+    var favPlayBtn = document.getElementById('fav-play-btn');
+    if (favPlayBtn) {
+        favPlayBtn.textContent = playing ? 'Pause' : 'Play';
+        favPlayBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    }
 }
 
 function cssEscape(s) {
@@ -1315,10 +1363,12 @@ function closeFavSheet() {
         var empty=document.getElementById('fav-empty');
         var footer=document.getElementById('fav-footer');
         var actions=document.getElementById('fav-actions');
+        var transport=document.getElementById('fav-transport');
         list.innerHTML='';
         empty.style.display=has?'none':'flex';
         footer.style.display=has?'flex':'none';
         actions.style.display=has?'block':'none';
+        if (transport) transport.style.display=has?'block':'none';
         favs.forEach(function(fav,idx){
             var row=document.createElement('li'); row.className='fav-row';
             var thumb=document.createElement('div'); thumb.className='fav-row-thumb';
@@ -1368,6 +1418,33 @@ function closeFavSheet() {
     document.getElementById('fav-close-btn').addEventListener('click', closeFavSheet);
     document.getElementById('fav-play-all-btn').addEventListener('click', function(){playFavAt(0);});
     document.getElementById('fav-clear-btn').addEventListener('click', function(){var f=[];save(f);syncHearts(f);syncLikeHeart(f);renderFavSheet();});
+
+    /* fav-sheet bottom transport (Prev / Play / Next) */
+    function favPrev() {
+        if (!window.esQueue || !window.esQueue.length) return;
+        if (window.esCurrentIndex < 0) { playTrack(0); return; }
+        playTrack(window.esCurrentIndex - 1);
+    }
+    function favNext() {
+        if (!window.esQueue || !window.esQueue.length) return;
+        if (window.esCurrentIndex < 0) { playTrack(0); return; }
+        playTrack(window.esCurrentIndex + 1);
+    }
+    function favPlayToggle() {
+        var p = window.esPlayer; if (!p) return;
+        window.esUserInitiatedPlayback = true;
+        var s = (typeof p.getPlayerState === 'function') ? p.getPlayerState() : -1;
+        if (s === 1 && typeof p.pauseVideo === 'function') p.pauseVideo();
+        else if ((s === 2 || s === 5) && typeof p.playVideo === 'function') p.playVideo();
+        else if (window.esQueue && window.esQueue.length) {
+            if (window.esCurrentIndex < 0) playTrack(0);
+            else if (typeof p.playVideo === 'function') p.playVideo();
+        }
+    }
+    document.getElementById('fav-prev-btn').addEventListener('click', function(e){ e.stopPropagation(); favPrev(); });
+    document.getElementById('fav-play-btn').addEventListener('click', function(e){ e.stopPropagation(); favPlayToggle(); });
+    document.getElementById('fav-next-btn').addEventListener('click', function(e){ e.stopPropagation(); favNext(); });
+
     document.getElementById('queue-mode-exit').addEventListener('click', function(){restoreMainQueue(true); this.blur && this.blur();});
     document.addEventListener('keydown', function(e){if(e.key==='Escape'&&document.getElementById('fav-sheet').classList.contains('is-open')) closeFavSheet();});
     var _fi=load(); syncHearts(_fi); syncLikeHeart(_fi);

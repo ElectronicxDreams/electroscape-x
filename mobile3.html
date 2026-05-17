@@ -234,7 +234,15 @@
         #floating-controls-panel.is-open,
         #floating-controls-backdrop.is-open {
             opacity: 1;
+        }
+        #floating-controls-panel.is-open {
             pointer-events: auto;
+        }
+        /* Backdrop must NEVER capture pointer events — it would block grid scrolling.
+           Outside-tap-to-close is handled in JS via a document pointerdown listener. */
+        #floating-controls-backdrop,
+        #floating-controls-backdrop.is-open {
+            pointer-events: none;
         }
         #floating-controls-panel.is-open {
             transform: translate(-50%, -50%) scale(1);
@@ -1229,6 +1237,12 @@ function updatePlayIcon(state) {
     var playing = (state === 1);
     document.body.classList.toggle('playing', playing);
 
+    var favPlayBtn = document.getElementById('fav-play-btn');
+    if (favPlayBtn) {
+        favPlayBtn.textContent = playing ? 'Pause' : 'Play';
+        favPlayBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    }
+
     var floatingPlayBtn = document.getElementById('floating-play');
     if (!floatingPlayBtn) return;
     var pauseSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
@@ -1472,6 +1486,22 @@ function closeFavSheet() {
         panel.classList.toggle('is-open', open);
         backdrop.classList.toggle('is-open', open);
         fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) {
+            // Defer so the same tap that opened the panel doesn't immediately close it
+            setTimeout(function () {
+                document.addEventListener('pointerdown', outsideTap, true);
+            }, 0);
+        } else {
+            document.removeEventListener('pointerdown', outsideTap, true);
+        }
+    }
+
+    function outsideTap(e) {
+        // Close on tap outside panel/fab. We do NOT preventDefault — this lets
+        // the grid keep scrolling normally while the panel is open.
+        if (!panel.contains(e.target) && !fab.contains(e.target)) {
+            setOpen(false);
+        }
     }
 
     function togglePanel() {
@@ -1484,7 +1514,6 @@ function closeFavSheet() {
     }
 
     fab.addEventListener('click', function () { togglePanel(); });
-    backdrop.addEventListener('click', function () { setOpen(false); });
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && panel.classList.contains('is-open')) setOpen(false);
     });
