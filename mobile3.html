@@ -237,15 +237,13 @@
         }
         #floating-controls-panel.is-open {
             pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
         }
         /* Backdrop must NEVER capture pointer events — it would block grid scrolling.
            Outside-tap-to-close is handled in JS via a document pointerdown listener. */
         #floating-controls-backdrop,
         #floating-controls-backdrop.is-open {
             pointer-events: none;
-        }
-        #floating-controls-panel.is-open {
-            transform: translate(-50%, -50%) scale(1);
         }
         .floating-controls-grid {
             display: grid;
@@ -555,9 +553,11 @@
         #fav-title { font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: var(--cyan); }
         #fav-close-btn { width: 32px; height: 32px; color: var(--cyan); font-size: 20px; font-weight: 700; line-height: 1; display: grid; place-items: center; }
         #fav-close-btn:hover { background: rgba(0,255,230,0.06); }
-        #fav-actions { display: none; padding: 6px 10px 4px; flex-shrink: 0; }
-        #fav-play-all-btn {
-            width: 100%;
+        #fav-actions { display: none; flex-direction: column; gap: 6px; padding: 6px 10px 4px; flex-shrink: 0; }
+        .fav-actions-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        #fav-play-all-btn,
+        #fav-clear-btn,
+        #fav-repeat-btn {
             height: 30px;
             border: 1px solid rgba(0,255,230,0.28);
             border-radius: 4px;
@@ -568,11 +568,20 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             cursor: pointer;
-            transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+            transition: border-color 0.2s, background 0.2s, color 0.2s, opacity 0.2s;
         }
-        #fav-play-all-btn:hover {
+        #fav-play-all-btn:hover,
+        #fav-clear-btn:hover,
+        #fav-repeat-btn:hover {
             border-color: rgba(0,255,230,0.55);
-            background: rgba(0,255,230,0.08);
+            background: rgba(0,255,230,0.10);
+        }
+        #fav-repeat-btn { width: 100%; }
+        #fav-repeat-btn.is-active {
+            border-color: rgba(0,255,230,0.7);
+            background: rgba(0,255,230,0.16);
+            color: #b6fff4;
+            box-shadow: 0 0 0 1px rgba(0,255,230,0.14) inset;
         }
         #fav-empty { display: flex; flex: 1; align-items: center; justify-content: center; padding: 28px; color: var(--cyan); font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; text-align: center; }
         #fav-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: rgba(0,255,230,0.28) transparent; }
@@ -898,7 +907,13 @@
             <span id="fav-title">Favourites</span>
             <button id="fav-close-btn" type="button" aria-label="Close">&times;</button>
         </div>
-        <div id="fav-actions"><button id="fav-play-all-btn" type="button">Play All</button></div>
+        <div id="fav-actions">
+            <div class="fav-actions-row">
+                <button id="fav-play-all-btn" type="button">Play All</button>
+                <button id="fav-clear-btn" type="button">Clear All</button>
+            </div>
+            <button id="fav-repeat-btn" type="button" aria-pressed="false">Repeat All</button>
+        </div>
         <div id="fav-empty">No favourites yet.</div>
         <ul id="fav-list"></ul>
         <div id="fav-footer">
@@ -1013,7 +1028,9 @@
                             window.esCurrentIndex >= (window.esQueue.length - 1)
                         );
                         if (atFavEnd) {
-                            if (window.esMainQueue && window.esMainQueue.length) {
+                            if (window.esRepeatFav) {
+                                playTrack(0);
+                            } else if (window.esMainQueue && window.esMainQueue.length) {
                                 restoreMainQueue(true, true);
                             } else {
                                 if (window.esPlayer && typeof window.esPlayer.pauseVideo === 'function') window.esPlayer.pauseVideo();
@@ -1123,6 +1140,10 @@ function buildQueue() {
     });
     window.esMainQueue = cloneQueue(window.esQueue);
     setQueueMode('main');
+    if (window.esRepeatFav) {
+        window.esRepeatFav = false;
+        if (typeof window.esApplyRepeatUI === 'function') window.esApplyRepeatUI();
+    }
 }
 
 function setActiveCard(index) {
@@ -1236,12 +1257,6 @@ function playTrack(index, autoplay) {
 function updatePlayIcon(state) {
     var playing = (state === 1);
     document.body.classList.toggle('playing', playing);
-
-    var favPlayBtn = document.getElementById('fav-play-btn');
-    if (favPlayBtn) {
-        favPlayBtn.textContent = playing ? 'Pause' : 'Play';
-        favPlayBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
-    }
 
     var floatingPlayBtn = document.getElementById('floating-play');
     if (!floatingPlayBtn) return;
@@ -1444,12 +1459,24 @@ function closeFavSheet() {
     function favPrev() {
         if (!window.esQueue || !window.esQueue.length) return;
         if (window.esCurrentIndex < 0) { playTrack(0, true); return; }
-        playTrack(window.esCurrentIndex - 1, true);
+        var n = window.esQueue.length;
+        var target = window.esCurrentIndex - 1;
+        if (target < 0) {
+            if (window.esQueueMode === 'fav' && window.esRepeatFav) target = n - 1;
+            else target = 0;
+        }
+        playTrack(target, true);
     }
     function favNext() {
         if (!window.esQueue || !window.esQueue.length) return;
         if (window.esCurrentIndex < 0) { playTrack(0, true); return; }
-        playTrack(window.esCurrentIndex + 1, true);
+        var n = window.esQueue.length;
+        var target = window.esCurrentIndex + 1;
+        if (target >= n) {
+            if (window.esQueueMode === 'fav' && window.esRepeatFav) target = 0;
+            else target = n - 1;
+        }
+        playTrack(target, true);
     }
     function favPlayToggle() {
         var p = window.esPlayer; if (!p) return;
@@ -1466,6 +1493,25 @@ function closeFavSheet() {
     document.getElementById('fav-backdrop').addEventListener('click', closeFavSheet);
     document.getElementById('fav-close-btn').addEventListener('click', closeFavSheet);
     document.getElementById('fav-play-all-btn').addEventListener('click', function(e){ e.stopPropagation(); playFavAt(0); });
+    document.getElementById('fav-clear-btn').addEventListener('click', function(e){ e.stopPropagation(); var f=[]; save(f); syncHearts(f); syncLikeHearts(f); renderFavSheet(); });
+
+    /* Repeat-all toggle for fav playlist (session-only, not persisted) */
+    var repeatBtn = document.getElementById('fav-repeat-btn');
+    function applyRepeatUI() {
+        var on = !!window.esRepeatFav;
+        repeatBtn.classList.toggle('is-active', on);
+        repeatBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        repeatBtn.textContent = on ? 'Repeat All: On' : 'Repeat All';
+    }
+    window.esRepeatFav = false;
+    applyRepeatUI();
+    window.esApplyRepeatUI = applyRepeatUI;
+    repeatBtn.addEventListener('click', function () {
+        window.esRepeatFav = !window.esRepeatFav;
+        applyRepeatUI();
+        repeatBtn.blur && repeatBtn.blur();
+    });
+
     document.getElementById('fav-prev-btn').addEventListener('click', function(e){ e.stopPropagation(); favPrev(); });
     document.getElementById('fav-play-btn').addEventListener('click', function(e){ e.stopPropagation(); favPlayToggle(); });
     document.getElementById('fav-next-btn').addEventListener('click', function(e){ e.stopPropagation(); favNext(); });
