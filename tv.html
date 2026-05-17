@@ -42,106 +42,96 @@ body {
 }
 
 /* ============================================================ */
-/* SECTION 2B: NAVIGATION DROPDOWN - matches index.html         */
+/* SECTION 2B: NAVIGATION BURGER + FROSTED FLOATING PANEL       */
 /* ============================================================ */
-.dropdown-wrap {
+#nav-top {
     display: flex;
     justify-content: center;
     margin-bottom: 30px;
     position: relative;
-    z-index: 40;
+    z-index: 60;
 }
 
-.dropdown-wrap > div {
-    position: relative;
-}
-
-.dropdown-toggle {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 7px;
-    letter-spacing: 8px;
-    text-transform: uppercase;
+#nav-links-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,255,230,0.28);
+    background: rgba(0,255,230,0.06);
     color: #00FFE6;
-    padding: 8px 0;
-    outline: none;
-    transition: color 0.25s ease;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
 }
+#nav-links-btn:hover {
+    border-color: #00FFE6;
+    background: rgba(0,255,230,0.12);
+}
+#nav-links-btn svg { width: 18px; height: 18px; }
 
-.dropdown-toggle:hover { color: rgba(0,255,230,0.75); }
-
-.dropdown-content {
-    position: absolute;
-    top: calc(100% + 8px);
+#nav-popup {
+    position: fixed;
+    top: 66px;
     left: 50%;
-    width: min(560px, calc(100vw - 28px));
     transform: translateX(-50%) translateY(-8px);
-    background: rgba(8, 12, 18, 0.62);
-    border: 1px solid rgba(0, 255, 230, 0.20);
-    border-radius: 6px;
-    box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.04),
-        0 28px 72px rgba(0, 0, 0, 0.78),
-        0 0 40px rgba(0, 255, 230, 0.09);
-    backdrop-filter: blur(24px) saturate(125%);
-    -webkit-backdrop-filter: blur(24px) saturate(125%);
+    z-index: 9500;
+    width: min(330px, 92vw);
+    background: linear-gradient(180deg, rgba(8,4,20,0.85), rgba(2,3,10,0.78));
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 28px 72px rgba(0,0,0,0.76), 0 0 40px rgba(157,71,255,0.12);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.22s ease, transform 0.22s ease;
+    transition: opacity 0.22s, transform 0.22s;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
 }
-
-.dropdown-content.open {
+#nav-popup.is-open {
     opacity: 1;
     pointer-events: auto;
     transform: translateX(-50%) translateY(0);
 }
 
-.nav-links {
-    display: flex;
-    flex-direction: column;
+#nav-popup-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9400;
+    background: transparent;
+    opacity: 0;
+    pointer-events: none;
+    border: 0;
     padding: 0;
+    margin: 0;
+}
+#nav-popup-backdrop.is-active {
+    opacity: 1;
+    pointer-events: auto;
 }
 
-.nav-links a,
-.nav-links button {
+.nav-popup-item {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: 18px 24px;
+    padding: 13px 20px;
     color: #fff;
     text-decoration: none;
     font-family: 'Michroma', sans-serif;
-    font-size: 8.4px;
-    font-weight: 400;
+    font-size: 8px;
+    letter-spacing: 3px;
+    line-height: 2.5;
     text-transform: uppercase;
-    letter-spacing: 6px;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
-    transition: color 0.2s ease, background 0.2s ease;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    transition: color 0.2s, background 0.2s;
     text-align: center;
-}
-
-.nav-links button {
     background: transparent;
-    border-left: none;
-    border-right: none;
-    border-top: none;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
     cursor: pointer;
 }
-
-.nav-links a:last-child,
-.nav-links button:last-child {
-    border-bottom: none;
-}
-
-.nav-links a:hover,
-.nav-links button:hover {
-    color: #00FFE6;
-    background: rgba(0,255,230,0.06);
-}
+.nav-popup-item:last-child { border-bottom: none; }
+.nav-popup-item:hover { color: #9d47ff; background: rgba(157,71,255,0.08); }
 
 #soon-overlay {
     position: fixed;
@@ -327,22 +317,21 @@ body {
     <!-- -------------------------------------------------------- -->
     <!-- SECTION 3A: NAVIGATION NODES DROPDOWN                    -->
     <!-- -------------------------------------------------------- -->
-    <div class="dropdown-wrap">
-        <div>
-            <button class="dropdown-toggle" id="nav-toggle" aria-expanded="false" aria-label="Toggle navigation">
-                LINKS
-            </button>
-            <div class="dropdown-content" id="nav-content">
-                <div class="nav-links">
-                    <a href="https://links.electroscapex.com/" target="_blank" rel="noopener noreferrer">Weblinks</a>
-                    <a href="https://electroscapex.com" target="_blank" rel="noopener noreferrer">Electroscape</a>
-                    <a href="https://imagevault.electroscapex.com/" target="_blank" rel="noopener noreferrer">Image Vault</a>
-                    <a href="https://www.themoviedb.org/list/8264050-tv-shows-recommended?language=en-gb&sort_by=primary_release_date.desc&view=grid" target="_blank">More TV Shows</a>
-                    <a href="https://www.themoviedb.org/list/8512181-movies?language=en-gb&view=grid&sort_by=primary_release_date.desc&show_me" target="_blank">Movies</a>
-                    <a href="mobile3.html">MX</a>
-                </div>
-            </div>
-        </div>
+    <nav id="nav-top">
+        <button id="nav-links-btn" type="button" aria-expanded="false" aria-label="Toggle navigation" aria-controls="nav-popup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h16"/>
+            </svg>
+        </button>
+    </nav>
+    <button id="nav-popup-backdrop" type="button" aria-label="Close navigation links" tabindex="-1"></button>
+    <div id="nav-popup" role="dialog" aria-label="Navigation links">
+        <a class="nav-popup-item" href="https://links.electroscapex.com/" target="_blank" rel="noopener noreferrer">Weblinks</a>
+        <a class="nav-popup-item" href="https://electroscapex.com" target="_blank" rel="noopener noreferrer">Electroscape</a>
+        <a class="nav-popup-item" href="https://imagevault.electroscapex.com/" target="_blank" rel="noopener noreferrer">Image Vault</a>
+        <a class="nav-popup-item" href="https://www.themoviedb.org/list/8264050-tv-shows-recommended?language=en-gb&sort_by=primary_release_date.desc&view=grid" target="_blank" rel="noopener noreferrer">More TV Shows</a>
+        <a class="nav-popup-item" href="https://www.themoviedb.org/list/8512181-movies?language=en-gb&view=grid&sort_by=primary_release_date.desc&show_me" target="_blank" rel="noopener noreferrer">Movies</a>
+        <a class="nav-popup-item" href="mobile3.html">MX</a>
     </div>
     <div id="soon-overlay" aria-live="polite" role="status">COMING SOON</div>
 
@@ -501,35 +490,46 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeDossier();
 });
 
-/* ── NAVIGATION DROPDOWN ── */
+/* ── NAVIGATION BURGER POPUP ── */
 function initNav() {
-    const toggle  = document.getElementById('nav-toggle');
-    const content = document.getElementById('nav-content');
-    if (!toggle || !content) return;
+    const btn = document.getElementById('nav-links-btn');
+    const popup = document.getElementById('nav-popup');
+    const backdrop = document.getElementById('nav-popup-backdrop');
+    if (!btn || !popup || !backdrop) return;
 
-    function openNav() {
-        content.classList.add('open');
-        toggle.setAttribute('aria-expanded', 'true');
-    }
+    let popupTimer = null;
 
-    function closeNav() {
-        content.classList.remove('open');
-        toggle.setAttribute('aria-expanded', 'false');
-    }
-
-    toggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (content.classList.contains('open')) {
-            closeNav();
-        } else {
-            openNav();
+    function clearPopupTimer() {
+        if (popupTimer) {
+            clearTimeout(popupTimer);
+            popupTimer = null;
         }
-    });
+    }
+    function armPopupTimer() {
+        clearPopupTimer();
+        popupTimer = setTimeout(() => closeNav(), 6000);
+    }
+    function openNav() {
+        popup.classList.add('is-open');
+        backdrop.classList.add('is-active');
+        btn.setAttribute('aria-expanded', 'true');
+        armPopupTimer();
+    }
+    function closeNav() {
+        popup.classList.remove('is-open');
+        backdrop.classList.remove('is-active');
+        btn.setAttribute('aria-expanded', 'false');
+        clearPopupTimer();
+    }
 
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        popup.classList.contains('is-open') ? closeNav() : openNav();
+    });
+    backdrop.addEventListener('click', closeNav);
     document.addEventListener('click', (e) => {
-        if (!content.contains(e.target) && e.target !== toggle) closeNav();
+        if (!popup.contains(e.target) && e.target !== btn) closeNav();
     });
-
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeNav();
     });
