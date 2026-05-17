@@ -1259,11 +1259,18 @@ function updatePlayIcon(state) {
     document.body.classList.toggle('playing', playing);
 
     var floatingPlayBtn = document.getElementById('floating-play');
-    if (!floatingPlayBtn) return;
     var pauseSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
     var playSvg  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-    floatingPlayBtn.innerHTML = playing ? pauseSvg : playSvg;
-    floatingPlayBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    if (floatingPlayBtn) {
+        floatingPlayBtn.innerHTML = playing ? pauseSvg : playSvg;
+        floatingPlayBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    }
+
+    var favPlayBtn = document.getElementById('fav-play-btn');
+    if (favPlayBtn) {
+        favPlayBtn.textContent = playing ? 'Pause' : 'Play';
+        favPlayBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    }
 }
 
 function cssEscape(s) {
