@@ -1,5 +1,11 @@
 
 <!-- index.html | Electroscape |   -->
+<!--
+RENAME LOG (hardcoded record):
+former mobile1.html -> mobile1.html
+former mobile2.html -> mobile2.html
+former mobile3.html -> mobile3.html
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1230,12 +1236,12 @@ body.fav-open #nav-popup-backdrop {
 
         <button id="nav-popup-backdrop" type="button" aria-label="Close navigation links" tabindex="-1"></button>
         <div id="nav-popup" role="dialog" aria-label="Navigation links">
+            <a class="nav-popup-item" href="https://electroscapex.com" target="_blank" rel="noopener noreferrer">Electroscape</a>
             <a class="nav-popup-item" href="https://links.electroscapex.com/" target="_blank" rel="noopener noreferrer">Weblinks</a>
-            <button class="nav-popup-item" id="nav-music-btn">Music Directory</button>
+            <button class="nav-popup-item" id="nav-music-btn" type="button">Music Directory</button>
             <a class="nav-popup-item" href="https://electroscapex.com/tv.html" target="_blank" rel="noopener noreferrer">TV</a>
-            <a class="nav-popup-item" href="mobile1.html">Electroscape Mobile</a>
-            <a class="nav-popup-item" href="mobile2.html">Electroscape Tablet</a>
-            <a class="nav-popup-item" href="mobile3.html">Electroscape Mobile -Alt</a>
+	    <a class="nav-popup-item" href="https://imagevault.electroscapex.com/" target="_blank" rel="noopener noreferrer">Image Vault</a>
+
         </div>
     </nav>
 
@@ -1443,24 +1449,15 @@ body.fav-open #nav-popup-backdrop {
    DEVICE REDIRECT — width-based, no user-agent detection
    ≤620px    → mobile1.html  (Samsung S25 Plus: 360px, all iPhones: 375–430px)
    621–1034px → mobile2.html (Honor MagicPad2: 768px, all iPads: 768–1024px)
-   ?view=desktop bypasses all redirects and persists desktop mode
+   ?view=desktop bypasses redirects for this load only
    ============================================================ */
 (function () {
     var params = new URLSearchParams(window.location.search);
     var view = params.get('view');
-    var KEY = 'es_force_desktop_view';
 
     if (view === 'desktop') {
-        try { localStorage.setItem(KEY, '1'); } catch (e) {}
         return;
     }
-    if (view === 'mobile') {
-        try { localStorage.removeItem(KEY); } catch (e) {}
-    }
-
-    try {
-        if (localStorage.getItem(KEY) === '1') return;
-    } catch (e) {}
 
     var w = window.innerWidth;
     if (w <= 620) {
