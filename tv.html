@@ -334,10 +334,12 @@ body {
             </button>
             <div class="dropdown-content" id="nav-content">
                 <div class="nav-links">
-                    <a href="https://electroscapex.com" target="_blank">ELECTROSCAPE</a>
-                    <button type="button" id="imagevault-soon-btn">IMAGE VAULT</button>
-                    <a href="https://www.themoviedb.org/list/8264050-tv-shows-recommended?language=en-gb&sort_by=primary_release_date.desc&view=grid" target="_blank">MORE TV SHOWS</a>
-                    <a href="https://www.themoviedb.org/list/8512181-movies?language=en-gb&view=grid&sort_by=primary_release_date.desc&show_me" target="_blank">MOVIES</a>
+                    <a href="https://links.electroscapex.com/" target="_blank" rel="noopener noreferrer">Weblinks</a>
+                    <a href="https://electroscapex.com" target="_blank" rel="noopener noreferrer">Electroscape</a>
+                    <a href="https://imagevault.electroscapex.com/" target="_blank" rel="noopener noreferrer">Image Vault</a>
+                    <a href="https://www.themoviedb.org/list/8264050-tv-shows-recommended?language=en-gb&sort_by=primary_release_date.desc&view=grid" target="_blank">More TV Shows</a>
+                    <a href="https://www.themoviedb.org/list/8512181-movies?language=en-gb&view=grid&sort_by=primary_release_date.desc&show_me" target="_blank">Movies</a>
+                    <a href="mobile3.html">MX</a>
                 </div>
             </div>
         </div>
@@ -503,9 +505,6 @@ document.addEventListener('keydown', (e) => {
 function initNav() {
     const toggle  = document.getElementById('nav-toggle');
     const content = document.getElementById('nav-content');
-    const imageSoonBtn = document.getElementById('imagevault-soon-btn');
-    const soonOverlay = document.getElementById('soon-overlay');
-    let soonTimer = null;
     if (!toggle || !content) return;
 
     function openNav() {
@@ -516,15 +515,6 @@ function initNav() {
     function closeNav() {
         content.classList.remove('open');
         toggle.setAttribute('aria-expanded', 'false');
-    }
-
-    function showSoon() {
-        if (!soonOverlay) return;
-        clearTimeout(soonTimer);
-        soonOverlay.classList.add('show');
-        soonTimer = setTimeout(() => {
-            soonOverlay.classList.remove('show');
-        }, 5000);
     }
 
     toggle.addEventListener('click', (e) => {
@@ -543,15 +533,6 @@ function initNav() {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeNav();
     });
-
-    if (imageSoonBtn) {
-        imageSoonBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            closeNav();
-            showSoon();
-        });
-    }
 }
 
 /* ── INIT - runs immediately since script is at end of body ── */
