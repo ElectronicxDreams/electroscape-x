@@ -1,4 +1,4 @@
-<!-- mobile3.html | Electroscape MX | 5.0 -->
+<!-- mobile3.html | Electroscape MX | 4.0 -->
 <!-- streamlined build: bottom frosted nav, visual-only progress strip, cyan mobile1-style grid + favourites -->
 <!DOCTYPE html>
 <html lang="en">
@@ -231,11 +231,8 @@
             display: grid;
             place-items: center;
         }
-        #floating-controls-panel.is-open,
-        #floating-controls-backdrop.is-open {
-            opacity: 1;
-        }
         #floating-controls-panel.is-open {
+            opacity: 1;
             pointer-events: auto;
             transform: translate(-50%, -50%) scale(1);
         }
@@ -360,91 +357,8 @@
         /* ============================================================
            PROGRESS
            ============================================================ */
-        #progress-wrap {
-            position: relative; z-index: 2;
-            padding: 8px 16px 0;
-        }
-        #progress-track {
-            height: 3px; border-radius: 999px;
-            background: transparent;
-            position: relative; cursor: default;
-            transition: opacity 0.2s ease;
-        }
-        #progress-track::after { content: ''; position: absolute; inset: -14px 0; }
-        @media (hover: none) { #progress-track::after { inset: -20px 0; } }
-        #progress-fill {
-            width: 0%; height: 100%; border-radius: inherit;
-            background: linear-gradient(90deg, var(--mag), var(--blue));
-            box-shadow: 0 0 12px rgba(255,67,247,.5), 0 0 12px rgba(31,123,255,.35);
-            transition: width 0.15s linear;
-        }
-        .time-row {
-            display: flex; justify-content: space-between;
-            margin-top: 5px;
-            color: rgba(192,132,252,.72);
-            font-family: 'Exo 2', sans-serif;
-            font-size: 11px;
-        }
-        #queue-mode-banner {
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            padding-top: 4px;
-        }
-        #queue-mode-banner.is-active { display: flex; }
-        #queue-mode-label {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 7px;
-            letter-spacing: 2px;
-            color: var(--cyan);
-            text-transform: uppercase;
-        }
-        #queue-mode-exit {
-            border: 1px solid rgba(32,221,255,0.28);
-            border-radius: 999px;
-            background: rgba(32,221,255,0.06);
-            color: var(--cyan);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 7px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            height: 18px;
-            padding: 0 8px;
-            cursor: pointer;
-        }
-        #queue-mode-exit:hover {
-            border-color: rgba(32,221,255,0.6);
-            background: rgba(32,221,255,0.10);
-        }
-
-        #progress-wrap { display: none !important; }
-        .time-row {
-            display: none;
-        }
-        #progress-track {
-            display: block;
-            height: 4px;
-            cursor: default;
-            background: rgba(255,255,255,0.10);
-        }
-        body.progress-hidden #progress-track {
-            opacity: 0;
-            pointer-events: none;
-        }
-        #queue-mode-banner {
-            position: fixed;
-            left: 10px;
-            right: 10px;
-            bottom: calc(66px + env(safe-area-inset-bottom));
-            z-index: 9320;
-            border: 1px solid rgba(32,221,255,0.25);
-            border-radius: 10px;
-            padding: 6px 8px;
-            background: rgba(2, 8, 16, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
+        /* Progress + queue-mode-banner UI removed — feature is fully replaced
+           by the in-flow fav-sheet "Now Controlling" label + nav-button dot. */
 
         /* ============================================================
            VIDEO GRID — 2-col default, 3-col locked >=621px
@@ -539,9 +453,6 @@
         body.fav-open #nav-popup-backdrop {
             opacity: 0;
             pointer-events: none;
-        }
-        body.fav-open #queue-mode-banner {
-            display: none !important;
         }
         #fav-header {
             display: grid; grid-template-columns: 1fr 36px;
@@ -699,7 +610,6 @@
             #top-zone { overflow: hidden; display: grid; grid-template-rows: auto auto auto auto; align-content: start; }
             #hero-wrap { margin: 3px 8px 0; max-height: none; display: flex; align-items: center; justify-content: center; }
             #hero-frame { width: min(100%, calc((100dvh - 160px) * 16 / 9)); max-height: calc(100dvh - 160px); margin: 0 auto; }
-            #progress-wrap { padding: 5px 14px 0; }
         }
 
         /* ============================================================
@@ -708,7 +618,6 @@
         @media (min-width: 621px) {
             #hero-wrap { margin-left: 6%; margin-right: 6%; max-height: 50dvh; }
             #hero-frame { max-height: calc(50dvh - 2px); }
-            #progress-wrap { padding-left: 8%; padding-right: 8%; }
             #video-grid { grid-template-columns: repeat(3, 1fr) !important; padding: 8px 20px 20px; }
         }
 
@@ -840,21 +749,6 @@
             </div>
         </section>
 
-        <!-- PROGRESS -->
-        <section id="progress-wrap">
-            <div id="progress-track">
-                <div id="progress-fill"></div>
-            </div>
-            <div class="time-row">
-                <span id="time-current">0:00</span>
-                <span id="time-total">0:00</span>
-            </div>
-            <div id="queue-mode-banner" aria-live="polite">
-                <span id="queue-mode-label">FAV QUEUE ACTIVE</span>
-                <button id="queue-mode-exit" type="button" aria-label="Exit favourites queue">Exit Fav Queue</button>
-            </div>
-        </section>
-
 
     </section>
     <section id="bottom-zone" aria-label="Scrollable playlist">
@@ -928,7 +822,7 @@
 
 <script>
 /* ============================================================
-
+   4.0 — Blue Midnight Build
    Engine ported from mobile2 ([M2] 1.0)
    ============================================================ */
 
@@ -1042,7 +936,6 @@
                         }
                     }
                     updatePlayIcon(ev.data);
-                    if (ev.data === YT.PlayerState.PLAYING && typeof window.esStartProgressTracker === 'function') window.esStartProgressTracker();
                 },
                 onError: function () {
                     var cur = window.esQueue && window.esQueue[window.esCurrentIndex];
@@ -1161,16 +1054,11 @@ function cloneQueue(queue) {
 }
 
 function updateQueueModeUI() {
-    var banner = document.getElementById('queue-mode-banner');
-    var label = document.getElementById('queue-mode-label');
     var favBtn = document.getElementById('nav-fav-btn');
     var footerLabel = document.getElementById('fav-queue-label');
-    if (!banner || !label) return;
     var favMode = (window.esQueueMode === 'fav');
-    banner.classList.toggle('is-active', favMode);
     if (favBtn) favBtn.classList.toggle('queue-active', favMode);
     if (footerLabel) footerLabel.textContent = 'Now Controlling: ' + (favMode ? 'Fav Queue' : 'Main Queue');
-    label.textContent = favMode ? 'FAV QUEUE ACTIVE' : 'MAIN QUEUE';
 }
 
 function setQueueMode(mode) {
@@ -1202,11 +1090,6 @@ function restoreMainQueue(autoplay, startAfterCurrent) {
         return;
     }
     playTrack(nextIndex, autoplay);
-}
-
-function scrollToTop() {
-    var bz = document.getElementById('bottom-zone');
-    if (bz && bz.scrollTo) bz.scrollTo({top:0, behavior:'smooth'}); else if (bz) bz.scrollTop = 0;
 }
 
 function resolvePlayableIndex(startIndex) {
@@ -1256,21 +1139,19 @@ function playTrack(index, autoplay) {
 
 function updatePlayIcon(state) {
     var playing = (state === 1);
-    document.body.classList.toggle('playing', playing);
-
-    var floatingPlayBtn = document.getElementById('floating-play');
-    var pauseSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-    var playSvg  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-    if (floatingPlayBtn) {
-        floatingPlayBtn.innerHTML = playing ? pauseSvg : playSvg;
-        floatingPlayBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
-    }
 
     var favPlayBtn = document.getElementById('fav-play-btn');
     if (favPlayBtn) {
         favPlayBtn.textContent = playing ? 'Pause' : 'Play';
         favPlayBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     }
+
+    var floatingPlayBtn = document.getElementById('floating-play');
+    if (!floatingPlayBtn) return;
+    var pauseSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+    var playSvg  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    floatingPlayBtn.innerHTML = playing ? pauseSvg : playSvg;
+    floatingPlayBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
 }
 
 function cssEscape(s) {
@@ -1321,40 +1202,6 @@ function cssEscape(s) {
     apply();
 }());
 
-/* --- PROGRESS BAR --- */
-(function () {
-    var body    = document.body;
-    var wrap    = document.getElementById('progress-wrap');
-    var fill    = document.getElementById('progress-fill');
-    var timeCur = document.getElementById('time-current');
-    var timeTot = document.getElementById('time-total');
-    var interval = null;
-
-    function fmt(s) { s=Math.max(0,Math.floor(s||0)); return Math.floor(s/60)+':'+(s%60<10?'0':'')+(s%60); }
-
-    function updateFill() {
-        var p = window.esPlayer; if (!p || typeof p.getDuration !== 'function') return;
-        var dur = p.getDuration(); if (!dur) return;
-        var cur = p.getCurrentTime(); var pct = (cur/dur)*100;
-        if (fill) fill.style.width = pct + '%';
-        if (timeCur) timeCur.textContent = fmt(cur);
-        if (timeTot) timeTot.textContent = fmt(dur);
-    }
-
-    window.esStartProgressTracker = function () {
-        if (interval) clearInterval(interval);
-        interval = setInterval(updateFill, 250);
-    };
-
-    /* Tap-to-hide visual seek bar */
-    if (wrap) {
-        wrap.addEventListener('click', function (e) {
-            if (e.target && e.target.closest && e.target.closest('#queue-mode-banner')) return;
-            body.classList.toggle('progress-hidden');
-        });
-    }
-}());
-
 /* --- FAV BUTTON FACTORY --- */
 function createFavButton(track) {
     var btn = document.createElement('button');
@@ -1397,9 +1244,6 @@ function closeFavSheet() {
         favs = favs || load();
         document.querySelectorAll('.v-fav-btn').forEach(function(b){ setHeart(b, isFav(b.getAttribute('data-id'), favs)); });
     }
-    function syncLikeHearts() {
-        return;
-    }
     function playFavAt(index) {
         var favs = load();
         var queue = favs.map(function(f){ var el=document.querySelector('.v-card[data-id="'+cssEscape(f.id)+'"]'); return el?{id:f.id,title:f.title,el:el}:null; }).filter(Boolean);
@@ -1424,7 +1268,7 @@ function closeFavSheet() {
         list.innerHTML='';
         empty.style.display=has?'none':'flex';
         footer.style.display=has?'block':'none';
-        if (actions) actions.style.display=has?'block':'none';
+        if (actions) actions.style.display=has?'flex':'none';
         favs.forEach(function(fav,idx){
             var row=document.createElement('li'); row.className='fav-row';
             var thumb=document.createElement('div'); thumb.className='fav-row-thumb';
@@ -1449,7 +1293,7 @@ function closeFavSheet() {
             play.addEventListener('click',function(e){e.stopPropagation();playFavAt(idx);});
             up.addEventListener('click',function(e){e.stopPropagation();moveFavBy(idx,-1);});
             down.addEventListener('click',function(e){e.stopPropagation();moveFavBy(idx,1);});
-            remove.addEventListener('click',function(e){e.stopPropagation();var next=load().filter(function(i){return i.id!==fav.id;});save(next);syncHearts(next);syncLikeHearts(next);renderFavSheet();});
+            remove.addEventListener('click',function(e){e.stopPropagation();var next=load().filter(function(i){return i.id!==fav.id;});save(next);syncHearts(next);renderFavSheet();});
         });
     };
 
@@ -1458,10 +1302,10 @@ function closeFavSheet() {
         var favs=load();
         if(isFav(track.id,favs)) favs=favs.filter(function(f){return f.id!==track.id;});
         else favs.push({id:track.id,title:track.title||track.id});
-        save(favs); syncHearts(favs); syncLikeHearts(favs);
+        save(favs); syncHearts(favs);
         if(document.getElementById('fav-sheet').classList.contains('is-open')) renderFavSheet();
     };
-    window.esSyncFavouriteButtons = function(){ var f=load(); syncHearts(f); syncLikeHearts(f); };
+    window.esSyncFavouriteButtons = function(){ var f=load(); syncHearts(f); };
 
     function favPrev() {
         if (!window.esQueue || !window.esQueue.length) return;
@@ -1500,7 +1344,7 @@ function closeFavSheet() {
     document.getElementById('fav-backdrop').addEventListener('click', closeFavSheet);
     document.getElementById('fav-close-btn').addEventListener('click', closeFavSheet);
     document.getElementById('fav-play-all-btn').addEventListener('click', function(e){ e.stopPropagation(); playFavAt(0); });
-    document.getElementById('fav-clear-btn').addEventListener('click', function(e){ e.stopPropagation(); var f=[]; save(f); syncHearts(f); syncLikeHearts(f); renderFavSheet(); });
+    document.getElementById('fav-clear-btn').addEventListener('click', function(e){ e.stopPropagation(); var f=[]; save(f); syncHearts(f); renderFavSheet(); });
 
     /* Repeat-all toggle for fav playlist (session-only, not persisted) */
     var repeatBtn = document.getElementById('fav-repeat-btn');
@@ -1522,9 +1366,8 @@ function closeFavSheet() {
     document.getElementById('fav-prev-btn').addEventListener('click', function(e){ e.stopPropagation(); favPrev(); });
     document.getElementById('fav-play-btn').addEventListener('click', function(e){ e.stopPropagation(); favPlayToggle(); });
     document.getElementById('fav-next-btn').addEventListener('click', function(e){ e.stopPropagation(); favNext(); });
-    document.getElementById('queue-mode-exit').addEventListener('click', function(){restoreMainQueue(true); this.blur && this.blur();});
     document.addEventListener('keydown', function(e){if(e.key==='Escape'&&document.getElementById('fav-sheet').classList.contains('is-open')) closeFavSheet();});
-    var _fi=load(); syncHearts(_fi); syncLikeHearts(_fi);
+    var _fi=load(); syncHearts(_fi);
     updateQueueModeUI();
 }());
 
@@ -1532,12 +1375,10 @@ function closeFavSheet() {
 (function () {
     var fab = document.getElementById('floating-controls-fab');
     var panel = document.getElementById('floating-controls-panel');
-    var backdrop = document.getElementById('floating-controls-backdrop');
-    if (!fab || !panel || !backdrop) return;
+    if (!fab || !panel) return;
 
     function setOpen(open) {
         panel.classList.toggle('is-open', open);
-        backdrop.classList.toggle('is-open', open);
         fab.setAttribute('aria-expanded', open ? 'true' : 'false');
         if (open) {
             // Defer so the same tap that opened the panel doesn't immediately close it
