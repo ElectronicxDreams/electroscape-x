@@ -58,13 +58,7 @@
             overflow-x: hidden;
             overflow-y: visible;
             background: #000;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(0,255,230,0.28) transparent;
         }
-
-        #bottom-zone::-webkit-scrollbar { width: 4px; }
-        #bottom-zone::-webkit-scrollbar-thumb { background: rgba(0,255,230,0.28); border-radius: 999px; }
 
         /* ============================================================
            NAV-POPUP
@@ -331,9 +325,6 @@
         .m-dim-toggle.is-active { box-shadow: 0 0 12px rgba(var(--accent-rgb),0.12); }
         .v-card:hover { border-color: rgba(var(--accent-rgb),0.3); }
         .v-card.active .v-card-title { color: var(--accent); }
-        .v-card-num { color: rgba(var(--accent-rgb),0.72); }
-        .v-play-btn { background: var(--accent); box-shadow: 0 0 8px rgba(var(--accent-rgb),0.25); }
-        .v-play-btn:hover { box-shadow: 0 0 16px rgba(var(--accent-rgb),0.5); }
         .v-fav-btn { border-color: rgba(var(--accent-rgb),0.2); color: var(--accent); }
         .v-fav-btn.is-active { border-color: rgba(var(--accent-rgb),0.5); background: rgba(var(--accent-rgb),0.08); }
         #nav-links-btn { border-color: rgba(var(--accent-rgb),0.22); background: rgba(var(--accent-rgb),0.06); color: var(--accent); }
@@ -379,17 +370,6 @@
         }
         .v-card.active .v-card-title { color: var(--cyan); }
 
-        .v-play-btn {
-            width: 26px; height: 26px; border-radius: 50%; border: none;
-            background: var(--cyan); color: #000;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; flex-shrink: 0;
-            box-shadow: 0 0 8px rgba(0,255,230,0.25);
-            transition: transform 0.15s, box-shadow 0.2s;
-        }
-        .v-play-btn:hover { transform: scale(1.15); box-shadow: 0 0 16px rgba(0,255,230,0.5); }
-        .v-play-btn svg { width: 12px; height: 12px; }
-
         .v-fav-btn {
             position: absolute; top: 6px; right: 6px;
             width: 24px; height: 24px; border-radius: 50%;
@@ -402,19 +382,8 @@
         .v-card:hover .v-fav-btn, .v-fav-btn.is-active { opacity: 1; }
         .v-fav-btn.is-active { border-color: rgba(0,255,230,0.5); background: rgba(0,255,230,0.08); }
 
-        /* v-card body centred; play button = cyan triangle overlay on thumb */
+        /* v-card body centred */
         .v-card-body { padding: 8px 9px 10px; text-align: center; }
-        .v-card-actions { display: none; }
-        .v-play-btn {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: auto; height: auto; border: none;
-            background: transparent; box-shadow: none; color: var(--cyan);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; opacity: 0; transition: opacity 0.2s;
-        }
-        .v-play-btn svg { width: 32px; height: 32px; filter: drop-shadow(0 0 8px rgba(0,255,230,0.8)); }
-        .v-card:hover .v-play-btn { opacity: 1; }
 
         /* in-player heart = like toggle */
         #p2m3-fav-open .fav-heart-path { fill: none; transition: fill 0.2s; }
@@ -1031,18 +1000,12 @@ function applyThumb(el, id) {
                 var thumb = document.createElement('div'); thumb.className = 'v-card-thumb'; applyThumb(thumb, track.id);
                 var body = document.createElement('div'); body.className = 'v-card-body';
                 var title = document.createElement('div'); title.className = 'v-card-title'; title.textContent = track.title;
-                var actions = document.createElement('div'); actions.className = 'v-card-actions';
-                var num = document.createElement('span'); num.className = 'v-card-num'; num.textContent = String(idx+1).padStart(2,'0');
-                var playBtn = document.createElement('button'); playBtn.className = 'v-play-btn'; playBtn.type = 'button';
-                playBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-                actions.appendChild(num); actions.appendChild(playBtn);
-                body.appendChild(title); body.appendChild(actions);
+                body.appendChild(title);
                 var fav = createFavButton(track);
                 card.appendChild(thumb); card.appendChild(body); card.appendChild(fav);
                 grid.appendChild(card);
 
                 card.addEventListener('click', function () { buildQueue(); playTrack(parseInt(card.getAttribute('data-idx'),10)); });
-                playBtn.addEventListener('click', function (e) { e.stopPropagation(); buildQueue(); playTrack(idx); });
             });
             buildQueue();
             if (typeof window.esSyncFavouriteButtons === 'function') window.esSyncFavouriteButtons();
@@ -1129,9 +1092,7 @@ function scrollToTop() {
         window,
         se,
         document.documentElement,
-        document.body,
-        document.getElementById('bottom-zone'),
-        document.getElementById('app-shell')
+        document.body
     ];
 
     targets.forEach(function (t) {
@@ -1239,11 +1200,10 @@ function cssEscape(s) {
     document.getElementById('p2m3-shuffle').addEventListener('click', doShuffle);
 
     /* fav sheet toggle from grid header */
-    [document.getElementById('nav-fav-btn')].forEach(function (b) {
-        if (b) b.addEventListener('click', function () {
-            var sheet = document.getElementById('fav-sheet');
-            sheet.classList.contains('is-open') ? closeFavSheet() : openFavSheet();
-        });
+    var navFavBtn = document.getElementById('nav-fav-btn');
+    if (navFavBtn) navFavBtn.addEventListener('click', function () {
+        var sheet = document.getElementById('fav-sheet');
+        sheet.classList.contains('is-open') ? closeFavSheet() : openFavSheet();
     });
 
     /* heart = like/unlike current track only */
@@ -1331,11 +1291,10 @@ function createFavButton(track) {
 
 /* --- FAV-SHEET --- */
 function syncFavSheetButtons(isOpen) {
-    [document.getElementById('nav-fav-btn')].forEach(function (btn) {
-        if (!btn) return;
-        btn.classList.toggle('is-active', isOpen);
-        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    });
+    var btn = document.getElementById('nav-fav-btn');
+    if (!btn) return;
+    btn.classList.toggle('is-active', isOpen);
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 }
 
 function openFavSheet() {

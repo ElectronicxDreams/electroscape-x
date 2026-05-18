@@ -1,11 +1,6 @@
 
 <!-- index.html | Electroscape |   -->
-<!--
-RENAME LOG (hardcoded record):
-former mobile1.html -> mobile1.html
-former mobile2.html -> mobile2.html
-former mobile3.html -> mobile3.html
--->
+ 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,18 +62,10 @@ body.glass-dark {
     --glass-blur: blur(22px) saturate(135%);
 }
 
-body.glass-dark #nav-popup,
-body.glass-dark .music-modal-box {
+body.glass-dark #nav-popup {
     background: var(--glass-panel-bg);
     border-color: var(--glass-border);
     box-shadow: var(--glass-shadow);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-}
-
-body.glass-dark #fav-backdrop,
-body.glass-dark #music-section {
-    background: var(--glass-backdrop-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
 }
@@ -97,8 +84,6 @@ body.glass-dark #player-container {
 /* Dark glass tuning: keep the link popup vivid, but make larger panels neutral black. */
 body.glass-dark #fav-backdrop {
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(18px) saturate(70%);
-    -webkit-backdrop-filter: blur(18px) saturate(70%);
 }
 
 body.glass-dark .fav-row {
@@ -735,10 +720,6 @@ body.glass-dark .music-card {
     gap: 10px;
 }
 
-.platform-label::after {
-    content: none;
-}
-
 .platform-dot {
     width: 7px;
     height: 7px;
@@ -1017,8 +998,6 @@ body.ctrl-hidden #ctrl-hide-toggle {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.26s;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
 }
 #fav-backdrop.is-visible {
     opacity: 1;
@@ -1075,22 +1054,44 @@ body.ctrl-hidden #ctrl-hide-toggle {
 #fav-close-btn:hover { background: rgba(0,255,230,0.06); }
 #fav-actions {
     display: none;
+    flex-direction: column;
+    gap: 6px;
     padding: 6px 10px 4px;
     flex-shrink: 0;
 }
+.fav-actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
 #fav-play-all-btn,
-#fav-clear-btn {
+#fav-clear-btn,
+#fav-repeat-btn {
     border: 1px solid rgba(0,255,230,0.28);
     border-radius: 4px;
     background: rgba(0,255,230,0.06);
     color: #00FFE6;
     font-family: 'Orbitron', sans-serif;
-    font-size: 7px;
+    font-size: 8px;
     letter-spacing: 2px;
     text-transform: uppercase;
+    padding: 7px 10px;
     cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
 }
-#fav-play-all-btn { width: 100%; padding: 6px 10px; }
+#fav-play-all-btn:hover,
+#fav-clear-btn:hover,
+#fav-repeat-btn:hover {
+    border-color: rgba(0,255,230,0.6);
+    background: rgba(0,255,230,0.10);
+}
+#fav-repeat-btn { width: 100%; }
+#fav-repeat-btn.is-active {
+    border-color: rgba(0,255,230,0.75);
+    background: rgba(0,255,230,0.16);
+    color: #b6fff4;
+    box-shadow: 0 0 0 1px rgba(0,255,230,0.14) inset;
+}
 #fav-empty {
     display: flex;
     flex: 1;
@@ -1189,21 +1190,46 @@ body.ctrl-hidden #ctrl-hide-toggle {
 }
 #fav-footer {
     display: none;
-    justify-content: center;
-    padding: 6px 10px 8px;
+    flex-direction: column;
+    gap: 7px;
+    padding: 8px 10px 10px;
     border-top: 1px solid rgba(255,255,255,0.07);
     flex-shrink: 0;
 }
-#fav-clear-btn {
-    padding: 5px 14px;
+#fav-queue-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(0,255,230,0.78);
+    text-align: center;
+}
+.fav-transport-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+.fav-panel-btn {
+    height: 32px;
+    border: 1px solid rgba(0,255,230,0.22);
+    border-radius: 4px;
+    background: rgba(0,255,230,0.04);
     color: #00FFE6;
-    border-color: rgba(0,255,230,0.32);
-    background: transparent;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, opacity 0.2s;
 }
-#fav-clear-btn:hover {
-    border-color: #00FFE6;
-    background: rgba(0,255,230,0.06);
+.fav-panel-btn:hover:not(:disabled) {
+    border-color: rgba(0,255,230,0.55);
+    background: rgba(0,255,230,0.08);
 }
+.fav-panel-btn:disabled { opacity: 0.35; cursor: default; }
 body.fav-open { overflow: hidden; }
 body.fav-open #nav-top,
 body.fav-open #nav-logo {
@@ -1319,7 +1345,7 @@ body.fav-open #nav-popup-backdrop {
         <div id="video-grid"></div>
 
         <!-- VERSION FOOTER -->
-        <div id="version-footer">8.0</div>
+        <div id="version-footer">8.1</div>
 
     </div><!-- end #player-section -->
 
@@ -1333,12 +1359,21 @@ body.fav-open #nav-popup-backdrop {
             <button id="fav-close-btn" type="button" aria-label="Close favourites">&times;</button>
         </div>
         <div id="fav-actions">
-            <button id="fav-play-all-btn" type="button">Play All</button>
+            <div class="fav-actions-row">
+                <button id="fav-play-all-btn" type="button">Play All</button>
+                <button id="fav-clear-btn" type="button">Clear All</button>
+            </div>
+            <button id="fav-repeat-btn" type="button" aria-pressed="false">Repeat All</button>
         </div>
         <div id="fav-empty">No favourites yet.</div>
         <ul id="fav-list"></ul>
         <div id="fav-footer">
-            <button id="fav-clear-btn" type="button">Clear All</button>
+            <div id="fav-queue-label">Now Controlling: Main Queue</div>
+            <div class="fav-transport-row">
+                <button class="fav-panel-btn" id="fav-prev-btn" type="button">Prev</button>
+                <button class="fav-panel-btn" id="fav-play-btn" type="button">Play</button>
+                <button class="fav-panel-btn" id="fav-next-btn" type="button">Next</button>
+            </div>
         </div>
     </section>
 
@@ -1505,14 +1540,12 @@ body.fav-open #nav-popup-backdrop {
     var musicSection = document.getElementById('music-section');
     var musicBtn     = document.getElementById('nav-music-btn');
     var closeBtn     = document.getElementById('music-close-btn');
-    var logo         = document.getElementById('nav-logo');
     var modalBox     = musicSection.querySelector('.music-modal-box');
 
     function openMusic() {
         musicSection.classList.add('active');
         musicSection.setAttribute('aria-hidden', 'false');
         if (typeof window.esHideNavLogo === 'function') window.esHideNavLogo(false);
-        else logo.classList.add('is-hidden');
         if (modalBox) modalBox.scrollTo({ top: 0, behavior: 'smooth' });
         if (closeBtn) closeBtn.focus({ preventScroll: true });
     }
@@ -1521,7 +1554,6 @@ body.fav-open #nav-popup-backdrop {
         musicSection.classList.remove('active');
         musicSection.setAttribute('aria-hidden', 'true');
         if (typeof window.esShowNavLogo === 'function') window.esShowNavLogo();
-        else logo.classList.remove('is-hidden');
     }
 
     musicBtn.addEventListener('click', openMusic);
@@ -1543,7 +1575,6 @@ body.fav-open #nav-popup-backdrop {
    ============================================================ */
 (function () {
     var btn   = document.getElementById('nav-links-btn');
-    var logo  = document.getElementById('nav-logo');
     var popup = document.getElementById('nav-popup');
     var backdrop = document.getElementById('nav-popup-backdrop');
     var popupTimer = null;
@@ -1564,7 +1595,6 @@ body.fav-open #nav-popup-backdrop {
         btn.setAttribute('aria-expanded', 'true');
         armPopupTimer();
         if (typeof window.esHideNavLogo === 'function') window.esHideNavLogo(false);
-        else logo.classList.add('is-hidden');
     }
 
     function closePopup() {
@@ -1575,7 +1605,6 @@ body.fav-open #nav-popup-backdrop {
         btn.setAttribute('aria-expanded', 'false');
         clearPopupTimer();
         if (typeof window.esShowNavLogo === 'function') window.esShowNavLogo();
-        else logo.classList.remove('is-hidden');
     }
 
     btn.addEventListener('click', function (e) {
@@ -1665,7 +1694,9 @@ body.fav-open #nav-popup-backdrop {
                             window.esCurrentIndex >= (window.esQueue.length - 1)
                         );
                         if (atFavEnd) {
-                            if (window.esMainQueue && window.esMainQueue.length) {
+                            if (window.esRepeatFav) {
+                                playTrack(0);
+                            } else if (window.esMainQueue && window.esMainQueue.length) {
                                 restoreMainQueue(true, true);
                             } else {
                                 if (window.esPlayer && typeof window.esPlayer.pauseVideo === 'function') window.esPlayer.pauseVideo();
@@ -1932,7 +1963,7 @@ function cssEscape(s) {
         list.innerHTML = '';
         empty.style.display = hasItems ? 'none' : 'flex';
         footer.style.display = hasItems ? 'flex' : 'none';
-        actions.style.display = hasItems ? 'block' : 'none';
+        actions.style.display = hasItems ? 'flex' : 'none';
 
         favs.forEach(function (fav, idx) {
             var row = document.createElement('li');
@@ -2088,6 +2119,61 @@ function cssEscape(s) {
         syncHearts([]);
         render();
     });
+
+    /* Repeat-all toggle for fav playlist (session-only, not persisted) */
+    var repeatBtn = document.getElementById('fav-repeat-btn');
+    function applyRepeatUI() {
+        var on = !!window.esRepeatFav;
+        repeatBtn.classList.toggle('is-active', on);
+        repeatBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        repeatBtn.textContent = on ? 'Repeat All: On' : 'Repeat All';
+    }
+    window.esRepeatFav = false;
+    applyRepeatUI();
+    window.esApplyRepeatUI = applyRepeatUI;
+    repeatBtn.addEventListener('click', function () {
+        window.esRepeatFav = !window.esRepeatFav;
+        applyRepeatUI();
+        repeatBtn.blur && repeatBtn.blur();
+    });
+
+    /* Fav-sheet bottom transport (Prev / Play / Next) */
+    function favPrev() {
+        if (!window.esQueue || !window.esQueue.length) return;
+        if (window.esCurrentIndex < 0) { playTrack(0); return; }
+        var n = window.esQueue.length;
+        var target = window.esCurrentIndex - 1;
+        if (target < 0) {
+            if (window.esQueueMode === 'fav' && window.esRepeatFav) target = n - 1;
+            else target = 0;
+        }
+        playTrack(target);
+    }
+    function favNext() {
+        if (!window.esQueue || !window.esQueue.length) return;
+        if (window.esCurrentIndex < 0) { playTrack(0); return; }
+        var n = window.esQueue.length;
+        var target = window.esCurrentIndex + 1;
+        if (target >= n) {
+            if (window.esQueueMode === 'fav' && window.esRepeatFav) target = 0;
+            else target = n - 1;
+        }
+        playTrack(target);
+    }
+    function favPlayToggle() {
+        var p = window.esPlayer; if (!p) return;
+        window.esUserInitiatedPlayback = true;
+        var s = (typeof p.getPlayerState === 'function') ? p.getPlayerState() : -1;
+        if (s === 1 && typeof p.pauseVideo === 'function') p.pauseVideo();
+        else if ((s === 2 || s === 5) && typeof p.playVideo === 'function') p.playVideo();
+        else if (window.esQueue && window.esQueue.length) {
+            if (window.esCurrentIndex < 0) playTrack(0);
+            else if (typeof p.playVideo === 'function') p.playVideo();
+        }
+    }
+    document.getElementById('fav-prev-btn').addEventListener('click', function (e) { e.stopPropagation(); favPrev(); });
+    document.getElementById('fav-play-btn').addEventListener('click', function (e) { e.stopPropagation(); favPlayToggle(); });
+    document.getElementById('fav-next-btn').addEventListener('click', function (e) { e.stopPropagation(); favNext(); });
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && sheet.classList.contains('is-open')) close();
     });
@@ -2115,6 +2201,10 @@ function buildQueue() {
     });
     window.esMainQueue = cloneQueue(window.esQueue);
     setQueueMode('main');
+    if (window.esRepeatFav) {
+        window.esRepeatFav = false;
+        if (typeof window.esApplyRepeatUI === 'function') window.esApplyRepeatUI();
+    }
 }
 
 function setActiveCard(index) {
@@ -2144,6 +2234,8 @@ function updateQueueModeUI() {
     if (label) label.textContent = favMode ? 'FAV QUEUE ACTIVE' : 'MAIN QUEUE';
     var navFavBtn = document.getElementById('nav-fav-btn');
     if (navFavBtn) navFavBtn.classList.toggle('queue-active', favMode);
+    var footerLabel = document.getElementById('fav-queue-label');
+    if (footerLabel) footerLabel.textContent = 'Now Controlling: ' + (favMode ? 'Fav Queue' : 'Main Queue');
 }
 
 function setQueueMode(mode) {
@@ -2189,14 +2281,6 @@ function resolvePlayableIndex(startIndex) {
 }
 
 function scrollToTop() {
-    var scroller = document.scrollingElement || document.documentElement || document.body;
-    if (typeof window.scrollTo === 'function') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    if (scroller) {
-        if (typeof scroller.scrollTo === 'function') scroller.scrollTo({ top: 0, behavior: 'smooth' });
-        scroller.scrollTop = 0;
-    }
     var playerSection = document.getElementById('player-section');
     if (playerSection && typeof playerSection.scrollIntoView === 'function') {
         playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2254,6 +2338,11 @@ function updatePlayIcon(state) {
     if (btn) {
         btn.classList.toggle('is-playing', playing);
         btn.innerHTML = playing ? pauseSvg : playSvg;
+    }
+    var favPlayBtn = document.getElementById('fav-play-btn');
+    if (favPlayBtn) {
+        favPlayBtn.textContent = playing ? 'Pause' : 'Play';
+        favPlayBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     }
 }
 
@@ -2422,7 +2511,7 @@ function updatePlayIcon(state) {
         var p = window.esPlayer;
         if (!p || typeof p.getDuration !== 'function') return;
         var rect = track.getBoundingClientRect();
-        var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        var clientX = e.clientX;
         var pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
         var duration = p.getDuration();
         if (!duration) return;
